@@ -1,0 +1,7 @@
+.idea/
+*.sln
+*.user
+*.dll
+*.exe
+*/bin/
+*/obj/
