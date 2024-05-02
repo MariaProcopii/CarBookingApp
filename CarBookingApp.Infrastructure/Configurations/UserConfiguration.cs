@@ -1,9 +1,9 @@
-using CarBookingApp.Enum;
-using CarBookingApp.Model;
+using CarBookingApp.Domain.Enum;
+using CarBookingApp.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Configurations;
+namespace CarBookingApp.Infrastructure.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
@@ -17,8 +17,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Gender)
         .HasConversion(g => g.ToString(), 
-            g => Enum.Parse<Gender>(g));
+            g => System.Enum.Parse<Gender>(g));
 
+        builder.Property(u => u.Age)
+            .HasColumnName("age");
+            
         builder.ToTable("Users", t =>
         {
             t.HasCheckConstraint("CK_User_Age_Adult", "age >= 18");
@@ -35,6 +38,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder
             .Property(u => u.PhoneNumber)
             .HasMaxLength(50);
+        
+        builder
+            .HasIndex(u => u.PhoneNumber)
+            .IsUnique();
 
         builder
             .HasMany(u => u.BookedRides)
@@ -47,7 +54,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         
         builder
             .Property<DateTime>("CreatedAt")
-            .HasColumnType("datetime")
+            .HasColumnType("timestamp with time zone")
             .HasDefaultValueSql("now()")
             .IsRequired();
     }

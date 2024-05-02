@@ -1,9 +1,9 @@
 using System.Reflection;
-using CarBookingApp.Model;
+using CarBookingApp.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Configurations;
+namespace CarBookingApp.Infrastructure.Configurations;
 
 public class CarBookingAppDbContext : DbContext
 {

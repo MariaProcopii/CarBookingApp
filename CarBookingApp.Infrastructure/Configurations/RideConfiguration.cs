@@ -1,8 +1,8 @@
-using CarBookingApp.Model;
+using CarBookingApp.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Configurations;
+namespace CarBookingApp.Infrastructure.Configurations;
 
 public class RideConfiguration : IEntityTypeConfiguration<Ride>
 {
@@ -13,18 +13,12 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
-
-        builder.Property(r => r.DestinationFrom)
-            .HasMaxLength(50);
         
         builder
             .HasOne(r => r.DestinationTo)
             .WithMany()
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
-        
-        builder.Property(r => r.DestinationTo)
-            .HasMaxLength(50);
         
         builder
             .Property(r => r.AvailableSeats)
@@ -41,15 +35,10 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
             .HasOne(r => r.Owner)
             .WithMany(u => u.CreatedRides)
             .IsRequired();
-
-        builder
-            .HasOne(r => r.RideDetail)
-            .WithOne(r => r.Ride)
-            .HasForeignKey<RideDetail>();
         
         builder
             .Property<DateTime>("CreatedAt")
-            .HasColumnType("datetime")
+            .HasColumnType("timestamp with time zone")
             .HasDefaultValueSql("now()")
             .IsRequired();
     }

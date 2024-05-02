@@ -1,8 +1,8 @@
-using CarBookingApp.Model;
+using CarBookingApp.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Configurations;
+namespace CarBookingApp.Infrastructure.Configurations;
 
 public class EntityConfiguration : IEntityTypeConfiguration<Entity>
 {

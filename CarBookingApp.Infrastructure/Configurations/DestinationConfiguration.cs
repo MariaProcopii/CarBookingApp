@@ -1,9 +1,9 @@
-using CarBookingApp.Enum;
-using CarBookingApp.Model;
+using CarBookingApp.Domain.Enum;
+using CarBookingApp.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Configurations;
+namespace CarBookingApp.Infrastructure.Configurations;
 
 public class DestinationConfiguration : IEntityTypeConfiguration<Destination>
 {
