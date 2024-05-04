@@ -97,25 +97,27 @@ namespace CarBookingApp.Infrastructure.Migrations
                 name: "RideReviews",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
-                    ReviewerId = table.Column<int>(type: "integer", nullable: false),
-                    rating = table.Column<float>(type: "real", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RideReviewerId = table.Column<int>(type: "integer", nullable: false),
+                    RideRevieweeId = table.Column<int>(type: "integer", nullable: false),
+                    Rating = table.Column<float>(type: "real", nullable: false),
                     ReviewComment = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RideReviews", x => x.Id);
-                    table.CheckConstraint("CK_RideReviews_Rating", "rating >= 0");
+                    table.CheckConstraint("CK_RideReviews_Rating", " \"Rating\" >= 0");
                     table.ForeignKey(
-                        name: "FK_RideReviews_Users_Id",
-                        column: x => x.Id,
+                        name: "FK_RideReviews_Users_RideRevieweeId",
+                        column: x => x.RideRevieweeId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RideReviews_Users_ReviewerId",
-                        column: x => x.ReviewerId,
+                        name: "FK_RideReviews_Users_RideReviewerId",
+                        column: x => x.RideReviewerId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -263,9 +265,15 @@ namespace CarBookingApp.Infrastructure.Migrations
                 column: "RideDetailId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RideReviews_ReviewerId",
+                name: "IX_RideReviews_RideRevieweeId",
                 table: "RideReviews",
-                column: "ReviewerId",
+                column: "RideRevieweeId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RideReviews_RideReviewerId",
+                table: "RideReviews",
+                column: "RideReviewerId",
                 unique: true);
 
             migrationBuilder.CreateIndex(

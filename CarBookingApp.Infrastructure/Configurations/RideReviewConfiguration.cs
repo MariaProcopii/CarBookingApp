@@ -10,12 +10,12 @@ public class RideReviewConfiguration : IEntityTypeConfiguration<RideReview>
     {
         builder.HasOne(r => r.Reviewer)
             .WithOne()
-            .HasForeignKey<RideReview>()
+            .HasForeignKey<RideReview>("RideReviewerId")
             .IsRequired();
 
         builder.HasOne(r => r.Reviewee)
             .WithOne()
-            .HasForeignKey<RideReview>()
+            .HasForeignKey<RideReview>("RideRevieweeId")
             .IsRequired();
         
         builder
@@ -23,15 +23,11 @@ public class RideReviewConfiguration : IEntityTypeConfiguration<RideReview>
             .HasColumnType("datetime")
             .HasDefaultValueSql("now()")
             .IsRequired();
-
-        builder.Property(r => r.Rating)
-            .HasColumnName("rating");
-
         
         builder.ToTable("RideReviews",
             t =>
             {
-                t.HasCheckConstraint("CK_RideReviews_Rating", "rating >= 0");
+                t.HasCheckConstraint("CK_RideReviews_Rating", " \"Rating\" >= 0");
             });
         
         builder

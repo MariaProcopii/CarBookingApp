@@ -138,7 +138,10 @@ namespace CarBookingApp.Infrastructure.Migrations
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideReview", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -146,24 +149,29 @@ namespace CarBookingApp.Infrastructure.Migrations
                         .HasDefaultValueSql("now()");
 
                     b.Property<float>("Rating")
-                        .HasColumnType("real")
-                        .HasColumnName("rating");
+                        .HasColumnType("real");
 
                     b.Property<string>("ReviewComment")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ReviewerId")
+                    b.Property<int>("RideRevieweeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RideReviewerId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReviewerId")
+                    b.HasIndex("RideRevieweeId")
+                        .IsUnique();
+
+                    b.HasIndex("RideReviewerId")
                         .IsUnique();
 
                     b.ToTable("RideReviews", null, t =>
                         {
-                            t.HasCheckConstraint("CK_RideReviews_Rating", "rating >= 0");
+                            t.HasCheckConstraint("CK_RideReviews_Rating", " \"Rating\" >= 0");
                         });
 
                     b.HasDiscriminator().HasValue("RideReview");
@@ -365,13 +373,13 @@ namespace CarBookingApp.Infrastructure.Migrations
                 {
                     b.HasOne("CarBookingApp.Domain.Model.User", "Reviewee")
                         .WithOne()
-                        .HasForeignKey("CarBookingApp.Domain.Model.RideReview", "Id")
+                        .HasForeignKey("CarBookingApp.Domain.Model.RideReview", "RideRevieweeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarBookingApp.Domain.Model.User", "Reviewer")
                         .WithOne()
-                        .HasForeignKey("CarBookingApp.Domain.Model.RideReview", "ReviewerId")
+                        .HasForeignKey("CarBookingApp.Domain.Model.RideReview", "RideReviewerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
