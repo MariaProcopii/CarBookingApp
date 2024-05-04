@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\CarBookingApp.Application\CarBookingApp.Application.csproj" />
       <ProjectReference Include="..\CarBookingApp.Domain\CarBookingApp.Domain.csproj" />
     </ItemGroup>
 
