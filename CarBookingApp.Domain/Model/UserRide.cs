@@ -2,7 +2,7 @@ using CarBookingApp.Domain.Enum;
 
 namespace CarBookingApp.Domain.Model;
 
-public class PassengerRide
+public class UserRide
 {
     public int PassengerId { get; set; } 
     public int RideId { get; set; }

@@ -2,8 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarBookingApp.Domain", "CarBookingApp.Domain\CarBookingApp.Domain.csproj", "{D03F6786-223B-4006-94D0-2E57A889CAD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarBookingApp.Infrastructure", "CarBookingApp.Infrastructure\CarBookingApp.Infrastructure.csproj", "{ED457F63-273F-43AC-8B89-EA91C209660E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarBookingApp.Infrastructure", "CarBookingApp.Infrastructure\CarBookingApp.Infrastructure.csproj", "{F5CB4248-1B04-463B-9331-AA82E74D6374}"
 EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +19,9 @@ Global
 		{ED457F63-273F-43AC-8B89-EA91C209660E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED457F63-273F-43AC-8B89-EA91C209660E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED457F63-273F-43AC-8B89-EA91C209660E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5CB4248-1B04-463B-9331-AA82E74D6374}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5CB4248-1B04-463B-9331-AA82E74D6374}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5CB4248-1B04-463B-9331-AA82E74D6374}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5CB4248-1B04-463B-9331-AA82E74D6374}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

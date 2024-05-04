@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CarBookingApp.Infrastructure.Migrations
 {
     [DbContext(typeof(CarBookingAppDbContext))]
-    [Migration("20240502084534_Initial")]
+    [Migration("20240504182850_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,89 +25,13 @@ namespace CarBookingApp.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.HasSequence("EntitySequence");
-
-            modelBuilder.Entity("CarBookingApp.Domain.Model.Entity", b =>
+            modelBuilder.Entity("CarBookingApp.Domain.Model.Destination", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValueSql("nextval('\"EntitySequence\"')");
-
-                    NpgsqlPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
-
-                    b.HasKey("Id");
-
-                    b.ToTable((string)null);
-
-                    b.UseTpcMappingStrategy();
-                });
-
-            modelBuilder.Entity("CarBookingApp.Domain.Model.PassengerRide", b =>
-                {
-                    b.Property<int>("PassengerId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("RideId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("BookingStatus")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("PENDING");
-
-                    b.Property<int>("PassengersId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("RideStatus")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("UPCOMING");
-
-                    b.HasKey("PassengerId", "RideId");
-
-                    b.HasIndex("PassengersId");
-
-                    b.HasIndex("RideId");
-
-                    b.ToTable("PassengerRide");
-                });
-
-            modelBuilder.Entity("FacilityRideDetail", b =>
-                {
-                    b.Property<int>("FacilitiesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RideDetailId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("FacilitiesId", "RideDetailId");
-
-                    b.HasIndex("RideDetailId");
-
-                    b.ToTable("FacilityRideDetail");
-                });
-
-            modelBuilder.Entity("UserVehicle", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("VehiclesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "VehiclesId");
-
-                    b.HasIndex("VehiclesId");
-
-                    b.ToTable("UserVehicle");
-                });
-
-            modelBuilder.Entity("CarBookingApp.Domain.Model.Destination", b =>
-                {
-                    b.HasBaseType("CarBookingApp.Domain.Model.Entity");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -118,29 +42,39 @@ namespace CarBookingApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.HasKey("Id");
+
                     b.ToTable("Destinations");
+
+                    b.HasDiscriminator().HasValue("Destination");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Facility", b =>
                 {
-                    b.HasBaseType("CarBookingApp.Domain.Model.Entity");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FacilityType")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.HasKey("Id");
+
                     b.ToTable("Facilities");
+
+                    b.HasDiscriminator().HasValue("Facility");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Ride", b =>
                 {
-                    b.HasBaseType("CarBookingApp.Domain.Model.Entity");
-
-                    b.Property<int>("AvailableSeats")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(1)
-                        .HasColumnName("available_seats");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -159,6 +93,13 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.Property<int>("OwnerId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TotalSeats")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.HasKey("Id");
+
                     b.HasIndex("DestinationFromId");
 
                     b.HasIndex("DestinationToId");
@@ -167,13 +108,16 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.ToTable("Rides", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Ride_AvailableSeats", "available_seats >= 1 AND available_seats <= 6");
+                            t.HasCheckConstraint("CK_Ride_AvailableSeats", "\"TotalSeats\" >= 1 AND \"TotalSeats\" <= 6");
                         });
+
+                    b.HasDiscriminator().HasValue("Ride");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideDetail", b =>
                 {
-                    b.HasBaseType("CarBookingApp.Domain.Model.Entity");
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
 
                     b.Property<string>("PickUpSpot")
                         .HasMaxLength(50)
@@ -182,24 +126,22 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("numeric")
-                        .HasDefaultValue(0m)
-                        .HasColumnName("price");
+                        .HasDefaultValue(0m);
 
-                    b.Property<int>("RideId")
-                        .HasColumnType("integer");
-
-                    b.HasIndex("RideId")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.ToTable("RideDetails", null, t =>
                         {
-                            t.HasCheckConstraint("CK_RideDetail_Price_GreaterThanZero", "price >= 0");
+                            t.HasCheckConstraint("CK_RideDetail_Price_GreaterThanZero", "\"Price\" >= 0");
                         });
+
+                    b.HasDiscriminator().HasValue("RideDetail");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideReview", b =>
                 {
-                    b.HasBaseType("CarBookingApp.Domain.Model.Entity");
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -214,14 +156,10 @@ namespace CarBookingApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("RevieweeId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("ReviewerId")
                         .HasColumnType("integer");
 
-                    b.HasIndex("RevieweeId")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.HasIndex("ReviewerId")
                         .IsUnique();
@@ -230,20 +168,25 @@ namespace CarBookingApp.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_RideReviews_Rating", "rating >= 0");
                         });
+
+                    b.HasDiscriminator().HasValue("RideReview");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.User", b =>
                 {
-                    b.HasBaseType("CarBookingApp.Domain.Model.Entity");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.Property<int>("Age")
-                        .HasColumnType("integer")
-                        .HasColumnName("age");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -269,6 +212,8 @@ namespace CarBookingApp.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.HasKey("Id");
+
                     b.HasIndex("Email")
                         .IsUnique();
 
@@ -277,36 +222,193 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.ToTable("Users", null, t =>
                         {
-                            t.HasCheckConstraint("CK_User_Age_Adult", "age >= 18");
+                            t.HasCheckConstraint("CK_User_Age_IsAdult", "EXTRACT(YEAR FROM CURRENT_DATE) - extract(YEAR FROM \"DateOfBirth\") >= 18");
                         });
+
+                    b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("CarBookingApp.Domain.Model.UserRide", b =>
+                {
+                    b.Property<int>("PassengerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RideId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("BookingStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("PENDING");
+
+                    b.Property<string>("RideStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("UPCOMING");
+
+                    b.HasKey("PassengerId", "RideId");
+
+                    b.HasIndex("RideId");
+
+                    b.ToTable("UserRide");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Vehicle", b =>
                 {
-                    b.HasBaseType("CarBookingApp.Domain.Model.Entity");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Make")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ManufactureYear")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Vender")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
                     b.ToTable("Vehicles");
+
+                    b.HasDiscriminator().HasValue("Vehicle");
                 });
 
-            modelBuilder.Entity("CarBookingApp.Domain.Model.PassengerRide", b =>
+            modelBuilder.Entity("DriverVehicle", b =>
+                {
+                    b.Property<int>("DriverId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VehiclesId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("DriverId", "VehiclesId");
+
+                    b.HasIndex("VehiclesId");
+
+                    b.ToTable("DriverVehicle");
+                });
+
+            modelBuilder.Entity("FacilityRideDetail", b =>
+                {
+                    b.Property<int>("FacilitiesId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RideDetailId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("FacilitiesId", "RideDetailId");
+
+                    b.HasIndex("RideDetailId");
+
+                    b.ToTable("FacilityRideDetail");
+                });
+
+            modelBuilder.Entity("CarBookingApp.Domain.Model.Driver", b =>
+                {
+                    b.HasBaseType("CarBookingApp.Domain.Model.User");
+
+                    b.Property<int>("YearsOfExperience")
+                        .HasColumnType("integer");
+
+                    b.ToTable("Drivers", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_User_Age_IsAdult", "EXTRACT(YEAR FROM CURRENT_DATE) - extract(YEAR FROM \"DateOfBirth\") >= 18");
+
+                            t.HasCheckConstraint("CK_Driver_Years_Of_EXP_PositiveNr", " \"YearsOfExperience\" >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("CarBookingApp.Domain.Model.Ride", b =>
+                {
+                    b.HasOne("CarBookingApp.Domain.Model.Destination", "DestinationFrom")
+                        .WithMany()
+                        .HasForeignKey("DestinationFromId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CarBookingApp.Domain.Model.Destination", "DestinationTo")
+                        .WithMany()
+                        .HasForeignKey("DestinationToId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CarBookingApp.Domain.Model.Driver", "Owner")
+                        .WithMany("CreatedRides")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DestinationFrom");
+
+                    b.Navigation("DestinationTo");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("CarBookingApp.Domain.Model.RideDetail", b =>
+                {
+                    b.HasOne("CarBookingApp.Domain.Model.Ride", "Ride")
+                        .WithOne("RideDetail")
+                        .HasForeignKey("CarBookingApp.Domain.Model.RideDetail", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ride");
+                });
+
+            modelBuilder.Entity("CarBookingApp.Domain.Model.RideReview", b =>
+                {
+                    b.HasOne("CarBookingApp.Domain.Model.User", "Reviewee")
+                        .WithOne()
+                        .HasForeignKey("CarBookingApp.Domain.Model.RideReview", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CarBookingApp.Domain.Model.User", "Reviewer")
+                        .WithOne()
+                        .HasForeignKey("CarBookingApp.Domain.Model.RideReview", "ReviewerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reviewee");
+
+                    b.Navigation("Reviewer");
+                });
+
+            modelBuilder.Entity("CarBookingApp.Domain.Model.UserRide", b =>
                 {
                     b.HasOne("CarBookingApp.Domain.Model.User", null)
                         .WithMany()
-                        .HasForeignKey("PassengersId")
+                        .HasForeignKey("PassengerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarBookingApp.Domain.Model.Ride", null)
                         .WithMany()
                         .HasForeignKey("RideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DriverVehicle", b =>
+                {
+                    b.HasOne("CarBookingApp.Domain.Model.Driver", null)
+                        .WithMany()
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CarBookingApp.Domain.Model.Vehicle", null)
+                        .WithMany()
+                        .HasForeignKey("VehiclesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -326,76 +428,13 @@ namespace CarBookingApp.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("UserVehicle", b =>
+            modelBuilder.Entity("CarBookingApp.Domain.Model.Driver", b =>
                 {
                     b.HasOne("CarBookingApp.Domain.Model.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CarBookingApp.Domain.Model.Vehicle", null)
-                        .WithMany()
-                        .HasForeignKey("VehiclesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CarBookingApp.Domain.Model.Ride", b =>
-                {
-                    b.HasOne("CarBookingApp.Domain.Model.Destination", "DestinationFrom")
-                        .WithMany()
-                        .HasForeignKey("DestinationFromId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CarBookingApp.Domain.Model.Destination", "DestinationTo")
-                        .WithMany()
-                        .HasForeignKey("DestinationToId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CarBookingApp.Domain.Model.User", "Owner")
-                        .WithMany("CreatedRides")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DestinationFrom");
-
-                    b.Navigation("DestinationTo");
-
-                    b.Navigation("Owner");
-                });
-
-            modelBuilder.Entity("CarBookingApp.Domain.Model.RideDetail", b =>
-                {
-                    b.HasOne("CarBookingApp.Domain.Model.Ride", "Ride")
-                        .WithOne("RideDetail")
-                        .HasForeignKey("CarBookingApp.Domain.Model.RideDetail", "RideId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ride");
-                });
-
-            modelBuilder.Entity("CarBookingApp.Domain.Model.RideReview", b =>
-                {
-                    b.HasOne("CarBookingApp.Domain.Model.User", "Reviewee")
                         .WithOne()
-                        .HasForeignKey("CarBookingApp.Domain.Model.RideReview", "RevieweeId")
+                        .HasForeignKey("CarBookingApp.Domain.Model.Driver", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("CarBookingApp.Domain.Model.User", "Reviewer")
-                        .WithOne()
-                        .HasForeignKey("CarBookingApp.Domain.Model.RideReview", "ReviewerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Reviewee");
-
-                    b.Navigation("Reviewer");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Ride", b =>
@@ -404,7 +443,7 @@ namespace CarBookingApp.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CarBookingApp.Domain.Model.User", b =>
+            modelBuilder.Entity("CarBookingApp.Domain.Model.Driver", b =>
                 {
                     b.Navigation("CreatedRides");
                 });

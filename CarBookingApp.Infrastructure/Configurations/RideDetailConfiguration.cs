@@ -12,13 +12,12 @@ public class RideDetailConfiguration : IEntityTypeConfiguration<RideDetail>
             .HasMaxLength(50);
         
         builder.Property(rd => rd.Price)
-            .HasColumnName("price")
             .HasDefaultValue(0);
         
         builder.ToTable("RideDetails",
             t =>
             {
-                t.HasCheckConstraint("CK_RideDetail_Price_GreaterThanZero", "price >= 0");
+                t.HasCheckConstraint("CK_RideDetail_Price_GreaterThanZero", "\"Price\" >= 0");
             });
 
         builder

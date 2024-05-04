@@ -9,6 +9,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
+        builder.UseTptMappingStrategy();
+        
         builder.Property(u => u.FirstName)
             .HasMaxLength(50);
         
@@ -17,14 +19,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Gender)
         .HasConversion(g => g.ToString(), 
-            g => System.Enum.Parse<Gender>(g));
-
-        builder.Property(u => u.Age)
-            .HasColumnName("age");
+            g => Enum.Parse<Gender>(g));
             
         builder.ToTable("Users", t =>
         {
-            t.HasCheckConstraint("CK_User_Age_Adult", "age >= 18");
+            t.HasCheckConstraint("CK_User_Age_IsAdult", "EXTRACT(YEAR FROM CURRENT_DATE) - extract(YEAR FROM \"DateOfBirth\") >= 18");
         });
         
         builder
@@ -46,11 +45,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder
             .HasMany(u => u.BookedRides)
             .WithMany(r => r.Passengers)
-            .UsingEntity<PassengerRide>();
-
-        builder
-            .HasMany(u => u.Vehicles)
-            .WithMany();
+            .UsingEntity<UserRide>(
+                l => l.HasOne<Ride>().WithMany().HasForeignKey(e => e.RideId),
+                r => r.HasOne<User>().WithMany().HasForeignKey(e => e.PassengerId)
+                );
         
         builder
             .Property<DateTime>("CreatedAt")

@@ -5,12 +5,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CarBookingApp.Infrastructure.Configurations;
 
-public class PassengerRideConfiguration : IEntityTypeConfiguration<PassengerRide>
+public class UserRideConfiguration : IEntityTypeConfiguration<UserRide>
 {
-    public void Configure(EntityTypeBuilder<PassengerRide> builder)
+    public void Configure(EntityTypeBuilder<UserRide> builder)
     {
-        builder.HasKey(pr => new { pr.PassengerId, pr.RideId });
-        
         builder.Property(pr => pr.BookingStatus)
             .HasConversion(b => b.ToString(), 
                 b => Enum.Parse<BookingStatus>(b))

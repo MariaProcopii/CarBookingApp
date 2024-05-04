@@ -8,6 +8,7 @@ namespace CarBookingApp.Infrastructure.Configurations;
 public class CarBookingAppDbContext : DbContext
 {
     public DbSet<User> Users { get; set; } = default!;
+    public DbSet<Driver> Drivers { get; set; } = default!;
     public DbSet<Destination> Destinations { get; set; } = default!;
     public DbSet<Entity> Entities { get; set; } = default!;
     public DbSet<Facility> Facilities { get; set; } = default!;
@@ -35,5 +36,6 @@ public class CarBookingAppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        modelBuilder.Ignore<Entity>();
     }
 }

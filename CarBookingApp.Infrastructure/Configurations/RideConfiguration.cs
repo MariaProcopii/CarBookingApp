@@ -21,14 +21,13 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
             .IsRequired();
         
         builder
-            .Property(r => r.AvailableSeats)
-            .HasColumnName("available_seats")
+            .Property(r => r.TotalSeats)
             .HasDefaultValue(1);
 
         builder.ToTable("Rides",
             t =>
             {
-                t.HasCheckConstraint("CK_Ride_AvailableSeats", "available_seats >= 1 AND available_seats <= 6");
+                t.HasCheckConstraint("CK_Ride_AvailableSeats", "\"TotalSeats\" >= 1 AND \"TotalSeats\" <= 6");
             });
 
         builder
