@@ -4,12 +4,12 @@ using CarBookingApp.Infrastructure.Configurations;
 
 namespace CarBookingApp.Infrastructure;
 
-public class UnitOfWork<T> : IUnitOfWork<T> where T : Entity 
+public class UnitOfWork : IUnitOfWork
 {
     private CarBookingAppDbContext _carBookingAppDbContext;
-    public IEntityRepository<T> EntityRepository { get; private set; }
+    public IEntityRepository EntityRepository { get; private set; }
 
-    public UnitOfWork(CarBookingAppDbContext carBookingAppDbContext, IEntityRepository<T> entityRepository)
+    public UnitOfWork(CarBookingAppDbContext carBookingAppDbContext, IEntityRepository entityRepository)
     {
         _carBookingAppDbContext = carBookingAppDbContext;
         EntityRepository = entityRepository;

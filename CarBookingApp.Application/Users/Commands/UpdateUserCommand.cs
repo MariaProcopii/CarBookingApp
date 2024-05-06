@@ -20,10 +20,10 @@ public class UpdateUserCommand : IRequest<UserDTO>
 
 public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UserDTO>
 {
-    private readonly IUnitOfWork<User> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateUserCommandHandler(IUnitOfWork<User> unitOfWork, IMapper mapper)
+    public UpdateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;

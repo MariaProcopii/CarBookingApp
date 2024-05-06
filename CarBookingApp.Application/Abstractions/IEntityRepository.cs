@@ -1,12 +1,11 @@
 using CarBookingApp.Domain.Model;
 
 namespace CarBookingApp.Application.Abstractions;
-
-public interface IEntityRepository<T> where T : Entity
+public interface IEntityRepository
 {
-    Task<T?> GetByIdAsync(int id);
-    Task<IEnumerable<T>> GetAllAsync();
-    Task<T> AddAsync(T entity);
-    Task<T> UpdateAsync(T entity);
-    Task<T?> DeleteAsync(int id);
+    Task<T?> GetByIdAsync<T>(int id) where T : Entity;
+    Task<IEnumerable<T>> GetAllAsync<T>() where T : Entity;
+    Task<T> AddAsync<T>(T entity) where T : Entity;
+    Task<T> UpdateAsync<T>(T entity) where T : Entity;
+    Task<T?> DeleteAsync<T>(int id) where T : Entity;
 }

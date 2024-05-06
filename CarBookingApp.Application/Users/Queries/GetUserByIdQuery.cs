@@ -13,10 +13,10 @@ public class GetUserByIdQuery : IRequest<UserDTO>
 
 public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDTO>
 {
-    private readonly IUnitOfWork<User> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public GetUserByIdQueryHandler(IUnitOfWork<User> unitOfWork, IMapper mapper)
+    public GetUserByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -24,7 +24,7 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDTO
 
     public async Task<UserDTO> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
-        var user = await _unitOfWork.EntityRepository.GetByIdAsync(request.Id);
+        var user = await _unitOfWork.EntityRepository.GetByIdAsync<User>(request.Id);
         return _mapper.Map<User, UserDTO>(user);
     }
 }

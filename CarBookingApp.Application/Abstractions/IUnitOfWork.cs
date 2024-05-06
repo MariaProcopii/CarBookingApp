@@ -2,9 +2,9 @@ using CarBookingApp.Domain.Model;
 
 namespace CarBookingApp.Application.Abstractions;
 
-public interface IUnitOfWork<T> where T : Entity
+public interface IUnitOfWork
 {
-    public IEntityRepository<T> EntityRepository { get; }
+    public IEntityRepository EntityRepository { get; }
     Task Save();
     Task BeginTransaction();
     Task CommitTransaction();

@@ -19,10 +19,10 @@ public class CreateUserCommand : IRequest<UserDTO>
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserDTO>
 {
-    private readonly IUnitOfWork<User> _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateUserCommandHandler(IUnitOfWork<User> unitOfWork, IMapper mapper)
+    public CreateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
