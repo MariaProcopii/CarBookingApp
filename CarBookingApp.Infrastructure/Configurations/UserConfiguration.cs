@@ -55,5 +55,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnType("timestamp with time zone")
             .HasDefaultValueSql("now()")
             .IsRequired();
+
+        builder
+            .Property(u => u.DateOfBirth)
+            .HasColumnType("timestamp without time zone");
     }
 }

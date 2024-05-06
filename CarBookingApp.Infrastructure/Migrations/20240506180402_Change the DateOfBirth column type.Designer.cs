@@ -3,6 +3,7 @@ using System;
 using CarBookingApp.Infrastructure.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CarBookingApp.Infrastructure.Migrations
 {
     [DbContext(typeof(CarBookingAppDbContext))]
-    partial class CarBookingAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240506180402_Change the DateOfBirth column type")]
+    partial class ChangetheDateOfBirthcolumntype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,8 +45,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Destinations");
-
-                    b.HasDiscriminator().HasValue("Destination");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Facility", b =>
@@ -61,8 +62,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Facilities");
-
-                    b.HasDiscriminator().HasValue("Facility");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Ride", b =>
@@ -107,8 +106,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_Ride_AvailableSeats", "\"TotalSeats\" >= 1 AND \"TotalSeats\" <= 6");
                         });
-
-                    b.HasDiscriminator().HasValue("Ride");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideDetail", b =>
@@ -131,8 +128,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_RideDetail_Price_GreaterThanZero", "\"Price\" >= 0");
                         });
-
-                    b.HasDiscriminator().HasValue("RideDetail");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideReview", b =>
@@ -173,8 +168,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_RideReviews_Rating", " \"Rating\" >= 0");
                         });
-
-                    b.HasDiscriminator().HasValue("RideReview");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.User", b =>
@@ -282,8 +275,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Vehicles");
-
-                    b.HasDiscriminator().HasValue("Vehicle");
                 });
 
             modelBuilder.Entity("DriverVehicle", b =>
