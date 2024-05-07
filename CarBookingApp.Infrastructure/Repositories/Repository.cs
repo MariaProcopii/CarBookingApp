@@ -32,14 +32,13 @@ public class Repository : IRepository
         return await entities.FirstOrDefaultAsync(entity => entity.Id == id);
     }
 
-    public Task<List<T>> GetByPredicate<T>(Func<T, bool> predicate) where T : Entity
+    public async Task<List<T>> GetByPredicate<T>(Expression<Func<T, bool>> predicate) where T : Entity
     {
         IQueryable<T> query = _carBookingAppDbContext
             .Set<T>()
-            .AsQueryable()
-            .Where(e => predicate(e));
+            .Where(predicate);
 
-        return query.ToListAsync();
+        return await query.ToListAsync();
     }
     
     public async Task<IEnumerable<T>> GetAllAsync<T>() where T : Entity

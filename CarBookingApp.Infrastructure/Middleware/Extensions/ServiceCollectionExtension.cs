@@ -13,6 +13,7 @@ public static class ServiceCollectionExtension
     {
         svcs
             .AddScoped<IRepository, Repository>()
+            .AddScoped<IVehicleRepository, VehicleRepository>()
             .AddDbContext<CarBookingAppDbContext>(cfg =>
                 cfg.UseNpgsql(conf.GetConnectionString("DefaultDB")));
     }

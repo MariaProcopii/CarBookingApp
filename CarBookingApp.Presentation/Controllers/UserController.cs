@@ -44,7 +44,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPut]
-    [Route("info/{id}")]
+    [Route("info/update/{id}")]
     public async Task<UserDTO> UpdateUser(int id, [FromBody] UpdateUserCommand updateUserCommand)
     {
         updateUserCommand.Id = id;
@@ -61,7 +61,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
-    [Route("upgrade/{id}")]
+    [Route("info/upgrade/{id}")]
     public async Task<UserDTO> UpgradeUserToDriver(int id, [FromBody] UpgradeUserToDriverCommand upgradeUserToDriverCommand)
     {
         upgradeUserToDriverCommand.Id = id;
@@ -70,7 +70,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPut]
-    [Route("downgrade/{id}")]
+    [Route("info/downgrade/{id}")]
     public async Task<UserDTO> DowngradeDriverToUser(int id)
     {
         var result = await _mediator.Send(new DowngradeDriverToUserCommand(id));
