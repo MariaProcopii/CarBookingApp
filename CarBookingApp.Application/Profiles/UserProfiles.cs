@@ -12,6 +12,8 @@ public class UserProfiles : Profile
     {
         CreateMap<User, Driver>();
         
+        CreateMap<Driver, User>();
+        
         CreateMap<Driver, UserDTO>();
         
         CreateMap<User, UserDTO>()

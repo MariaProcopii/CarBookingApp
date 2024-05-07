@@ -68,4 +68,12 @@ public class UserController : ControllerBase
         var result = await _mediator.Send(upgradeUserToDriverCommand);
         return result;
     }
+    
+    [HttpPut]
+    [Route("downgrade/{id}")]
+    public async Task<UserDTO> DowngradeDriverToUser(int id)
+    {
+        var result = await _mediator.Send(new DowngradeDriverToUserCommand(id));
+        return result;
+    }
 }
