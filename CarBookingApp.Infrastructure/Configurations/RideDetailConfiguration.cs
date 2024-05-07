@@ -25,7 +25,7 @@ public class RideDetailConfiguration : IEntityTypeConfiguration<RideDetail>
             .WithMany();
 
         builder
-            .HasOne(r => r.Ride)
+            .HasOne<Ride>()
             .WithOne(r => r.RideDetail)
             .HasForeignKey<RideDetail>()
             .IsRequired();

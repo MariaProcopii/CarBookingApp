@@ -12,9 +12,9 @@ public static class ServiceCollectionExtension
     public static void AddInfrastructureServices(this IServiceCollection svcs, IConfiguration conf)
     {
         svcs
-            .AddScoped<IEntityRepository, EntityRepository>()
-            .AddScoped<IUnitOfWork, UnitOfWork>()
+            .AddScoped<IRepository, Repository>()
             .AddDbContext<CarBookingAppDbContext>(cfg =>
                 cfg.UseNpgsql(conf.GetConnectionString("DefaultDB")));
     }
+    
 }

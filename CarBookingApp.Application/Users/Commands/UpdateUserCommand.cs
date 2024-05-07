@@ -19,20 +19,20 @@ public class UpdateUserCommand : IRequest<UserDTO>
 
 public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UserDTO>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IRepository _repository;
     private readonly IMapper _mapper;
 
-    public UpdateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public UpdateUserCommandHandler(IRepository repository, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _repository = repository;
         _mapper = mapper;
     }
 
     public async Task<UserDTO> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
         var user = _mapper.Map<UpdateUserCommand, User>(request);
-        var updatedUser = await _unitOfWork.EntityRepository.UpdateAsync(user);
-        await _unitOfWork.Save();
+        var updatedUser = await _repository.UpdateAsync(user);
+        await _repository.Save();
         
         var userDto = _mapper.Map<User, UserDTO>(updatedUser);
         return userDto;

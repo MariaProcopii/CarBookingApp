@@ -21,12 +21,12 @@ public class CreateUserCommand : IRequest<UserDTO>
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserDTO>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IRepository _repository;
     private readonly IMapper _mapper;
 
-    public CreateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public CreateUserCommandHandler(IRepository repository, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _repository = repository;
         _mapper = mapper;
     }
 
@@ -34,8 +34,8 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserD
     {
         var user = _mapper.Map<CreateUserCommand, User>(request);
         
-        var createdUser = await _unitOfWork.EntityRepository.AddAsync(user);
-        await _unitOfWork.Save();
+        var createdUser = await _repository.AddAsync(user);
+        await _repository.Save();
         
         var userDto = _mapper.Map<User, UserDTO>(createdUser);
         return userDto;

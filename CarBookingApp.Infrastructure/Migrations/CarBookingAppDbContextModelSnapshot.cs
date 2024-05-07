@@ -42,8 +42,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Destinations");
-
-                    b.HasDiscriminator().HasValue("Destination");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Facility", b =>
@@ -61,8 +59,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Facilities");
-
-                    b.HasDiscriminator().HasValue("Facility");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Ride", b =>
@@ -107,8 +103,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_Ride_AvailableSeats", "\"TotalSeats\" >= 1 AND \"TotalSeats\" <= 6");
                         });
-
-                    b.HasDiscriminator().HasValue("Ride");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideDetail", b =>
@@ -131,8 +125,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_RideDetail_Price_GreaterThanZero", "\"Price\" >= 0");
                         });
-
-                    b.HasDiscriminator().HasValue("RideDetail");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideReview", b =>
@@ -173,8 +165,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_RideReviews_Rating", " \"Rating\" >= 0");
                         });
-
-                    b.HasDiscriminator().HasValue("RideReview");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.User", b =>
@@ -279,8 +269,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Vehicles");
-
-                    b.HasDiscriminator().HasValue("Vehicle");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.VehicleDetail", b =>
@@ -305,9 +293,7 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("VehicleDetail");
-
-                    b.HasDiscriminator().HasValue("VehicleDetail");
+                    b.ToTable("VehicleDetails");
                 });
 
             modelBuilder.Entity("FacilityRideDetail", b =>
@@ -369,13 +355,11 @@ namespace CarBookingApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideDetail", b =>
                 {
-                    b.HasOne("CarBookingApp.Domain.Model.Ride", "Ride")
+                    b.HasOne("CarBookingApp.Domain.Model.Ride", null)
                         .WithOne("RideDetail")
                         .HasForeignKey("CarBookingApp.Domain.Model.RideDetail", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Ride");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideReview", b =>

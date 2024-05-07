@@ -2,7 +2,7 @@ using CarBookingApp.Domain.Enum;
 
 namespace CarBookingApp.Domain.Model;
 
-public class User : Entity
+public class User
 {
     public int Id { get; set; }
     public required string FirstName { get; set; }

@@ -1,6 +1,6 @@
 namespace CarBookingApp.Domain.Model;
 
-public class VehicleDetail : Entity
+public class VehicleDetail
 {
     public int Id { get; set; }
     public required int ManufactureYear { get; set; }

@@ -1,6 +1,6 @@
 namespace CarBookingApp.Domain.Model;
 
-public class RideReview : Entity
+public class RideReview
 {
     public int Id { get; set; }
     public User Reviewer { get; set; }

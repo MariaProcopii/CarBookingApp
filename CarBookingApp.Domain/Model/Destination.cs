@@ -3,7 +3,7 @@ using CarBookingApp.Domain.Enum;
 
 namespace CarBookingApp.Domain.Model;
 
-public class Destination : Entity
+public class Destination
 {
     public int Id { get; set; }
     public required string Name { get; set; }

@@ -15,18 +15,18 @@ public class UpgradeToDriverCommand : IRequest<DriverDTO>
 
 public class UpgradeToDriverCommandHandler : IRequestHandler<UpgradeToDriverCommand, DriverDTO>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IRepository _repository;
     private readonly IMapper _mapper;
 
-    public UpgradeToDriverCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
+    public UpgradeToDriverCommandHandler(IRepository repository, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
+        _repository = repository;
         _mapper = mapper;
     }
 
     public async Task<DriverDTO> Handle(UpgradeToDriverCommand request, CancellationToken cancellationToken)
     {
-        var user = await _unitOfWork.EntityRepository.GetByIdAsync<User>(request.Id);
+        var user = await _repository.GetByIdAsync<User>(request.Id);
         
         var driver = new Driver
         {
@@ -39,9 +39,9 @@ public class UpgradeToDriverCommandHandler : IRequestHandler<UpgradeToDriverComm
             PhoneNumber = user.PhoneNumber,
             Id = user.Id
         };
-        await _unitOfWork.EntityRepository.DeleteAsync<User>(request.Id);
-        var createdDriver = await _unitOfWork.EntityRepository.AddAsync(driver);
-        await _unitOfWork.Save();
+        await _repository.DeleteAsync<User>(request.Id);
+        var createdDriver = await _repository.AddAsync(driver);
+        await _repository.Save();
         
         var driverDto = _mapper.Map<Driver, DriverDTO>(createdDriver);
         return driverDto;
