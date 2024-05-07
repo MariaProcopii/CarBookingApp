@@ -9,8 +9,9 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
     public void Configure(EntityTypeBuilder<Driver> builder)
     {
         builder
-            .HasMany(u => u.Vehicles)
-            .WithMany();
+            .HasOne(u => u.VehicleDetail)
+            .WithOne()
+            .HasForeignKey<VehicleDetail>();
         
         builder.ToTable("Drivers",
             t =>

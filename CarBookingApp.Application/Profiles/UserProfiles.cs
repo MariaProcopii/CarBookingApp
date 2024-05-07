@@ -16,6 +16,8 @@ public class UserProfiles : Profile
         CreateMap<CreateUserCommand, User>()
             .ForMember(dest => dest.Gender, opt => 
                     opt.MapFrom(src => Enum.Parse<Gender>(src.Gender)));
-        CreateMap<UpdateUserCommand, User>();
+        CreateMap<UpdateUserCommand, User>()
+            .ForMember(dest => dest.Gender, opt => 
+                opt.MapFrom(src => Enum.Parse<Gender>(src.Gender)));
     }
 }

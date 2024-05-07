@@ -4,7 +4,7 @@ using CarBookingApp.Application.Users.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CarBoolingApp.Presentation.Controllers;
+namespace CarBookingApp.Presentation.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -21,7 +21,7 @@ public class UserController : ControllerBase
     }
     
     [HttpGet]
-    [Route("{id}")]
+    [Route("info/{id}")]
     public async Task<UserDTO> GetUserById(int id)
     {
         var result = await _mediator.Send(new GetUserByIdQuery(id));
@@ -36,6 +36,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
+    [Route("create")]
     public async Task<UserDTO> CreateUser([FromBody] CreateUserCommand createUserCommand)
     {
         var result = await _mediator.Send(createUserCommand);
@@ -43,8 +44,10 @@ public class UserController : ControllerBase
     }
     
     [HttpPut]
-    public async Task<UserDTO> UpdateUser([FromBody] UpdateUserCommand updateUserCommand)
+    [Route("info/{id}")]
+    public async Task<UserDTO> UpdateUser(int id, [FromBody] UpdateUserCommand updateUserCommand)
     {
+        updateUserCommand.Id = id;
         var result = await _mediator.Send(updateUserCommand);
         return result;
     }

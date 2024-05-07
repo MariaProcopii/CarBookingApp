@@ -5,5 +5,4 @@ public class Vehicle : Entity
     public int Id { get; set; }
     public required string Vender { get; set; }
     public required string Model { get; set; }
-    public required int ManufactureYear { get; set; }
 }

@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarBookingApp.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarBookingApp.Application", "CarBookingApp.Application\CarBookingApp.Application.csproj", "{0CBEF247-CB8D-4C73-B781-A30C36667D18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarBoolingApp.Presentation", "CarBoolingApp.Presentation\CarBoolingApp.Presentation.csproj", "{1FB24D0E-2470-457B-8FE9-D0A7F08BF157}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarBookingApp.Presentation", "CarBookingApp.Presentation\CarBookingApp.Presentation.csproj", "{1FB24D0E-2470-457B-8FE9-D0A7F08BF157}"
 EndProject
 
 Global

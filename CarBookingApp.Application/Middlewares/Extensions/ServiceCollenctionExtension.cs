@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace CarBookingApp.Application.Middlewares.Extensions;
 
 public static class ServiceCollectionExtension
-{
+{   
     public static void AddApplicationServices(this IServiceCollection svcs)
     {
         svcs
