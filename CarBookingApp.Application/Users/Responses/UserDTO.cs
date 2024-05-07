@@ -1,4 +1,5 @@
-using Newtonsoft.Json;
+using CarBookingApp.Domain.Model;
+
 namespace CarBookingApp.Application.Users.Responses;
 
 public class UserDTO
@@ -10,6 +11,6 @@ public class UserDTO
     public DateTime DateOfBirth { get; set; } 
     public string Email { get; set; }
     public string PhoneNumber { get; set; }
-    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public int? YearsOfExperience { get; set; }
+    public VehicleDetail VehicleDetail { get; set; }
 }

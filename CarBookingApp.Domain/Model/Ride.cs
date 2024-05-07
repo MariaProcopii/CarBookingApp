@@ -1,8 +1,7 @@
 namespace CarBookingApp.Domain.Model;
 
-public class Ride
+public class Ride : Entity
 {
-    public int Id { get; set; }
     public required DateTime DateOfTheRide { get; set; } 
     public required Destination DestinationFrom { get; set; }
     public required Destination DestinationTo { get; set; }

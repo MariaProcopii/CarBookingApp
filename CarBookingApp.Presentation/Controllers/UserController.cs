@@ -59,4 +59,13 @@ public class UserController : ControllerBase
         var result = await _mediator.Send(new DeleteUserCommand(id));
         return result;
     }
+    
+    [HttpPost]
+    [Route("upgrade/{id}")]
+    public async Task<UserDTO> UpgradeUserToDriver(int id, [FromBody] UpgradeUserToDriverCommand upgradeUserToDriverCommand)
+    {
+        upgradeUserToDriverCommand.Id = id;
+        var result = await _mediator.Send(upgradeUserToDriverCommand);
+        return result;
+    }
 }

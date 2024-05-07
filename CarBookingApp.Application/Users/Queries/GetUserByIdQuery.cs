@@ -22,7 +22,18 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDTO
 
     public async Task<UserDTO> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
-        var user = await _repository.GetByIdAsync<User>(request.UserId);
-        return _mapper.Map<User, UserDTO>(user);
+
+        var user = await  _repository.GetByIdAsync<User>(request.UserId);
+        UserDTO userDTO;
+        if (user is Driver driver)
+        {
+            userDTO = _mapper.Map<Driver, UserDTO>(driver);
+        }
+        else
+        {
+            userDTO = _mapper.Map<User, UserDTO>(user);
+        }
+        
+        return userDTO;
     }
 }

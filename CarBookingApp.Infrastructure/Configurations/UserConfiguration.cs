@@ -9,7 +9,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.UseTptMappingStrategy();
+        builder.UseTphMappingStrategy();
         
         builder.Property(u => u.FirstName)
             .HasMaxLength(50);

@@ -22,7 +22,20 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, List<Us
     public async Task<List<UserDTO>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
         var users = await _repository.GetAllAsync<User>();
-        var userDTOs = _mapper.Map<IEnumerable<User>, List<UserDTO>>(users);
+        var userDTOs = new List<UserDTO>();
+        
+        foreach (var user in users)
+        {
+            if (user is Driver driver)
+            {
+                userDTOs.Add(_mapper.Map<Driver, UserDTO>(driver));
+            }
+            else
+            {
+                userDTOs.Add(_mapper.Map<User, UserDTO>(user));
+            }
+        }
+
         return userDTOs;
     }
 }

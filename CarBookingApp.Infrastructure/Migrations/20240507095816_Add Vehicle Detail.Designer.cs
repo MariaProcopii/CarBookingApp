@@ -3,6 +3,7 @@ using System;
 using CarBookingApp.Infrastructure.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CarBookingApp.Infrastructure.Migrations
 {
     [DbContext(typeof(CarBookingAppDbContext))]
-    partial class CarBookingAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240507095816_Add Vehicle Detail")]
+    partial class AddVehicleDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,11 +186,6 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -225,18 +223,16 @@ namespace CarBookingApp.Infrastructure.Migrations
                             t.HasCheckConstraint("CK_User_Age_IsAdult", "EXTRACT(YEAR FROM CURRENT_DATE) - extract(YEAR FROM \"DateOfBirth\") >= 18");
                         });
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.UserRide", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("PassengerId")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<int>("RideId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("BookingStatus")
                         .IsRequired()
@@ -244,21 +240,13 @@ namespace CarBookingApp.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasDefaultValue("PENDING");
 
-                    b.Property<int>("PassengerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RideId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("RideStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
                         .HasDefaultValue("UPCOMING");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("PassengerId");
+                    b.HasKey("PassengerId", "RideId");
 
                     b.HasIndex("RideId");
 
@@ -308,7 +296,7 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("VehicleDetails");
+                    b.ToTable("VehicleDetail");
                 });
 
             modelBuilder.Entity("FacilityRideDetail", b =>
@@ -333,14 +321,12 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.Property<int>("YearsOfExperience")
                         .HasColumnType("integer");
 
-                    b.ToTable("Users", null, t =>
+                    b.ToTable("Drivers", null, t =>
                         {
                             t.HasCheckConstraint("CK_User_Age_IsAdult", "EXTRACT(YEAR FROM CURRENT_DATE) - extract(YEAR FROM \"DateOfBirth\") >= 18");
 
                             t.HasCheckConstraint("CK_Driver_Years_Of_EXP_PositiveNr", " \"YearsOfExperience\" >= 0");
                         });
-
-                    b.HasDiscriminator().HasValue("Driver");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Ride", b =>
@@ -372,11 +358,13 @@ namespace CarBookingApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideDetail", b =>
                 {
-                    b.HasOne("CarBookingApp.Domain.Model.Ride", null)
+                    b.HasOne("CarBookingApp.Domain.Model.Ride", "Ride")
                         .WithOne("RideDetail")
                         .HasForeignKey("CarBookingApp.Domain.Model.RideDetail", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Ride");
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.RideReview", b =>
@@ -441,6 +429,15 @@ namespace CarBookingApp.Infrastructure.Migrations
                     b.HasOne("CarBookingApp.Domain.Model.RideDetail", null)
                         .WithMany()
                         .HasForeignKey("RideDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CarBookingApp.Domain.Model.Driver", b =>
+                {
+                    b.HasOne("CarBookingApp.Domain.Model.User", null)
+                        .WithOne()
+                        .HasForeignKey("CarBookingApp.Domain.Model.Driver", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

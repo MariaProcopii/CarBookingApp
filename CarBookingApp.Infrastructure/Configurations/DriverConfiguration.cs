@@ -13,7 +13,7 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
             .WithOne()
             .HasForeignKey<VehicleDetail>();
         
-        builder.ToTable("Drivers",
+        builder.ToTable("Users",
             t =>
             {
                 t.HasCheckConstraint("CK_Driver_Years_Of_EXP_PositiveNr", " \"YearsOfExperience\" >= 0");

@@ -14,7 +14,8 @@ public class UpdateUserCommand : IRequest<UserDTO>
     public string Gender { get; set; }
     public DateTime DateOfBirth { get; set; } 
     public string Email { get; set; }
-    public string PhoneNumber { get; set; } 
+    public string PhoneNumber { get; set; }
+    public int? YearsOfExperience { get; set; }
 }
 
 public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UserDTO>
@@ -30,10 +31,17 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UserD
 
     public async Task<UserDTO> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
-        var user = _mapper.Map<UpdateUserCommand, User>(request);
-        var updatedUser = await _repository.UpdateAsync(user);
+
+        var existingUser = await _repository.GetByIdAsync<User>(request.Id);
+        var updateUser = _mapper.Map<UpdateUserCommand, User>(request, existingUser);
+        if (existingUser is Driver existingDriver)
+        { 
+            updateUser = _mapper.Map(request, existingDriver);
+        }
+
+        var updatedUser = await _repository.UpdateAsync(updateUser);
         await _repository.Save();
-        
+
         var userDto = _mapper.Map<User, UserDTO>(updatedUser);
         return userDto;
     }
