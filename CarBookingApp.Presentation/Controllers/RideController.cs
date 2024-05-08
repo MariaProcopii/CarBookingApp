@@ -57,4 +57,18 @@ public class RideController : ControllerBase
     {
         return await _mediator.Send(unsubscribeFromRideCommand);
     }
+    
+    [HttpPut]
+    [Route("info/approve")]
+    public async Task<int> ApproveUserForRide([FromBody] ApproveUserForRideCommand approveUserForRideCommand)
+    {
+        return await _mediator.Send(approveUserForRideCommand);
+    }
+    
+    [HttpPut]
+    [Route("info/reject")]
+    public async Task<int> RejectUserForRide([FromBody] RejectUserForRideCommand rejectUserForRideCommand)
+    {
+        return await _mediator.Send(rejectUserForRideCommand);
+    }
 }
