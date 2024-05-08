@@ -46,8 +46,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMany(u => u.BookedRides)
             .WithMany(r => r.Passengers)
             .UsingEntity<UserRide>(
-                l => l.HasOne<Ride>().WithMany().HasForeignKey(e => e.RideId),
-                r => r.HasOne<User>().WithMany().HasForeignKey(e => e.PassengerId)
+                l => l.HasOne(r => r.Ride)
+                    .WithMany()
+                    .HasForeignKey(e => e.RideId),
+                r => r.HasOne(r => r.Passenger)
+                    .WithMany()
+                    .HasForeignKey(e => e.PassengerId)
                 );
         
         builder

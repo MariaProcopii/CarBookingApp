@@ -76,4 +76,25 @@ public class UserController : ControllerBase
         var result = await _mediator.Send(new DowngradeDriverToUserCommand(id));
         return result;
     }
+    
+    [HttpPut]
+    [Route("pending/approve")]
+    public async Task<int> ApproveUserForRide([FromBody] ApproveUserForRideCommand approveUserForRideCommand)
+    {
+        return await _mediator.Send(approveUserForRideCommand);
+    }
+    
+    [HttpPut]
+    [Route("pending/reject")]
+    public async Task<int> RejectUserForRide([FromBody] RejectUserForRideCommand rejectUserForRideCommand)
+    {
+        return await _mediator.Send(rejectUserForRideCommand);
+    }
+    
+    [HttpGet]
+    [Route("pending/{userId}")]
+    public async Task<List<UserDTO>> GetPendingPassengers(int userId)
+    {
+        return await _mediator.Send(new GetPendingPassengersQuery(userId));
+    }
 }

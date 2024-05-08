@@ -1,10 +1,9 @@
-using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
-namespace CarBookingApp.Application.Rides.Commands;
+namespace CarBookingApp.Application.Users.Commands;
 public class RejectUserForRideCommand : IRequest<int>
 {
     public int RideId { get; set; }

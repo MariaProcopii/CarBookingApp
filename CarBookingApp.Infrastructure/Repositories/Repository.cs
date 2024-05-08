@@ -20,7 +20,8 @@ public class Repository : IRepository
         return await _carBookingAppDbContext.Set<T>().FindAsync(id);
     }
     
-    public async Task<T?> GetByIdWithInclude<T>(int id, params Expression<Func<T, object>>[] includeProperties) where T : Entity
+    public async Task<T?> GetByIdWithInclude<T>(int id, 
+        params Expression<Func<T, object>>[] includeProperties) where T : Entity
     {
         IQueryable<T> entities = _carBookingAppDbContext.Set<T>();
 
@@ -31,16 +32,19 @@ public class Repository : IRepository
 
         return await entities.FirstOrDefaultAsync(entity => entity.Id == id);
     }
-
-    public async Task<List<T>> GetByPredicate<T>(Expression<Func<T, bool>> predicate) where T : Entity
-    {
-        IQueryable<T> query = _carBookingAppDbContext
-            .Set<T>()
-            .Where(predicate);
-
-        return await query.ToListAsync();
-    }
     
+    public async Task<List<T>> GetByPredicate<T>(Expression<Func<T, bool>> predicate, 
+        params Expression<Func<T, object>>[] includeProperties) where T : Entity
+    {
+        IQueryable<T> entities = _carBookingAppDbContext.Set<T>();
+        foreach (var includeProperty in includeProperties)
+        {
+            entities = entities.Include(includeProperty);
+        }
+
+        return await entities.Where(predicate).ToListAsync();
+    }
+
     public async Task<IEnumerable<T>> GetAllAsync<T>() where T : Entity
     {
         return await _carBookingAppDbContext.Set<T>().ToListAsync();
@@ -69,7 +73,8 @@ public class Repository : IRepository
         return entityToDelete;
     }
     
-    public async Task<T?> DeleteAsyncWithInclude<T>(int id, params Expression<Func<T, object>>[] includeProperties) where T : Entity
+    public async Task<T?> DeleteAsyncWithInclude<T>(int id, 
+        params Expression<Func<T, object>>[] includeProperties) where T : Entity
     {
         var entityToDelete = await GetByIdWithInclude(id, includeProperties);
         if (entityToDelete != null)

@@ -1,5 +1,7 @@
 using CarBookingApp.Application.Rides.Commands;
+using CarBookingApp.Application.Rides.Queries;
 using CarBookingApp.Application.Rides.Responses;
+using CarBookingApp.Application.Users.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,18 +59,25 @@ public class RideController : ControllerBase
     {
         return await _mediator.Send(unsubscribeFromRideCommand);
     }
-    
-    [HttpPut]
-    [Route("info/approve")]
-    public async Task<int> ApproveUserForRide([FromBody] ApproveUserForRideCommand approveUserForRideCommand)
+
+    [HttpGet]
+    [Route("{userId}")]
+    public async Task<List<RideDTO>> GetAllRides(int userId)
     {
-        return await _mediator.Send(approveUserForRideCommand);
+        return await _mediator.Send(new GetAllRidesQuery(userId));
     }
     
-    [HttpPut]
-    [Route("info/reject")]
-    public async Task<int> RejectUserForRide([FromBody] RejectUserForRideCommand rejectUserForRideCommand)
+    [HttpGet]
+    [Route("booked/{userId}")]
+    public async Task<List<RideDTO>> GetBookedRides(int userId)
     {
-        return await _mediator.Send(rejectUserForRideCommand);
+        return await _mediator.Send(new GetBookedRidesQuery(userId));
+    }
+    
+    [HttpGet]
+    [Route("pending/{userId}")]
+    public async Task<List<RideDTO>> GetPendingRides(int userId)
+    {
+        return await _mediator.Send(new GetPendingRidesQuery(userId));
     }
 }
