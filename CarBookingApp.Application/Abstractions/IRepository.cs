@@ -11,5 +11,8 @@ public interface IRepository
     Task<T> AddAsync<T>(T entity) where T : Entity;
     Task<T> UpdateAsync<T>(T entity) where T : Entity;
     Task<T?> DeleteAsync<T>(int id) where T : Entity;
+
+    public Task<T?> DeleteAsyncWithInclude<T>(int id, params Expression<Func<T, object>>[] includeProperties)
+        where T : Entity;
     Task Save();
 }

@@ -69,6 +69,17 @@ public class Repository : IRepository
         return entityToDelete;
     }
     
+    public async Task<T?> DeleteAsyncWithInclude<T>(int id, params Expression<Func<T, object>>[] includeProperties) where T : Entity
+    {
+        var entityToDelete = await GetByIdWithInclude(id, includeProperties);
+        if (entityToDelete != null)
+        {
+            _carBookingAppDbContext.Set<T>().Remove(entityToDelete);
+        }
+
+        return entityToDelete;
+    }
+    
     public async Task Save()
     {
         await _carBookingAppDbContext.SaveChangesAsync();

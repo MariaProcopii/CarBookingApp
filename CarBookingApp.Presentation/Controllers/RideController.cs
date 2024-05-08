@@ -9,22 +9,38 @@ namespace CarBookingApp.Presentation.Controllers;
 [Route("[controller]")]
 public class RideController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
+    private readonly ILogger<RideController> _logger;
 
     private readonly IMediator _mediator;
 
-    public RideController(ILogger<UserController> logger, IMediator mediator)
+    public RideController(ILogger<RideController> logger, IMediator mediator)
     {
         _logger = logger;
         _mediator = mediator;
     }
     
     [HttpPost]
-    [Route("create/{userId}")]
-    public async Task<RideDTO> CreateUser(int userId, [FromBody] CreateRideCommand createRideCommand)
+    [Route("create/{ownerId}")]
+    public async Task<RideDTO> CreateRide(int ownerId, [FromBody] CreateRideCommand createRideCommand)
     {
-        createRideCommand.OwnerId = userId;
+        createRideCommand.OwnerId = ownerId;
         var result = await _mediator.Send(createRideCommand);
         return result;
+    }
+    
+    [HttpDelete]
+    [Route("delete/{rideId}")]
+    public async Task<RideDTO> DeleteRide(int rideId)
+    {
+        var result = await _mediator.Send(new DeleteRideCommand(rideId));
+        return result;
+    }
+    
+    [HttpPut]
+    [Route("info/update/{rideId}")]
+    public async Task<RideDTO> UpdateRide(int rideId, [FromBody] UpdateRideCommand updateRideCommand)
+    {
+        updateRideCommand.RideId = rideId;
+        return await _mediator.Send(updateRideCommand);
     }
 }
