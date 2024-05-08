@@ -43,4 +43,18 @@ public class RideController : ControllerBase
         updateRideCommand.RideId = rideId;
         return await _mediator.Send(updateRideCommand);
     }
+    
+    [HttpPost]
+    [Route("info/book")]
+    public async Task<RideDTO> BookRide([FromBody] BookRideCommand bookRideCommand)
+    {
+        return await _mediator.Send(bookRideCommand);
+    }
+    
+    [HttpPut]
+    [Route("info/unsubscribe")]
+    public async Task<RideDTO> UnsubscribeFromRide([FromBody] UnsubscribeFromRideCommand unsubscribeFromRideCommand)
+    {
+        return await _mediator.Send(unsubscribeFromRideCommand);
+    }
 }
