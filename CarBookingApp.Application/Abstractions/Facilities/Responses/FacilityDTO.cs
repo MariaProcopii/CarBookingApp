@@ -1,0 +1,7 @@
+namespace CarBookingApp.Application.Abstractions.Facilities.Responses;
+
+public class FacilityDTO
+{
+    public int Id { get; set; }
+    public string FacilityType { get; set; }
+}
