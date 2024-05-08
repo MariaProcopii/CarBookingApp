@@ -1,5 +1,5 @@
 using AutoMapper;
-using CarBookingApp.Application.Abstractions.Facilities.Responses;
+using CarBookingApp.Application.Facilities.Responses;
 using CarBookingApp.Domain.Model;
 
 namespace CarBookingApp.Application.Profiles;

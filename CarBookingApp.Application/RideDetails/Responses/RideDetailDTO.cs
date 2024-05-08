@@ -1,4 +1,4 @@
-using CarBookingApp.Application.Abstractions.Facilities.Responses;
+using CarBookingApp.Application.Facilities.Responses;
 
 namespace CarBookingApp.Application.RideDetails.Responses;
 

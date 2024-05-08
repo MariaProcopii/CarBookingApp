@@ -1,9 +1,10 @@
 using AutoMapper;
-using CarBookingApp.Application.Abstractions.Facilities.Responses;
+using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Facilities.Responses;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
-namespace CarBookingApp.Application.Abstractions.Facilities.Queries;
+namespace CarBookingApp.Application.Facilities.Queries;
 
 public record GetAllFacilitiesQuery() : IRequest<List<FacilityDTO>>;
 

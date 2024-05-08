@@ -1,5 +1,5 @@
-using CarBookingApp.Application.Abstractions.Facilities.Queries;
-using CarBookingApp.Application.Abstractions.Facilities.Responses;
+using CarBookingApp.Application.Facilities.Queries;
+using CarBookingApp.Application.Facilities.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

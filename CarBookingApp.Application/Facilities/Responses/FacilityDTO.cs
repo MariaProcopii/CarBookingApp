@@ -1,4 +1,4 @@
-namespace CarBookingApp.Application.Abstractions.Facilities.Responses;
+namespace CarBookingApp.Application.Facilities.Responses;
 
 public class FacilityDTO
 {
