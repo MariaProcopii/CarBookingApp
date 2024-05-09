@@ -1,13 +1,8 @@
-using CarBookingApp.Application.Middlewares.Extensions;
-using CarBookingApp.Infrastructure.Middleware.Extensions;
+using CarBookingApp.Presentation.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddInfrastructureServices(builder.Configuration);
-builder.Services.AddApplicationServices();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddPresentationServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -17,6 +12,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandling();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CarBookingApp.Infrastructure.Middleware.Extensions;
+namespace CarBookingApp.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {
@@ -17,5 +17,4 @@ public static class ServiceCollectionExtension
             .AddDbContext<CarBookingAppDbContext>(cfg =>
                 cfg.UseNpgsql(conf.GetConnectionString("DefaultDB")));
     }
-    
 }

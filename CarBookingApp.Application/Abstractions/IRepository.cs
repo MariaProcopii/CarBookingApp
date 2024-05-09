@@ -4,8 +4,8 @@ using CarBookingApp.Domain.Model;
 namespace CarBookingApp.Application.Abstractions;
 public interface IRepository
 {
-    Task<T?> GetByIdAsync<T>(int id) where T : Entity;
-    Task<T?> GetByIdWithInclude<T>(int id, 
+    Task<T> GetByIdAsync<T>(int id) where T : Entity;
+    Task<T> GetByIdWithInclude<T>(int id, 
         params Expression<Func<T, object>>[] includeProperties) where T : Entity;
 
     public Task<List<T>> GetByPredicate<T>(Expression<Func<T, bool>> predicate,
@@ -15,7 +15,7 @@ public interface IRepository
     Task<T> UpdateAsync<T>(T entity) where T : Entity;
     Task<T?> DeleteAsync<T>(int id) where T : Entity;
 
-    public Task<T?> DeleteAsyncWithInclude<T>(int id, 
+    public Task<T> DeleteAsyncWithInclude<T>(int id, 
         params Expression<Func<T, object>>[] includeProperties) where T : Entity;
     Task Save();
 }

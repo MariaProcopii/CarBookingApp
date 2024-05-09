@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Domain.Model;
 using CarBookingApp.Infrastructure.Configurations;
+using CarBookingApp.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarBookingApp.Infrastructure.Repositories;
@@ -15,12 +16,18 @@ public class Repository : IRepository
         _carBookingAppDbContext = carBookingAppDbContext;
     }
 
-    public async Task<T?> GetByIdAsync<T>(int id) where T : Entity
+    public async Task<T> GetByIdAsync<T>(int id) where T : Entity
     {
-        return await _carBookingAppDbContext.Set<T>().FindAsync(id);
+        var entity = await _carBookingAppDbContext.Set<T>().FindAsync(id);
+        if (entity == null)
+        {
+            throw new EntityNotFoundException($"Object {typeof(T).Name} with id {id} not found");
+        }
+
+        return entity;
     }
-    
-    public async Task<T?> GetByIdWithInclude<T>(int id, 
+
+    public async Task<T> GetByIdWithInclude<T>(int id,
         params Expression<Func<T, object>>[] includeProperties) where T : Entity
     {
         IQueryable<T> entities = _carBookingAppDbContext.Set<T>();
@@ -30,10 +37,17 @@ public class Repository : IRepository
             entities = entities.Include(includeProperty);
         }
 
-        return await entities.FirstOrDefaultAsync(entity => entity.Id == id);
+        var entity = await entities.FirstOrDefaultAsync(entity => entity.Id == id);
+
+        if (entity == null)
+        {
+            throw new EntityNotFoundException($"Object {typeof(T).Name} with id {id} not found");
+        }
+
+        return entity;
     }
-    
-    public async Task<List<T>> GetByPredicate<T>(Expression<Func<T, bool>> predicate, 
+
+    public async Task<List<T>> GetByPredicate<T>(Expression<Func<T, bool>> predicate,
         params Expression<Func<T, object>>[] includeProperties) where T : Entity
     {
         IQueryable<T> entities = _carBookingAppDbContext.Set<T>();
@@ -62,29 +76,23 @@ public class Repository : IRepository
         return entity;
     }
 
-    public async Task<T?> DeleteAsync<T>(int id) where T : Entity
+    public async Task<T> DeleteAsync<T>(int id) where T : Entity
     {
         var entityToDelete = await GetByIdAsync<T>(id);
-        if (entityToDelete != null)
-        {
-            _carBookingAppDbContext.Set<T>().Remove(entityToDelete);
-        }
+        _carBookingAppDbContext.Set<T>().Remove(entityToDelete);
 
         return entityToDelete;
     }
-    
-    public async Task<T?> DeleteAsyncWithInclude<T>(int id, 
+
+    public async Task<T> DeleteAsyncWithInclude<T>(int id,
         params Expression<Func<T, object>>[] includeProperties) where T : Entity
     {
         var entityToDelete = await GetByIdWithInclude(id, includeProperties);
-        if (entityToDelete != null)
-        {
-            _carBookingAppDbContext.Set<T>().Remove(entityToDelete);
-        }
+        _carBookingAppDbContext.Set<T>().Remove(entityToDelete);
 
         return entityToDelete;
     }
-    
+
     public async Task Save()
     {
         await _carBookingAppDbContext.SaveChangesAsync();

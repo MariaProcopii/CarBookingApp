@@ -12,7 +12,7 @@ public class CreateUserCommand : IRequest<UserDTO>
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    [EnumDataType(typeof(Gender))]
+    // [EnumDataType(typeof(Gender))]
     public string Gender { get; set; }
     public DateTime DateOfBirth { get; set; } 
     public string Email { get; set; }
