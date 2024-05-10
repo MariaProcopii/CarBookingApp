@@ -22,8 +22,12 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, List<Ri
     public async Task<List<RideShortInfoDTO>> Handle(GetAllRidesQuery request, CancellationToken cancellationToken)
     {
         var rides = await _repository
-            .GetByPredicate<Ride>(r => r.Owner.Id != request.UserId && r.DateOfTheRide > DateTime.UtcNow, 
-            r => r.DestinationFrom, r => r.DestinationTo);
+            .GetByPredicate<Ride>(r => r.Owner.Id != request.UserId 
+                                && r.DateOfTheRide > DateTime.UtcNow 
+                                && r.Passengers.Count < r.TotalSeats,
+            r => r.DestinationFrom, 
+                                r => r.DestinationTo,
+                                r => r.Passengers);
         
         return _mapper.Map<List<Ride>, List<RideShortInfoDTO>>(rides);
     }

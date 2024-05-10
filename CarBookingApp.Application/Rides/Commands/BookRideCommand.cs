@@ -1,5 +1,6 @@
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Common.Exceptions;
 using CarBookingApp.Application.Rides.Responses;
 using CarBookingApp.Domain.Model;
 using MediatR;
@@ -25,18 +26,20 @@ public class BookRideCommandHandler : IRequestHandler<BookRideCommand, RideShort
 
     public async Task<RideShortInfoDTO> Handle(BookRideCommand request, CancellationToken cancellationToken)
     {
-        var bookings = await _repository.GetByPredicate<UserRide>(ur => ur.RideId == request.RideId);
         var ride = await _repository.GetByIdWithInclude<Ride>(request.RideId, 
-            r => r.DestinationFrom, r => r.DestinationTo, r => r.Owner);
+            r => r.DestinationFrom, 
+                                r => r.DestinationTo,
+                                r => r.Owner,
+                                r => r.Passengers);
         
-        if (ride.TotalSeats <= bookings.Count)
+        if (ride.TotalSeats <= ride.Passengers.Count)
         {
-            throw new Exception("No available seats");
+            throw new ActionNotAllowedException("No available seats");
         }
         
         if (ride.Owner.Id == request.PassengerId)
         {
-            throw new Exception("Owner cannot book his ride");
+            throw new ActionNotAllowedException("Owner cannot book his ride");
         }
 
         var userRide = new UserRide()

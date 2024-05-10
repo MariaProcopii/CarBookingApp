@@ -1,5 +1,6 @@
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Common.Exceptions;
 using CarBookingApp.Application.VehicleDetails.Responses;
 using CarBookingApp.Application.Vehicles.Responses;
 using CarBookingApp.Domain.Model;
@@ -31,8 +32,12 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleDetailCo
     {
         List<Vehicle> vehicle = await _repository.GetByPredicate<Vehicle>(v => v.Vender == request.Vehicle.Vender 
                                                                                && v.Model == request.Vehicle.Model);
-        //TODO: user can create only one vehicle detail
-        //TODO: user should be a driver
+        var user = await _repository.GetByIdAsync<User>(request.UserId);
+        if (user is not Driver)
+        {
+            throw new ActionNotAllowedException("User should be a driver.");
+        }
+        
         var vehicleDetail = new VehicleDetail
         {
             ManufactureYear = request.ManufactureYear,

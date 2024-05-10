@@ -31,7 +31,10 @@ public class ExceptionHandlingMiddleware
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
                 case EntityNotFoundException _:
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    break;
+                case ActionNotAllowedException _:
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                     break;
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;

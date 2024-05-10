@@ -1,5 +1,6 @@
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Common.Exceptions;
 using CarBookingApp.Application.Rides.Responses;
 using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
@@ -33,12 +34,12 @@ public class UnsubscribeFromRideCommandHandler : IRequestHandler<UnsubscribeFrom
 
         if (userRide.First().RideStatus == RideStatus.ONGOING)
         {
-            throw new Exception("You cannot cancel an ongoing ride");
+            throw new ActionNotAllowedException("You cannot cancel an ongoing ride");
         }
 
         if (ride.Owner.Id == request.PassengerId)
         {
-            throw new Exception("Owner cannot unsubscribe from his ride");
+            throw new ActionNotAllowedException("Owner cannot unsubscribe from his ride");
         }
 
         await _repository.DeleteAsync<UserRide>(userRide.First().Id);
