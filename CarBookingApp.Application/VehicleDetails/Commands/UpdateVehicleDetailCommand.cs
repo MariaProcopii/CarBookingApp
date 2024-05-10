@@ -1,6 +1,7 @@
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.VehicleDetails.Responses;
+using CarBookingApp.Application.Vehicles.Responses;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
@@ -9,8 +10,8 @@ namespace CarBookingApp.Application.VehicleDetails.Commands;
 public class UpdateVehicleDetailCommand : IRequest<VehicleDetailDTO>
 {
     public int UserId { get; set; }
-    public string Vender { get; set; }
-    public string Model { get; set; }
+    public VehicleDTO Vehicle { get; set; }
+
     public int ManufactureYear { get; set; }
     public string RegistrationNumber { get; set; }
 }
@@ -29,8 +30,8 @@ public class UpdateVehicleDetailCommandHandler : IRequestHandler<UpdateVehicleDe
 
     public  async Task<VehicleDetailDTO> Handle(UpdateVehicleDetailCommand request, CancellationToken cancellationToken)
     {
-        List<Vehicle> vehicle = await _repository.GetByPredicate<Vehicle>(v => v.Vender == request.Vender 
-                                                                               && v.Model == request.Model);
+        List<Vehicle> vehicle = await _repository.GetByPredicate<Vehicle>(v => v.Vender == request.Vehicle.Vender 
+                                                                               && v.Model == request.Vehicle.Model);
 
         var vehicleDetailToUpdate = await _repository.GetByIdAsync<VehicleDetail>(request.UserId);
         

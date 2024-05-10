@@ -22,7 +22,7 @@ public class FacilityController : ControllerBase
         
     [HttpGet]
     [Route("pick/type")]
-    public async Task<List<FacilityDTO>> GetAllFacilities()
+    public async Task<List<String>> GetAllFacilities()
     {
         return await _mediator.Send(new GetAllFacilitiesQuery());
     }

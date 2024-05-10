@@ -23,7 +23,7 @@ public class RideController : ControllerBase
     
     [HttpPost]
     [Route("create/{ownerId}")]
-    public async Task<RideDTO> CreateRide(int ownerId, [FromBody] CreateRideCommand createRideCommand)
+    public async Task<RideWithRideDetailsInfoDTO> CreateRide(int ownerId, [FromBody] CreateRideCommand createRideCommand)
     {
         createRideCommand.OwnerId = ownerId;
         var result = await _mediator.Send(createRideCommand);
@@ -32,7 +32,7 @@ public class RideController : ControllerBase
     
     [HttpDelete]
     [Route("delete/{rideId}")]
-    public async Task<RideDTO> DeleteRide(int rideId)
+    public async Task<RideShortInfoDTO> DeleteRide(int rideId)
     {
         var result = await _mediator.Send(new DeleteRideCommand(rideId));
         return result;
@@ -40,7 +40,7 @@ public class RideController : ControllerBase
     
     [HttpPut]
     [Route("info/update/{rideId}")]
-    public async Task<RideDTO> UpdateRide(int rideId, [FromBody] UpdateRideCommand updateRideCommand)
+    public async Task<RideWithRideDetailsInfoDTO> UpdateRide(int rideId, [FromBody] UpdateRideCommand updateRideCommand)
     {
         updateRideCommand.RideId = rideId;
         return await _mediator.Send(updateRideCommand);
@@ -48,36 +48,43 @@ public class RideController : ControllerBase
     
     [HttpPost]
     [Route("info/book")]
-    public async Task<RideDTO> BookRide([FromBody] BookRideCommand bookRideCommand)
+    public async Task<RideShortInfoDTO> BookRide([FromBody] BookRideCommand bookRideCommand)
     {
         return await _mediator.Send(bookRideCommand);
     }
     
     [HttpPut]
     [Route("info/unsubscribe")]
-    public async Task<RideDTO> UnsubscribeFromRide([FromBody] UnsubscribeFromRideCommand unsubscribeFromRideCommand)
+    public async Task<RideShortInfoDTO> UnsubscribeFromRide([FromBody] UnsubscribeFromRideCommand unsubscribeFromRideCommand)
     {
         return await _mediator.Send(unsubscribeFromRideCommand);
     }
 
     [HttpGet]
     [Route("{userId}")]
-    public async Task<List<RideDTO>> GetAllRides(int userId)
+    public async Task<List<RideShortInfoDTO>> GetAllRides(int userId)
     {
         return await _mediator.Send(new GetAllRidesQuery(userId));
     }
     
     [HttpGet]
     [Route("booked/{userId}")]
-    public async Task<List<RideDTO>> GetBookedRides(int userId)
+    public async Task<List<RideShortInfoDTO>> GetBookedRides(int userId)
     {
         return await _mediator.Send(new GetBookedRidesQuery(userId));
     }
     
     [HttpGet]
     [Route("pending/{userId}")]
-    public async Task<List<RideDTO>> GetPendingRides(int userId)
+    public async Task<List<RideShortInfoDTO>> GetPendingRides(int userId)
     {
         return await _mediator.Send(new GetPendingRidesQuery(userId));
+    }
+    
+    [HttpGet]
+    [Route("details/{rideId}")]
+    public async Task<RideFullInfoDTO> GetRideInfoById(int rideId)
+    {
+        return await _mediator.Send(new GetRideInfoByIdQuery(rideId));
     }
 }

@@ -6,16 +6,17 @@ using MediatR;
 
 namespace CarBookingApp.Application.Rides.Commands;
 
-public class CreateRideCommand : IRequest<RideDTO>
+public class CreateRideCommand : IRequest<RideWithRideDetailsInfoDTO>
 {
     public DateTime DateOfTheRide { get; set; } 
     public string DestinationFrom { get; set; }
     public string DestinationTo { get; set; }
     public int TotalSeats { get; set; }
     public int OwnerId { get; set; }
+    public RideDetailDTO RideDetail { get; set; }
 }
 
-public class CreateRideCommandHandler : IRequestHandler<CreateRideCommand, RideDTO>
+public class CreateRideCommandHandler : IRequestHandler<CreateRideCommand, RideWithRideDetailsInfoDTO>
 {
     private readonly IRepository _repository;
     private readonly IMapper _mapper;
@@ -26,7 +27,7 @@ public class CreateRideCommandHandler : IRequestHandler<CreateRideCommand, RideD
         _mapper = mapper;
     }
 
-    public async Task<RideDTO> Handle(CreateRideCommand request, CancellationToken cancellationToken)
+    public async Task<RideWithRideDetailsInfoDTO> Handle(CreateRideCommand request, CancellationToken cancellationToken)
     {
         var owner = await _repository.GetByIdAsync<User>(request.OwnerId);
         if (owner is not Driver)
@@ -37,6 +38,20 @@ public class CreateRideCommandHandler : IRequestHandler<CreateRideCommand, RideD
             .GetByPredicate<Destination>(d => d.Name == request.DestinationFrom);
         var destinationTo = await _repository
             .GetByPredicate<Destination>(d => d.Name == request.DestinationTo);
+        
+        List<Facility> facilities = new List<Facility>();
+        foreach (var facilityType in request.RideDetail.Facilities)
+        {
+            var getFacility = await _repository.GetByPredicate<Facility>(f => f.FacilityType == facilityType);
+            facilities.Add(getFacility.First());
+        }
+
+        var rideDetail = new RideDetail
+        {
+            PickUpSpot = request.RideDetail.PickUpSpot,
+            Price = request.RideDetail.Price,
+            Facilities = facilities
+        };
 
         var ride = new Ride
         {
@@ -44,11 +59,13 @@ public class CreateRideCommandHandler : IRequestHandler<CreateRideCommand, RideD
             TotalSeats = request.TotalSeats,
             DestinationFrom = destinationFrom.First(),
             DestinationTo = destinationTo.First(),
-            Owner = (Driver)owner
+            Owner = (Driver)owner,
+            RideDetail = rideDetail
         };
 
         var createdRide = await _repository.AddAsync(ride);
         await _repository.Save();
-        return _mapper.Map<Ride, RideDTO>(createdRide);
+        
+        return _mapper.Map<Ride, RideWithRideDetailsInfoDTO>(createdRide);
     }
 }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.VehicleDetails.Responses;
+using CarBookingApp.Application.Vehicles.Responses;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
@@ -9,8 +10,7 @@ namespace CarBookingApp.Application.VehicleDetails.Commands;
 public class CreateVehicleDetailCommand : IRequest<VehicleDetailDTO>
 {
     public int UserId { get; set; }
-    public string Vender { get; set; }
-    public string Model { get; set; }
+    public VehicleDTO Vehicle { get; set; }
     public int ManufactureYear { get; set; }
     public string RegistrationNumber { get; set; }
 }
@@ -29,9 +29,10 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleDetailCo
 
     public  async Task<VehicleDetailDTO> Handle(CreateVehicleDetailCommand request, CancellationToken cancellationToken)
     {
-        List<Vehicle> vehicle = await _repository.GetByPredicate<Vehicle>(v => v.Vender == request.Vender 
-                                                                               && v.Model == request.Model);
-        
+        List<Vehicle> vehicle = await _repository.GetByPredicate<Vehicle>(v => v.Vender == request.Vehicle.Vender 
+                                                                               && v.Model == request.Vehicle.Model);
+        //TODO: user can create only one vehicle detail
+        //TODO: user should be a driver
         var vehicleDetail = new VehicleDetail
         {
             ManufactureYear = request.ManufactureYear,

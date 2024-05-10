@@ -1,27 +1,24 @@
-using AutoMapper;
 using CarBookingApp.Application.Abstractions;
-using CarBookingApp.Application.Destinations.Responses;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
 namespace CarBookingApp.Application.Destinations.Queries;
 
-public record GetAllDestinationsQuery() : IRequest<List<DestinationDTO>>;
+public record GetAllDestinationsQuery() : IRequest<List<String>>;
 
-public class GetAllDestinationsQueryHandler : IRequestHandler<GetAllDestinationsQuery, List<DestinationDTO>>
+public class GetAllDestinationsQueryHandler : IRequestHandler<GetAllDestinationsQuery, List<String>>
 {
     private readonly IRepository _repository;
-    private readonly IMapper _mapper;
 
-    public GetAllDestinationsQueryHandler(IRepository repository, IMapper mapper)
+    public GetAllDestinationsQueryHandler(IRepository repository)
     {
         _repository = repository;
-        _mapper = mapper;
     }
-
-    public  async Task<List<DestinationDTO>> Handle(GetAllDestinationsQuery request, CancellationToken cancellationToken)
+    
+    public  async Task<List<String>> Handle(GetAllDestinationsQuery request, CancellationToken cancellationToken)
     {
         var destinations = await _repository.GetAllAsync<Destination>();
-        return _mapper.Map<IEnumerable<Destination>, List<DestinationDTO>>(destinations);
+        var destinationsAsString = destinations.Select(d => d.Name).ToList();
+        return destinationsAsString;
     }
 }

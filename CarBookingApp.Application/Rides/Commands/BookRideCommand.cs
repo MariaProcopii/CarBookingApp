@@ -6,13 +6,13 @@ using MediatR;
 
 namespace CarBookingApp.Application.Rides.Commands;
 
-public class BookRideCommand() : IRequest<RideDTO>
+public class BookRideCommand() : IRequest<RideShortInfoDTO>
 {
     public int RideId { get; set; }
     public int PassengerId { get; set; }
 }
 
-public class BookRideCommandHandler : IRequestHandler<BookRideCommand, RideDTO>
+public class BookRideCommandHandler : IRequestHandler<BookRideCommand, RideShortInfoDTO>
 {
     private readonly IRepository _repository;
     private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ public class BookRideCommandHandler : IRequestHandler<BookRideCommand, RideDTO>
         _mapper = mapper;
     }
 
-    public async Task<RideDTO> Handle(BookRideCommand request, CancellationToken cancellationToken)
+    public async Task<RideShortInfoDTO> Handle(BookRideCommand request, CancellationToken cancellationToken)
     {
         var bookings = await _repository.GetByPredicate<UserRide>(ur => ur.RideId == request.RideId);
         var ride = await _repository.GetByIdWithInclude<Ride>(request.RideId, 
@@ -47,6 +47,6 @@ public class BookRideCommandHandler : IRequestHandler<BookRideCommand, RideDTO>
 
         await _repository.AddAsync(userRide);
         await _repository.Save();
-        return _mapper.Map<Ride, RideDTO>(ride);
+        return _mapper.Map<Ride, RideShortInfoDTO>(ride);
     }
 }

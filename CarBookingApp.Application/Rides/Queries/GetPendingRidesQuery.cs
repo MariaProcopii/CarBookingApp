@@ -7,9 +7,9 @@ using MediatR;
 
 namespace CarBookingApp.Application.Rides.Queries;
 
-public record GetPendingRidesQuery(int UserId) : IRequest<List<RideDTO>>;
+public record GetPendingRidesQuery(int UserId) : IRequest<List<RideShortInfoDTO>>;
 
-public class GetPendingRidesQueryHandler : IRequestHandler<GetPendingRidesQuery, List<RideDTO>>
+public class GetPendingRidesQueryHandler : IRequestHandler<GetPendingRidesQuery, List<RideShortInfoDTO>>
 {
     private readonly IRepository _repository;
     private readonly IMapper _mapper;
@@ -20,7 +20,7 @@ public class GetPendingRidesQueryHandler : IRequestHandler<GetPendingRidesQuery,
         _mapper = mapper;
     }
 
-    public async Task<List<RideDTO>> Handle(GetPendingRidesQuery request, CancellationToken cancellationToken)
+    public async Task<List<RideShortInfoDTO>> Handle(GetPendingRidesQuery request, CancellationToken cancellationToken)
     {
         var userRides = await _repository
             .GetByPredicate<UserRide>(ur => ur.BookingStatus == BookingStatus.PENDING
@@ -29,6 +29,6 @@ public class GetPendingRidesQueryHandler : IRequestHandler<GetPendingRidesQuery,
 
         var rides = userRides.Select(ur => ur.Ride).ToList();
         
-        return _mapper.Map<List<Ride>, List<RideDTO>>(rides);
+        return _mapper.Map<List<Ride>, List<RideShortInfoDTO>>(rides);
     }
 }

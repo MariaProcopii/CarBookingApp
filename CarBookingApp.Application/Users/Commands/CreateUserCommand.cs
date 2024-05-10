@@ -1,8 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.Users.Responses;
-using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
@@ -12,7 +10,6 @@ public class CreateUserCommand : IRequest<UserDTO>
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    // [EnumDataType(typeof(Gender))]
     public string Gender { get; set; }
     public DateTime DateOfBirth { get; set; } 
     public string Email { get; set; }

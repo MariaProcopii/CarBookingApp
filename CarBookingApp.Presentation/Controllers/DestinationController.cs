@@ -22,7 +22,7 @@ public class DestinationController : ControllerBase
         
     [HttpGet]
     [Route("pick/name")]
-    public async Task<List<DestinationDTO>> GetAllDestinations()
+    public async Task<List<String>> GetAllDestinations()
     {
         return await _mediator.Send(new GetAllDestinationsQuery());
     }
