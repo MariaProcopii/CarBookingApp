@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace CarBookingApp.Application.Users.Validations;
 
-public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
 {
-    public CreateUserCommandValidator()
+    public UpdateUserCommandValidator()
     {
         RuleFor(x => x.FirstName).NotEmpty().MaximumLength(50);
         RuleFor(x => x.LastName).NotEmpty().MaximumLength(50);
@@ -16,7 +16,7 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
         RuleFor(x => x.PhoneNumber).NotEmpty().Matches(@"^[0-9]*$");
     }
-    
+
     private bool BeAValidDate(DateTime dateOfBirth)
     {
         DateTime minimumDateOfBirth = DateTime.Now.Date.AddYears(-18);

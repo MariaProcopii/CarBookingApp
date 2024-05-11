@@ -1,7 +1,4 @@
-using AutoMapper;
 using CarBookingApp.Application.Abstractions;
-using CarBookingApp.Application.Vehicles.Responses;
-using CarBookingApp.Domain.Model;
 using MediatR;
 
 namespace CarBookingApp.Application.Vehicles.Queries;
@@ -14,12 +11,10 @@ public class GetAllModelsForVendorQuery() : IRequest<List<String>>
 public class GetAllModelsForVendorQueryHandler : IRequestHandler<GetAllModelsForVendorQuery, List<String>>
 {
     private readonly IVehicleRepository _repository;
-    private readonly IMapper _mapper;
 
-    public GetAllModelsForVendorQueryHandler(IVehicleRepository repository, IMapper mapper)
+    public GetAllModelsForVendorQueryHandler(IVehicleRepository repository)
     {
         _repository = repository;
-        _mapper = mapper;
     }
 
     public async Task<List<String>> Handle(GetAllModelsForVendorQuery request, CancellationToken cancellationToken)

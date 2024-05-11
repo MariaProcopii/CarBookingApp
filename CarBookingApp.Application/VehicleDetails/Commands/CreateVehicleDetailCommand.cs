@@ -35,7 +35,7 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleDetailCo
         var user = await _repository.GetByIdAsync<User>(request.UserId);
         if (user is not Driver)
         {
-            throw new ActionNotAllowedException("User should be a driver.");
+            throw new ActionNotAllowedException($"User with id {request.UserId} should be a driver.");
         }
         
         var vehicleDetail = new VehicleDetail

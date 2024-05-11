@@ -29,7 +29,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
             if (failures.Any())
             {
-                throw new EntityNotValidException(String.Join(", ", failures));
+                throw new EntityNotValidException(String.Join(" ", failures));
             }
         }
         return await next();

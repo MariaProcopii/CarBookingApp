@@ -1,4 +1,5 @@
 using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Common.Exceptions;
 using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using MediatR;
@@ -23,6 +24,17 @@ public class RejectUserForRideCommandHandler : IRequestHandler<RejectUserForRide
     {
         var userRide = await _repository.GetByPredicate<UserRide>(ur => ur.RideId == request.RideId
                                                                         && ur.PassengerId == request.PassengerId);
+        if (!userRide.Any())
+        {
+            throw new ActionNotAllowedException($"No user with id {request.PassengerId} is waiting approval " +
+                                                $"for ride with id {request.RideId}");
+        }
+
+        if (userRide.First().BookingStatus == BookingStatus.APPROVED)
+        {
+            throw new ActionNotAllowedException("You cannot reject already approved user");
+        }
+        
         userRide.First().BookingStatus = BookingStatus.REJECTED;
         await _repository.Save();
         return request.RideId;
