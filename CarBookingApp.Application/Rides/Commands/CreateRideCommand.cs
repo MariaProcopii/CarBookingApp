@@ -33,7 +33,7 @@ public class CreateRideCommandHandler : IRequestHandler<CreateRideCommand, RideW
         var owner = await _repository.GetByIdAsync<User>(request.OwnerId);
         if (owner is not Driver)
         {
-            throw new ActionNotAllowedException("User is not a driver");
+            throw new ActionNotAllowedException("User is not a driver.");
         }
         var destinationFrom = await _repository
             .GetByPredicate<Destination>(d => d.Name == request.DestinationFrom);
