@@ -10,20 +10,18 @@ namespace CarBookingApp.Presentation.Controllers;
 [Route("[controller]")]
 public class FacilityController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
-
     private readonly IMediator _mediator;
 
-    public FacilityController(ILogger<UserController> logger, IMediator mediator)
+    public FacilityController(IMediator mediator)
     {
-        _logger = logger;
         _mediator = mediator;
     }
         
     [HttpGet]
     [Route("pick/type")]
-    public async Task<List<String>> GetAllFacilities()
+    public async Task<ActionResult<List<String>>> GetAllFacilities()
     {
-        return await _mediator.Send(new GetAllFacilitiesQuery());
+        var result = await _mediator.Send(new GetAllFacilitiesQuery());
+        return Ok(result);
     }
 }

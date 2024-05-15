@@ -26,14 +26,6 @@ public class CarBookingAppDbContext : DbContext
     {
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        const string connectionString = "Host=localhost;Port=5432;Database=carbookingapp;Username=maria;Password=maria;";
-        optionsBuilder
-            .UseNpgsql(connectionString)
-            .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

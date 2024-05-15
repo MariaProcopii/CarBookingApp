@@ -10,39 +10,36 @@ namespace CarBookingApp.Presentation.Controllers;
 [Route("[controller]")]
 public class VehicleDetailController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
-
     private readonly IMediator _mediator;
 
-    public VehicleDetailController(ILogger<UserController> logger, IMediator mediator)
+    public VehicleDetailController(IMediator mediator)
     {
-        _logger = logger;
         _mediator = mediator;
     }
     
     [HttpPost]
     [Route("create/{userId}")]
-    public async Task<VehicleDetailDTO> CreateVehicleDetail(int userId, [FromBody] CreateVehicleDetailCommand createVehicleDetailCommand)
+    public async Task<ActionResult<VehicleDetailDTO>> CreateVehicleDetail(int userId, [FromBody] CreateVehicleDetailCommand createVehicleDetailCommand)
     {
         createVehicleDetailCommand.UserId = userId;
         var result = await _mediator.Send(createVehicleDetailCommand);
-        return result;
+        return Ok(result);
     }
     
     [HttpPut]
     [Route("info/update/{userId}")]
-    public async Task<VehicleDetailDTO> UpdateVehicleDetail(int userId, [FromBody] UpdateVehicleDetailCommand updateVehicleDetailCommand)
+    public async Task<ActionResult<VehicleDetailDTO>> UpdateVehicleDetail(int userId, [FromBody] UpdateVehicleDetailCommand updateVehicleDetailCommand)
     {
         updateVehicleDetailCommand.UserId = userId;
         var result = await _mediator.Send(updateVehicleDetailCommand);
-        return result;
+        return Ok(result);
     }
     
     [HttpGet]
     [Route("info/{userId}")]
-    public async Task<VehicleDetailDTO> GetVehicleDetailById(int userId)
+    public async Task<ActionResult<VehicleDetailDTO>> GetVehicleDetailById(int userId)
     {
         var result = await _mediator.Send(new GetVehicleDetailByIdQuery(userId));
-        return result;
+        return Ok(result);
     }
 }

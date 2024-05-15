@@ -1,49 +1,65 @@
+using System.Linq.Expressions;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.Vehicles.Queries;
+using CarBookingApp.Domain.Model;
 using Moq;
 using Xunit;
 
 namespace CarBookingApp.UnitTests.Application.Vehicles.Queries;
 
-    public class GetAllModelsForVendorQueryTests
+public class GetAllModelsForVendorQueryTests
+{
+    private readonly Mock<IRepository> _mockRepository;
+    private readonly GetAllModelsForVendorQueryHandler _handler;
+
+    public GetAllModelsForVendorQueryTests()
     {
-        private readonly Mock<IVehicleRepository> _mockRepository;
-        private readonly GetAllModelsForVendorQueryHandler _handler;
+        _mockRepository = new Mock<IRepository>();
+        _handler = new GetAllModelsForVendorQueryHandler(_mockRepository.Object);
+    }
 
-        public GetAllModelsForVendorQueryTests()
+    [Fact]
+    public async Task GetAllModelsForVendor_WhenVendorExists_ShouldReturnListOfModels()
+    {
+        var vendor = "Toyota";
+        var query = new GetAllModelsForVendorQuery { Vendor = vendor };
+        var vehicles = new List<Vehicle>
         {
-            _mockRepository = new Mock<IVehicleRepository>();
-            _handler = new GetAllModelsForVendorQueryHandler(_mockRepository.Object);
-        }
+            new() { Vender = "Toyota", Model = "Corolla" },
+            new() { Vender = "Toyota", Model = "Camry" },
+            new() { Vender = "Toyota", Model = "Rav4" }
+        };
+        _mockRepository.Setup(repo => repo
+            .GetByPredicate(It.IsAny<Expression<Func<Vehicle, bool>>>())).ReturnsAsync(vehicles);
 
-        [Fact]
-        public async Task GetAllModelsForVendor_WhenVendorExists_ShouldReturnListOfModels()
+        var result = await _handler.Handle(query, CancellationToken.None);
+
+        Assert.Multiple(() =>
         {
-            var vendor = "Toyota";
-            var command = new GetAllModelsForVendorQuery { Vendor = vendor };
-            var expectedModels = new List<string> { "Corolla", "Camry", "Rav4" };
-            _mockRepository.Setup(repo => repo.GetModelsForVendorListAsynk(vendor))
-                           .ReturnsAsync(expectedModels);
-
-            var result = await _handler.Handle(command, CancellationToken.None);
-
             Assert.NotNull(result);
-            _mockRepository.Verify(repo => repo.GetModelsForVendorListAsynk(vendor), Times.Once);
-        }
+            Assert.Equal(vehicles.Select(v => v.Model).Distinct(), result);
+            _mockRepository.Verify(repo => repo
+                .GetByPredicate(It.IsAny<Expression<Func<Vehicle, bool>>>()), Times.Once);
+        });
+    }
 
-        [Fact]
-        public async Task GetAllModelsForVendor_WhenVendorDoesNotExists_ShouldReturnEmptyList()
+    [Fact]
+    public async Task GetAllModelsForVendor_WhenVendorDoesNotExists_ShouldReturnEmptyList()
+    {
+        var vendor = "NonExistingVendor";
+        var query = new GetAllModelsForVendorQuery { Vendor = vendor };
+        var vehicles = new List<Vehicle>();
+        _mockRepository.Setup(repo => repo
+            .GetByPredicate(It.IsAny<Expression<Func<Vehicle, bool>>>())).ReturnsAsync(vehicles);
+
+        var result = await _handler.Handle(query, CancellationToken.None);
+
+        Assert.Multiple(() =>
         {
-            var vendor = "NonExistingVendor";
-            var expectedModels = new List<string>();
-            var command = new GetAllModelsForVendorQuery { Vendor = vendor };
-            _mockRepository.Setup(repo => repo.GetModelsForVendorListAsynk(vendor))
-                           .ReturnsAsync(expectedModels);
-
-            var result = await _handler.Handle(command, CancellationToken.None);
-
             Assert.NotNull(result);
             Assert.Empty(result);
-            _mockRepository.Verify(repo => repo.GetModelsForVendorListAsynk(vendor), Times.Once);
-        }
+            _mockRepository.Verify(repo => repo
+                .GetByPredicate(It.IsAny<Expression<Func<Vehicle, bool>>>()), Times.Once);
+        });
     }
+}

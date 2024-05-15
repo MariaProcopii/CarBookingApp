@@ -11,80 +11,87 @@ namespace CarBookingApp.Presentation.Controllers;
 [Route("[controller]")]
 public class RideController : ControllerBase
 {
-    private readonly ILogger<RideController> _logger;
-
     private readonly IMediator _mediator;
 
-    public RideController(ILogger<RideController> logger, IMediator mediator)
+    public RideController(IMediator mediator)
     {
-        _logger = logger;
         _mediator = mediator;
     }
     
     [HttpPost]
     [Route("create/{ownerId}")]
-    public async Task<RideWithRideDetailsInfoDTO> CreateRide(int ownerId, [FromBody] CreateRideCommand createRideCommand)
+    public async Task<ActionResult<RideWithRideDetailsInfoDTO>> CreateRide(int ownerId, 
+        [FromBody] CreateRideCommand createRideCommand)
     {
         createRideCommand.OwnerId = ownerId;
         var result = await _mediator.Send(createRideCommand);
-        return result;
+        return Ok(result);
     }
     
     [HttpDelete]
     [Route("delete/{rideId}")]
-    public async Task<RideShortInfoDTO> DeleteRide(int rideId)
+    public async Task<ActionResult<RideShortInfoDTO>> DeleteRide(int rideId)
     {
         var result = await _mediator.Send(new DeleteRideCommand(rideId));
-        return result;
+        return Ok(result);
     }
     
     [HttpPut]
     [Route("info/update/{rideId}")]
-    public async Task<RideWithRideDetailsInfoDTO> UpdateRide(int rideId, [FromBody] UpdateRideCommand updateRideCommand)
+    public async Task<ActionResult<RideWithRideDetailsInfoDTO>> UpdateRide(int rideId, 
+        [FromBody] UpdateRideCommand updateRideCommand)
     {
         updateRideCommand.RideId = rideId;
-        return await _mediator.Send(updateRideCommand);
+        var result = await _mediator.Send(updateRideCommand);
+        return Ok(result);
     }
     
     [HttpPost]
     [Route("info/book")]
-    public async Task<RideShortInfoDTO> BookRide([FromBody] BookRideCommand bookRideCommand)
+    public async Task<ActionResult<RideShortInfoDTO>> BookRide([FromBody] BookRideCommand bookRideCommand)
     {
-        return await _mediator.Send(bookRideCommand);
+        var result = await _mediator.Send(bookRideCommand);
+        return Ok(result);
     }
     
     [HttpPut]
     [Route("info/unsubscribe")]
-    public async Task<RideShortInfoDTO> UnsubscribeFromRide([FromBody] UnsubscribeFromRideCommand unsubscribeFromRideCommand)
+    public async Task<ActionResult<RideShortInfoDTO>> UnsubscribeFromRide(
+        [FromBody] UnsubscribeFromRideCommand unsubscribeFromRideCommand)
     {
-        return await _mediator.Send(unsubscribeFromRideCommand);
+        var result = await _mediator.Send(unsubscribeFromRideCommand);
+        return Ok(result);
     }
 
     [HttpGet]
     [Route("{userId}")]
-    public async Task<List<RideShortInfoDTO>> GetAllRides(int userId)
+    public async Task<ActionResult<List<RideShortInfoDTO>>> GetAllRides(int userId)
     {
-        return await _mediator.Send(new GetAllRidesQuery(userId));
+        var result = await _mediator.Send(new GetAllRidesQuery(userId));
+        return Ok(result);
     }
     
     [HttpGet]
     [Route("booked/{userId}")]
-    public async Task<List<RideShortInfoDTO>> GetBookedRides(int userId)
+    public async Task<ActionResult<List<RideShortInfoDTO>>> GetBookedRides(int userId)
     {
-        return await _mediator.Send(new GetBookedRidesQuery(userId));
+        var result = await _mediator.Send(new GetBookedRidesQuery(userId));
+        return Ok(result);
     }
     
     [HttpGet]
     [Route("pending/{userId}")]
-    public async Task<List<RideShortInfoDTO>> GetPendingRides(int userId)
+    public async Task<ActionResult<List<RideShortInfoDTO>>> GetPendingRides(int userId)
     {
-        return await _mediator.Send(new GetPendingRidesQuery(userId));
+        var result = await _mediator.Send(new GetPendingRidesQuery(userId));
+        return Ok(result);
     }
     
     [HttpGet]
     [Route("details/{rideId}")]
-    public async Task<RideFullInfoDTO> GetRideInfoById(int rideId)
+    public async Task<ActionResult<RideFullInfoDTO>> GetRideInfoById(int rideId)
     {
-        return await _mediator.Send(new GetRideInfoByIdQuery(rideId));
+        var result = await _mediator.Send(new GetRideInfoByIdQuery(rideId));
+        return Ok(result);
     }
 }

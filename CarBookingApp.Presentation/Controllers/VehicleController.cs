@@ -8,29 +8,26 @@ namespace CarBookingApp.Presentation.Controllers;
 [Route("[controller]")]
 public class VehicleController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
-
     private readonly IMediator _mediator;
 
-    public VehicleController(ILogger<UserController> logger, IMediator mediator)
-    {
-        _logger = logger;
+    public VehicleController(IMediator mediator)
+    { 
         _mediator = mediator;
     }
     
     [HttpGet]
     [Route("pick/vendor")]
-    public async Task<List<String>> GetAllVendor()
+    public async Task<ActionResult<List<String>>> GetAllVendor()
     {
         var result = await _mediator.Send(new GetAllUniqueVendorQuery());
-        return result;
+        return Ok(result);
     }
     
     [HttpGet]
     [Route("pick/model")]
-    public async Task<List<String>> GetAllModelsForVendor([FromBody] GetAllModelsForVendorQuery getAllModelsForVendorQuery)
+    public async Task<ActionResult<List<String>>> GetAllModelsForVendor([FromBody] GetAllModelsForVendorQuery getAllModelsForVendorQuery)
     {
         var result = await _mediator.Send(getAllModelsForVendorQuery);
-        return result;
+        return Ok(result);
     }
 }

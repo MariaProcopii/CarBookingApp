@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>CarBookingApp.Presentation</RootNamespace>
+        <UserSecretsId>312632a2-07af-4d9c-a40a-54fedc01ea41</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
