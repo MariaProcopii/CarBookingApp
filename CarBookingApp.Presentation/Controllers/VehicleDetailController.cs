@@ -2,12 +2,14 @@ using CarBookingApp.Application.VehicleDetails.Commands;
 using CarBookingApp.Application.VehicleDetails.Queries;
 using CarBookingApp.Application.VehicleDetails.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarBookingApp.Presentation.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class VehicleDetailController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -19,6 +21,7 @@ public class VehicleDetailController : ControllerBase
     
     [HttpPost]
     [Route("create/{userId}")]
+    [Authorize("Driver")]
     public async Task<ActionResult<VehicleDetailDTO>> CreateVehicleDetail(int userId, [FromBody] CreateVehicleDetailCommand createVehicleDetailCommand)
     {
         createVehicleDetailCommand.UserId = userId;
@@ -28,6 +31,7 @@ public class VehicleDetailController : ControllerBase
     
     [HttpPut]
     [Route("info/update/{userId}")]
+    [Authorize("Driver")]
     public async Task<ActionResult<VehicleDetailDTO>> UpdateVehicleDetail(int userId, [FromBody] UpdateVehicleDetailCommand updateVehicleDetailCommand)
     {
         updateVehicleDetailCommand.UserId = userId;
@@ -37,6 +41,8 @@ public class VehicleDetailController : ControllerBase
     
     [HttpGet]
     [Route("info/{userId}")]
+    [Authorize("User, Driver")]
+
     public async Task<ActionResult<VehicleDetailDTO>> GetVehicleDetailById(int userId)
     {
         var result = await _mediator.Send(new GetVehicleDetailByIdQuery(userId));

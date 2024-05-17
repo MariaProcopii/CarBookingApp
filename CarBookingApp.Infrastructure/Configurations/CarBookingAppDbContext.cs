@@ -1,11 +1,14 @@
 using System.Reflection;
+using CarBookingApp.Domain.Auth;
 using CarBookingApp.Domain.Model;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CarBookingApp.Infrastructure.Configurations;
 
-public class CarBookingAppDbContext : DbContext
+public class CarBookingAppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
 {
     public DbSet<User> Users { get; set; } = default!;
     public DbSet<Driver> Drivers { get; set; } = default!;
@@ -16,11 +19,7 @@ public class CarBookingAppDbContext : DbContext
     public DbSet<RideReview> RideReviews { get; set; } = default!;
     public DbSet<Vehicle> Vehicles { get; set; } = default!;
     public DbSet<VehicleDetail> VehicleDetails { get; set; } = default!;
-
-
-    public CarBookingAppDbContext()
-    {
-    }
+    
 
     public CarBookingAppDbContext(DbContextOptions options) : base(options)
     {
@@ -28,6 +27,7 @@ public class CarBookingAppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

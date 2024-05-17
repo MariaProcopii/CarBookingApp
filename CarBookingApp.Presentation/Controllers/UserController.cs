@@ -2,12 +2,14 @@ using CarBookingApp.Application.Users.Commands;
 using CarBookingApp.Application.Users.Queries;
 using CarBookingApp.Application.Users.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarBookingApp.Presentation.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -19,6 +21,7 @@ public class UserController : ControllerBase
     
     [HttpGet]
     [Route("info/{id}")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<UserDTO>> GetUserById(int id)
     {
         var result = await _mediator.Send(new GetUserByIdQuery(id));
@@ -26,6 +29,7 @@ public class UserController : ControllerBase
     }
     
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<List<UserDTO>>> GetUsers()
     {
         var result = await _mediator.Send(new GetAllUsersQuery());
@@ -43,6 +47,7 @@ public class UserController : ControllerBase
     
     [HttpPut]
     [Route("info/update/{id}")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<UserDTO>> UpdateUser(int id, 
         [FromBody] UpdateUserCommand updateUserCommand)
     {
@@ -53,6 +58,7 @@ public class UserController : ControllerBase
     
     [HttpDelete]
     [Route("{id}")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<UserDTO>> DeleteUser(int id)
     {
         var result = await _mediator.Send(new DeleteUserCommand(id));
@@ -61,6 +67,7 @@ public class UserController : ControllerBase
     
     [HttpPost]
     [Route("info/upgrade/{id}")]
+    [Authorize(Roles = "User")]
     public async Task<ActionResult<UserDTO>> UpgradeUserToDriver(int id, 
         [FromBody] UpgradeUserToDriverCommand upgradeUserToDriverCommand)
     {
@@ -71,6 +78,7 @@ public class UserController : ControllerBase
     
     [HttpPut]
     [Route("info/downgrade/{id}")]
+    [Authorize(Roles = "Driver")]
     public async Task<ActionResult<UserDTO>> DowngradeDriverToUser(int id)
     {
         var result = await _mediator.Send(new DowngradeDriverToUserCommand(id));
@@ -79,6 +87,7 @@ public class UserController : ControllerBase
     
     [HttpPut]
     [Route("pending/approve")]
+    [Authorize(Roles = "Driver")]
     public async Task<ActionResult<int>> ApproveUserForRide(
         [FromBody] ApproveUserForRideCommand approveUserForRideCommand)
     {
@@ -88,6 +97,7 @@ public class UserController : ControllerBase
     
     [HttpPut]
     [Route("pending/reject")]
+    [Authorize(Roles = "Driver")]
     public async Task<ActionResult<int>> RejectUserForRide(
         [FromBody] RejectUserForRideCommand rejectUserForRideCommand)
     {
@@ -97,6 +107,7 @@ public class UserController : ControllerBase
     
     [HttpGet]
     [Route("pending/{userId}")]
+    [Authorize(Roles = "Driver")]
     public async Task<ActionResult<List<UserDTO>>> GetPendingPassengers(int userId)
     {
         var result = await _mediator.Send(new GetPendingPassengersQuery(userId));

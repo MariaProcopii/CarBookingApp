@@ -3,12 +3,14 @@ using CarBookingApp.Application.Rides.Queries;
 using CarBookingApp.Application.Rides.Responses;
 using CarBookingApp.Application.Users.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarBookingApp.Presentation.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class RideController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -20,6 +22,7 @@ public class RideController : ControllerBase
     
     [HttpPost]
     [Route("create/{ownerId}")]
+    [Authorize(Roles = "Driver")]
     public async Task<ActionResult<RideWithRideDetailsInfoDTO>> CreateRide(int ownerId, 
         [FromBody] CreateRideCommand createRideCommand)
     {
@@ -30,6 +33,7 @@ public class RideController : ControllerBase
     
     [HttpDelete]
     [Route("delete/{rideId}")]
+    [Authorize(Roles = "Driver")]
     public async Task<ActionResult<RideShortInfoDTO>> DeleteRide(int rideId)
     {
         var result = await _mediator.Send(new DeleteRideCommand(rideId));
@@ -38,6 +42,7 @@ public class RideController : ControllerBase
     
     [HttpPut]
     [Route("info/update/{rideId}")]
+    [Authorize(Roles = "Driver")]
     public async Task<ActionResult<RideWithRideDetailsInfoDTO>> UpdateRide(int rideId, 
         [FromBody] UpdateRideCommand updateRideCommand)
     {
@@ -48,6 +53,7 @@ public class RideController : ControllerBase
     
     [HttpPost]
     [Route("info/book")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<RideShortInfoDTO>> BookRide([FromBody] BookRideCommand bookRideCommand)
     {
         var result = await _mediator.Send(bookRideCommand);
@@ -56,6 +62,7 @@ public class RideController : ControllerBase
     
     [HttpPut]
     [Route("info/unsubscribe")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<RideShortInfoDTO>> UnsubscribeFromRide(
         [FromBody] UnsubscribeFromRideCommand unsubscribeFromRideCommand)
     {
@@ -65,6 +72,7 @@ public class RideController : ControllerBase
 
     [HttpGet]
     [Route("{userId}")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<List<RideShortInfoDTO>>> GetAllRides(int userId)
     {
         var result = await _mediator.Send(new GetAllRidesQuery(userId));
@@ -73,6 +81,7 @@ public class RideController : ControllerBase
     
     [HttpGet]
     [Route("booked/{userId}")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<List<RideShortInfoDTO>>> GetBookedRides(int userId)
     {
         var result = await _mediator.Send(new GetBookedRidesQuery(userId));
@@ -81,6 +90,7 @@ public class RideController : ControllerBase
     
     [HttpGet]
     [Route("pending/{userId}")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<List<RideShortInfoDTO>>> GetPendingRides(int userId)
     {
         var result = await _mediator.Send(new GetPendingRidesQuery(userId));
@@ -89,6 +99,7 @@ public class RideController : ControllerBase
     
     [HttpGet]
     [Route("details/{rideId}")]
+    [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<RideFullInfoDTO>> GetRideInfoById(int rideId)
     {
         var result = await _mediator.Send(new GetRideInfoByIdQuery(rideId));
