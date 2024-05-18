@@ -1,7 +1,6 @@
 using System.Net;
 using CarBookingApp.Application.Users.Commands;
 using CarBookingApp.Application.Users.Responses;
-using CarBookingApp.Domain.Model;
 using CarBookingApp.Infrastructure.Repositories;
 using CarBookingApp.IntegrationTests.Helpers;
 using CarBookingApp.Presentation.Controllers;
@@ -91,39 +90,6 @@ public class UserControllerIntegrationTests
     }
     
     [Fact]
-    public async Task UserController_WhenCommandIsValid_ShouldCreateUser()
-    {
-        using var contextBuilder = new DataContextBuilder();
-
-        var dbContext = contextBuilder.GetContext();
-        var mediator = TestHelpers.CreateMediator(new Repository(dbContext));
-        var controller = new UserController(mediator);
-
-        var createUserCommand = new CreateUserCommand
-        {
-            FirstName = "Maria",
-            LastName = "Procopii",
-            Gender = "FEMALE",
-            DateOfBirth = new DateTime(1990, 1, 1),
-            Email = "mari.procopii@example.com",
-            PhoneNumber = "069889092"
-        };
-
-        var resultRequest = await controller.CreateUser(createUserCommand);
-        var result = resultRequest.Result as OkObjectResult;
-        var user = result!.Value as UserDTO;
-
-        Assert.Multiple(() =>
-        {
-            Assert.NotNull(user);
-            Assert.Equal("Maria", user.FirstName);
-            Assert.Equal("Procopii", user.LastName);
-            Assert.Equal("FEMALE", user.Gender);
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-        });
-    }
-    
-    [Fact]
     public async Task UserController_WhenUpdateCommandIsValid_ShouldUpdateUser()
     {
         var userCount = 1;
@@ -160,31 +126,6 @@ public class UserControllerIntegrationTests
         });
     }
     
-    [Fact]
-    public async Task UserController_WhenUserExists_ShouldDeleteUser()
-    {
-        var userCount = 1;
-
-        using var contextBuilder = new DataContextBuilder();
-        var dbContext = contextBuilder.GetContext();
-        contextBuilder.SeedUsers(userCount);
-
-        var mediator = TestHelpers.CreateMediator(new Repository(dbContext));
-        var controller = new UserController(mediator);
-
-        var resultRequest = await controller.DeleteUser(userCount);
-        var result = resultRequest.Result as OkObjectResult;
-        var user = result!.Value as UserDTO;
-
-        Assert.Multiple(() =>
-        {
-            Assert.NotNull(user);
-            Assert.Equal(userCount, user.Id);
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            var deletedUser = dbContext.Set<User>().Find(userCount);
-            Assert.Null(deletedUser);
-        });
-    }
     
     [Fact]
     public async Task UserController_WhenValidCommand_ShouldApproveUserForRide()

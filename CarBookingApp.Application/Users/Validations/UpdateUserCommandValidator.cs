@@ -15,6 +15,12 @@ public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
             .WithMessage("The user must be at least 18 years old.");
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
         RuleFor(x => x.PhoneNumber).NotEmpty().Matches(@"^[0-9]*$");
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .MinimumLength(8)
+            .WithMessage("Password must be at least 8 characters long.")
+            .Matches(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$")
+            .WithMessage("Password must contain at least one uppercase letter, one lowercase letter and one digit.");
     }
 
     private bool BeAValidDate(DateTime dateOfBirth)

@@ -17,5 +17,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseDbTransaction();
 app.MapControllers();
 app.Run();

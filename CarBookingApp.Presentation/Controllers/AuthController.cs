@@ -16,9 +16,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("SignIn")]
-    public async Task<IActionResult> SignInUser(SignInUserCommand signInUserCommand)
+    public async Task<IActionResult> SignUpUser(SignUpUserCommand signUpUserCommand)
     {
-        var accessToken = await _mediator.Send(signInUserCommand);
+        var accessToken = await _mediator.Send(signUpUserCommand);
         return Ok(accessToken);
     }
     

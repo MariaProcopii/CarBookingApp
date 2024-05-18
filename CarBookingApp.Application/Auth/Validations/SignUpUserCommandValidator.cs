@@ -1,12 +1,12 @@
-using CarBookingApp.Application.Users.Commands;
+using CarBookingApp.Application.Auth.Command;
 using CarBookingApp.Domain.Enum;
 using FluentValidation;
 
-namespace CarBookingApp.Application.Users.Validations;
+namespace CarBookingApp.Application.Auth.Validations;
 
-public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+public class SignUpUserCommandValidator : AbstractValidator<SignUpUserCommand>
 {
-    public CreateUserCommandValidator()
+    public SignUpUserCommandValidator()
     {
         RuleFor(x => x.FirstName).NotEmpty().MaximumLength(50);
         RuleFor(x => x.LastName).NotEmpty().MaximumLength(50);
@@ -15,6 +15,12 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
             .WithMessage("The user must be at least 18 years old.");
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
         RuleFor(x => x.PhoneNumber).NotEmpty().Matches(@"^[0-9]*$");
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .MinimumLength(8)
+            .WithMessage("Password must be at least 8 characters long.")
+            .Matches(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$")
+            .WithMessage("Password must contain at least one uppercase letter, one lowercase letter and one digit.");
     }
     
     private bool BeAValidDate(DateTime dateOfBirth)

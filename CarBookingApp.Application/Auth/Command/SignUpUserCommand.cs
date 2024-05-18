@@ -1,12 +1,15 @@
 using System.Security.Claims;
+using AutoMapper;
 using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Common.Exceptions;
 using CarBookingApp.Domain.Auth;
+using CarBookingApp.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 namespace CarBookingApp.Application.Auth.Command;
 
-public class SignInUserCommand : IRequest<string>
+public class SignUpUserCommand : IRequest<string>
 {
     public string Email { get; set; }
     public string Password { get; set; }
@@ -17,30 +20,38 @@ public class SignInUserCommand : IRequest<string>
     public string PhoneNumber { get; set; } 
 }
 
-public class SignInUserCommandHandler : IRequestHandler<SignInUserCommand, string>
+public class SignInUserCommandHandler : IRequestHandler<SignUpUserCommand, string>
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly IJwtService _jwtService;
     private readonly IRepository _repository;
-    public SignInUserCommandHandler(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IJwtService jwtService, IRepository repository)
+    private readonly IMapper _mapper;
+
+    public SignInUserCommandHandler(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager, IJwtService jwtService, IRepository repository, IMapper mapper)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _jwtService = jwtService;
         _repository = repository;
+        _mapper = mapper;
     }
 
-    public async Task<string> Handle(SignInUserCommand request, CancellationToken cancellationToken)
+    public async Task<string> Handle(SignUpUserCommand request, CancellationToken cancellationToken)
     {
         var newAppUser = new ApplicationUser
         {
             UserName = request.FirstName + request.LastName,
-            Email = request.Email,
-            PhoneNumber = request.PhoneNumber
+            Email = request.Email
         };
-        
+        var isEmailPresent = await _userManager.FindByEmailAsync(request.Email);
+        if (isEmailPresent is not null)
+        {
+            throw new EntityNotValidException("Email already used.");
+        }
+
         var result = await _userManager.CreateAsync(newAppUser, request.Password);
+        var userId = await _userManager.GetUserIdAsync(newAppUser);
         var role = "User";
         if (result.Succeeded)
         {
@@ -58,24 +69,22 @@ public class SignInUserCommandHandler : IRequestHandler<SignInUserCommand, strin
                 new(ClaimTypes.Name, request.FirstName),
                 new(ClaimTypes.Surname, request.LastName),
                 new(ClaimTypes.Email, request.Email),
-                new(ClaimTypes.Role, role)
+                new(ClaimTypes.Role, role),
+                new(ClaimTypes.NameIdentifier, userId)
             };
 
             await _userManager.AddClaimsAsync(newAppUser, claims);
-
-            var token = _jwtService.GenerateAccessToken(new List<Claim>
-            {
-                new(ClaimTypes.Name, request.FirstName),
-                new(ClaimTypes.Surname, request.LastName),
-                new(ClaimTypes.Email, request.Email),
-                new(ClaimTypes.Role, role)
-            });
+            var user = _mapper.Map<SignUpUserCommand, User>(request);
+            user.Id = int.Parse(userId);
+            await _repository.AddAsync(user);
+            await _repository.Save();
+            var token = _jwtService.GenerateAccessToken(claims);
 
             return await Task.FromResult(token);
         }
         else
         {
-            throw new Exception("An error occured in the process of user registration");
+            throw new EntityNotValidException("Something went wrong while creating the user.");
         }
     }
 }

@@ -1,4 +1,5 @@
 using AutoMapper;
+using CarBookingApp.Application.Auth.Command;
 using CarBookingApp.Application.Users.Commands;
 using CarBookingApp.Application.Users.Responses;
 using CarBookingApp.Domain.Enum;
@@ -20,11 +21,11 @@ public class UserProfiles : Profile
             .ForMember(dest => dest.Gender, opt =>
                 opt.MapFrom(src => src.Gender.ToString()));
         
-        CreateMap<CreateUserCommand, User>()
-            .ForMember(dest => dest.Gender, opt => 
-                    opt.MapFrom(src => Enum.Parse<Gender>(src.Gender)));
-        
         CreateMap<UpdateUserCommand, User>()
+            .ForMember(dest => dest.Gender, opt => 
+                opt.MapFrom(src => Enum.Parse<Gender>(src.Gender)));
+        
+        CreateMap<SignUpUserCommand, User>()
             .ForMember(dest => dest.Gender, opt => 
                 opt.MapFrom(src => Enum.Parse<Gender>(src.Gender)));
     }

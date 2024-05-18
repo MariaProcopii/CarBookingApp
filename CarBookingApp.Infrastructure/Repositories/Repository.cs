@@ -21,7 +21,7 @@ public class Repository : IRepository
         var entity = await _carBookingAppDbContext.Set<T>().FindAsync(id);
         if (entity == null)
         {
-            throw new EntityNotFoundException($"Object {typeof(T).Name} with id {id} not found");
+            throw new EntityNotFoundException($"Object {typeof(T).Name} with id {id} not found.");
         }
 
         return entity;
@@ -41,7 +41,7 @@ public class Repository : IRepository
 
         if (entity == null)
         {
-            throw new EntityNotFoundException($"Object {typeof(T).Name} with id {id} not found");
+            throw new EntityNotFoundException($"Object {typeof(T).Name} with id {id} not found.");
         }
 
         return entity;
@@ -56,7 +56,13 @@ public class Repository : IRepository
             entities = entities.Include(includeProperty);
         }
 
-        return await entities.Where(predicate).ToListAsync();
+        var filteredEntities = await entities.Where(predicate).ToListAsync();
+        if (!filteredEntities.Any())
+        {
+            throw new EntityNotFoundException($"Object {typeof(T).Name} not found.");
+        }
+
+        return filteredEntities;
     }
 
     public async Task<IEnumerable<T>> GetAllAsync<T>() where T : Entity

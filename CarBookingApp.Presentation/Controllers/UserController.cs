@@ -20,6 +20,15 @@ public class UserController : ControllerBase
     }
     
     [HttpGet]
+    [Route("info")]
+    [Authorize(Roles = "User, Driver")]
+    public async Task<ActionResult<UserDTO>> GetUserByEmail([FromBody] GetUserByEmailQuery getUserByEmailQuery)
+    {
+        var result = await _mediator.Send(getUserByEmailQuery);
+        return Ok(result);
+    }
+    
+    [HttpGet]
     [Route("info/{id}")]
     [Authorize(Roles = "User, Driver")]
     public async Task<ActionResult<UserDTO>> GetUserById(int id)
@@ -33,15 +42,6 @@ public class UserController : ControllerBase
     public async Task<ActionResult<List<UserDTO>>> GetUsers()
     {
         var result = await _mediator.Send(new GetAllUsersQuery());
-        return Ok(result);
-    }
-    
-    [HttpPost]
-    [Route("create")]
-    public async Task<ActionResult<UserDTO>> CreateUser(
-        [FromBody] CreateUserCommand createUserCommand)
-    {
-        var result = await _mediator.Send(createUserCommand);
         return Ok(result);
     }
     
@@ -59,7 +59,7 @@ public class UserController : ControllerBase
     [HttpDelete]
     [Route("{id}")]
     [Authorize(Roles = "User, Driver")]
-    public async Task<ActionResult<UserDTO>> DeleteUser(int id)
+    public async Task<ActionResult<int>> DeleteUser(int id)
     {
         var result = await _mediator.Send(new DeleteUserCommand(id));
         return Ok(result);
@@ -68,7 +68,7 @@ public class UserController : ControllerBase
     [HttpPost]
     [Route("info/upgrade/{id}")]
     [Authorize(Roles = "User")]
-    public async Task<ActionResult<UserDTO>> UpgradeUserToDriver(int id, 
+    public async Task<ActionResult<string>> UpgradeUserToDriver(int id, 
         [FromBody] UpgradeUserToDriverCommand upgradeUserToDriverCommand)
     {
         upgradeUserToDriverCommand.Id = id;
@@ -79,7 +79,7 @@ public class UserController : ControllerBase
     [HttpPut]
     [Route("info/downgrade/{id}")]
     [Authorize(Roles = "Driver")]
-    public async Task<ActionResult<UserDTO>> DowngradeDriverToUser(int id)
+    public async Task<ActionResult<string>> DowngradeDriverToUser(int id)
     {
         var result = await _mediator.Send(new DowngradeDriverToUserCommand(id));
         return Ok(result);

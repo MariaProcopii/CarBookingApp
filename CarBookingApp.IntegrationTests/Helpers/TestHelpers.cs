@@ -12,7 +12,7 @@ public static class TestHelpers
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(CreateUserCommand))));
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(UpdateUserCommand))));
         services.AddSingleton(repository);
         services.AddAutoMapper(typeof(IRepository));
 

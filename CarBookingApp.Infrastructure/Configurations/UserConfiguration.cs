@@ -1,3 +1,4 @@
+using CarBookingApp.Domain.Auth;
 using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using Microsoft.EntityFrameworkCore;
@@ -63,5 +64,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder
             .Property(u => u.DateOfBirth)
             .HasColumnType("timestamp without time zone");
+        
+        builder.HasKey(u => u.Id);
+
+        builder.HasOne<ApplicationUser>()
+            .WithOne()
+            .HasForeignKey<User>(au => au.Id);
     }
 }

@@ -1,5 +1,3 @@
-using CarBookingApp.Domain.Model;
-
 namespace CarBookingApp.Application.Users.Responses;
 
 public class UserDTO
