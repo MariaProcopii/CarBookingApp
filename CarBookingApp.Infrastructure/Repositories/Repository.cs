@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Common.Models;
 using CarBookingApp.Domain.Model;
 using CarBookingApp.Infrastructure.Configurations;
 using CarBookingApp.Infrastructure.Exceptions;
@@ -97,6 +98,40 @@ public class Repository : IRepository
         _carBookingAppDbContext.Set<T>().Remove(entityToDelete);
 
         return entityToDelete;
+    }
+    
+    public async Task<PaginatedList<T>> GetAllPaginatedAsync<T>(
+        int pageNumber,
+        int pageSize,
+        Expression<Func<T, bool>>? filter = null,
+        Expression<Func<T, object>>? orderBy = null,
+        bool ascending = true,
+        params Expression<Func<T, object>>[] includeProperties) where T : Entity
+    {
+        IQueryable<T> query = _carBookingAppDbContext.Set<T>();
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        foreach (var includeProperty in includeProperties)
+        {
+            query = query.Include(includeProperty);
+        }
+
+        if (orderBy != null)
+        {
+            query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
+        }
+
+        var totalCount = await query.CountAsync();
+        var entities = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PaginatedList<T>(entities, totalCount, pageNumber, pageSize);
     }
 
     public async Task Save()

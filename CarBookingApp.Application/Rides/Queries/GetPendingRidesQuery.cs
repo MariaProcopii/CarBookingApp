@@ -1,5 +1,7 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Common.Models;
 using CarBookingApp.Application.Rides.Responses;
 using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
@@ -7,9 +9,10 @@ using MediatR;
 
 namespace CarBookingApp.Application.Rides.Queries;
 
-public record GetPendingRidesQuery(int UserId) : IRequest<List<RideShortInfoDTO>>;
+public record GetPendingRidesQuery(int UserId, int PageNumber = 1, int PageSize = 9, 
+    string OrderBy = "DateOfTheRide", bool Ascending = true) : IRequest<PaginatedList<RideShortInfoDTO>>;
 
-public class GetPendingRidesQueryHandler : IRequestHandler<GetPendingRidesQuery, List<RideShortInfoDTO>>
+public class GetPendingRidesQueryHandler : IRequestHandler<GetPendingRidesQuery, PaginatedList<RideShortInfoDTO>>
 {
     private readonly IRepository _repository;
     private readonly IMapper _mapper;
@@ -20,15 +23,37 @@ public class GetPendingRidesQueryHandler : IRequestHandler<GetPendingRidesQuery,
         _mapper = mapper;
     }
 
-    public async Task<List<RideShortInfoDTO>> Handle(GetPendingRidesQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<RideShortInfoDTO>> Handle(GetPendingRidesQuery request, CancellationToken cancellationToken)
     {
-        var userRides = await _repository
-            .GetByPredicate<UserRide>(ur => ur.BookingStatus == BookingStatus.PENDING
-                                            && ur.PassengerId == request.UserId, ur => ur.Ride,
-                ur => ur.Ride.DestinationTo, ur => ur.Ride.DestinationFrom);
+        int pageNumber = request.PageNumber;
+        int pageSize = request.PageSize;
 
-        var rides = userRides.Select(ur => ur.Ride).ToList();
+        Expression<Func<UserRide, bool>> filter = ur => ur.BookingStatus == BookingStatus.PENDING
+                                                        && ur.PassengerId == request.UserId;
+
+        Expression<Func<UserRide, object>> orderBy = request.OrderBy.ToLower() switch
+        {
+            "dateoftheride" => ur => ur.Ride.DateOfTheRide,
+            "destinationfrom" => ur => ur.Ride.DestinationFrom,
+            "destinationto" => ur => ur.Ride.DestinationTo,
+            _ => ur => ur.Ride.DateOfTheRide
+        };
+
+        var userRidesPaginated = await _repository.GetAllPaginatedAsync(
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            filter: filter,
+            orderBy: orderBy,
+            ascending: request.Ascending,
+            ur => ur.Ride,
+            ur => ur.Ride.DestinationTo,
+            ur => ur.Ride.DestinationFrom
+        );
+
+        var rides = userRidesPaginated.Items.Select(ur => ur.Ride).ToList();
         
-        return _mapper.Map<List<Ride>, List<RideShortInfoDTO>>(rides);
+        var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(rides);
+
+        return new PaginatedList<RideShortInfoDTO>(rideDTOs, userRidesPaginated.TotalCount, userRidesPaginated.PageIndex, userRidesPaginated.PageSize);
     }
 }

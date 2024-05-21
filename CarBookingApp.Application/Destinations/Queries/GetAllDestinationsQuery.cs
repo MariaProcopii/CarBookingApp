@@ -9,7 +9,7 @@ public record GetAllDestinationsQuery() : IRequest<List<String>>;
 public class GetAllDestinationsQueryHandler : IRequestHandler<GetAllDestinationsQuery, List<String>>
 {
     private readonly IRepository _repository;
-
+        
     public GetAllDestinationsQueryHandler(IRepository repository)
     {
         _repository = repository;

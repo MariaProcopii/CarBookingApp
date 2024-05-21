@@ -1,3 +1,4 @@
+using CarBookingApp.Application.Common.Models;
 using CarBookingApp.Application.Users.Commands;
 using CarBookingApp.Application.Users.Queries;
 using CarBookingApp.Application.Users.Responses;
@@ -39,9 +40,15 @@ public class UserController : ControllerBase
     
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<List<UserDTO>>> GetUsers()
+    public async Task<ActionResult<PaginatedList<UserDTO>>> GetUsers(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 9,
+        [FromQuery] string? username = null,
+        [FromQuery] string orderBy = "Name",
+        [FromQuery] bool ascending = true)
     {
-        var result = await _mediator.Send(new GetAllUsersQuery());
+        var query = new GetAllUsersQuery(pageNumber, pageSize, username, orderBy, ascending);
+        var result = await _mediator.Send(query);
         return Ok(result);
     }
     
@@ -108,9 +115,15 @@ public class UserController : ControllerBase
     [HttpGet]
     [Route("pending/{userId}")]
     [Authorize(Roles = "Driver")]
-    public async Task<ActionResult<List<UserDTO>>> GetPendingPassengers(int userId)
+    public async Task<ActionResult<PaginatedList<UserDTO>>> GetPendingPassengers(
+        int userId, 
+        [FromQuery] int pageNumber = 1, 
+        [FromQuery] int pageSize = 10, 
+        [FromQuery] string orderBy = "Name", 
+        [FromQuery] bool ascending = true)
     {
-        var result = await _mediator.Send(new GetPendingPassengersQuery(userId));
+        var query = new GetPendingPassengersQuery(userId, pageNumber, pageSize, orderBy, ascending);
+        var result = await _mediator.Send(query);
         return Ok(result);
     }
 }

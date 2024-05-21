@@ -3,6 +3,13 @@ using CarBookingApp.Presentation.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddPresentationServices(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        b => b.WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 var app = builder.Build();
 
@@ -14,6 +21,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandling();
 app.UseHttpsRedirection();
+
+app.UseRouting();
+app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

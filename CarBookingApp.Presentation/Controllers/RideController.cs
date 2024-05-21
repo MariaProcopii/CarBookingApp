@@ -1,7 +1,7 @@
+using CarBookingApp.Application.Common.Models;
 using CarBookingApp.Application.Rides.Commands;
 using CarBookingApp.Application.Rides.Queries;
 using CarBookingApp.Application.Rides.Responses;
-using CarBookingApp.Application.Users.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,27 +73,45 @@ public class RideController : ControllerBase
     [HttpGet]
     [Route("{userId}")]
     [Authorize(Roles = "User, Driver")]
-    public async Task<ActionResult<List<RideShortInfoDTO>>> GetAllRides(int userId)
+    public async Task<ActionResult<PaginatedList<RideShortInfoDTO>>> GetRides(
+        int userId, 
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 9,
+        [FromQuery] string orderBy = "DateOfTheRide",
+        [FromQuery] bool ascending = true)
     {
-        var result = await _mediator.Send(new GetAllRidesQuery(userId));
+        var query = new GetAllRidesQuery(userId, pageNumber, pageSize, orderBy, ascending);
+        var result = await _mediator.Send(query);
         return Ok(result);
     }
     
     [HttpGet]
     [Route("booked/{userId}")]
     [Authorize(Roles = "User, Driver")]
-    public async Task<ActionResult<List<RideShortInfoDTO>>> GetBookedRides(int userId)
+    public async Task<ActionResult<PaginatedList<RideShortInfoDTO>>> GetBookedRides(
+        int userId,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 9,
+        [FromQuery] string orderBy = "DateOfTheRide",
+        [FromQuery] bool ascending = true)
     {
-        var result = await _mediator.Send(new GetBookedRidesQuery(userId));
+        var query = new GetBookedRidesQuery(userId, pageNumber, pageSize, orderBy, ascending);
+        var result = await _mediator.Send(query);
         return Ok(result);
     }
     
     [HttpGet]
     [Route("pending/{userId}")]
     [Authorize(Roles = "User, Driver")]
-    public async Task<ActionResult<List<RideShortInfoDTO>>> GetPendingRides(int userId)
+    public async Task<ActionResult<PaginatedList<RideShortInfoDTO>>> GetPendingRides(
+        int userId,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 9,
+        [FromQuery] string orderBy = "DateOfTheRide",
+        [FromQuery] bool ascending = true)
     {
-        var result = await _mediator.Send(new GetPendingRidesQuery(userId));
+        var query = new GetPendingRidesQuery(userId, pageNumber, pageSize, orderBy, ascending);
+        var result = await _mediator.Send(query);
         return Ok(result);
     }
     

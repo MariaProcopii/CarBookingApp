@@ -15,15 +15,15 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("SignIn")]
+    [HttpPost("SignUp")]
     public async Task<IActionResult> SignUpUser(SignUpUserCommand signUpUserCommand)
     {
         var accessToken = await _mediator.Send(signUpUserCommand);
         return Ok(accessToken);
     }
     
-    [HttpPost("Login")]
-    public async Task<IActionResult> LoginUser(LogInUserCommand logInUserCommand)
+    [HttpPost("LogIn")]
+    public async Task<IActionResult> LogInUser(LogInUserCommand logInUserCommand)
     {
         var accessToken = await _mediator.Send(logInUserCommand);
         return Ok(accessToken);

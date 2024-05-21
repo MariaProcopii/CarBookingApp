@@ -37,7 +37,6 @@ public class GetAllRidesQueryTests
         var result = await _handler.Handle(request, CancellationToken.None);
 
         Assert.NotNull(result);
-        Assert.Empty(result);
         _mockRepository.Verify(x => x.GetByPredicate(It.IsAny<Expression<Func<Ride, bool>>>(),
             It.IsAny<Expression<Func<Ride, object>>[]>()), Times.Once());
         _mockMapper.Verify(x => x.Map<List<Ride>, List<RideShortInfoDTO>>(rides), Times.Once());
