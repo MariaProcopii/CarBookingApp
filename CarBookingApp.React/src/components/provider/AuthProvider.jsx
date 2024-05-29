@@ -5,23 +5,20 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  // State to hold the authentication token
   const [token, setToken_] = useState(localStorage.getItem("token"));
 
-  // Function to set the authentication token
+
   const setToken = (newToken) => {
     setToken_(newToken);
   };
 
-  // Function that check TTL of JWT
+
   const isTokenExpired = () => {
     console.log("enter func");
     if (!token) return;
     try {
       const decodedToken = jwtDecode(token);
       const currentTime = Date.now() / 1000;
-      console.log(currentTime);
-      console.log(decodedToken.exp);
       if (decodedToken.exp < currentTime) {
         delete axios.defaults.headers.common["Authorization"];
         localStorage.removeItem("token");
@@ -44,13 +41,45 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (!token) return;
-    const intervalId = setInterval(isTokenExpired, 120000);
-    console.log("Timer start");
-    setTimeout(()=>{console.log("done counting")}, 120000);
-    return () => clearInterval(intervalId);
-  }, []);
+  
+    const intervalDuration = 120000;
+    const storedStartTime = localStorage.getItem('tokenTimerStart');
+  
+    let startTime = storedStartTime ? parseInt(storedStartTime, 10) : Date.now();
+  
+    if (!storedStartTime) {
+      localStorage.setItem('tokenTimerStart', startTime);
+    }
+  
+    const calculateRemainingTime = () => {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTime;
+      return intervalDuration - (elapsedTime % intervalDuration);
+    };
+  
+    const setTimer = (remainingTime) => {
+      const timeoutId = setTimeout(() => {
+        isTokenExpired();
+        startTime = Date.now();
+        localStorage.setItem('tokenTimerStart', startTime);
+        setTimer(intervalDuration);
+      }, remainingTime);
+  
+      return () => clearTimeout(timeoutId);
+    };
+  
+    const remainingTime = calculateRemainingTime();
+    const clearTimer = setTimer(remainingTime);
+  
+    console.log('Timer start');
+  
+    return () => {
+      clearTimer();
+      localStorage.removeItem('tokenTimerStart');
+    };
+  }, [token]);
 
-  // Memoized value of the authentication context
+
   const contextValue = useMemo(
     () => ({
       token,
@@ -59,7 +88,7 @@ const AuthProvider = ({ children }) => {
     [token]
   );
 
-  // Provide the authentication context to the children components
+
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
