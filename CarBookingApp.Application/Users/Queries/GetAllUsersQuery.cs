@@ -8,7 +8,8 @@ using MediatR;
 
 namespace CarBookingApp.Application.Users.Queries;
 
-public record GetAllUsersQuery(int PageNumber = 1, int PageSize = 9, string? Username = null, string OrderBy = "Name", bool Ascending = true) : IRequest<PaginatedList<UserDTO>>;
+public record GetAllUsersQuery(int PageNumber = 1, int PageSize = 9, string? Username = null, 
+    string OrderBy = "Name", bool Ascending = true) : IRequest<PaginatedList<UserDTO>>;
 
 
 public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, PaginatedList<UserDTO>>
