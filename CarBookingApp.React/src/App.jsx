@@ -3,7 +3,8 @@ import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import AuthProvider from './components/provider/AuthProvider';
-import Routes from './components/routes';
+import AppRoutes from './components/routes/AppRoutes';
+import { BrowserRouter as Router} from "react-router-dom";
 
 const themeOptionsLight = {
   palette: {
@@ -61,9 +62,11 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <Routes />
-      </AuthProvider>
+      <Router>
+        <AuthProvider>
+          <AppRoutes />
+         </AuthProvider>
+      </Router>
     </ThemeProvider>
   );
 }
