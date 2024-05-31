@@ -1,73 +1,50 @@
-import axios from 'axios';
-import { useState } from 'react';
+import { Grid,Paper, Avatar, TextField, Button, Typography, Link, Box, FormControl,
+         InputLabel, Select, MenuItem}  from '@mui/material';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateField } from '@mui/x-date-pickers/DateField';
+import { MuiTelInput } from 'mui-tel-input';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
+import { Form, Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from "yup";
+import axios from 'axios';
+import {useState} from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/provider/AuthProvider";
+import { parseErrorMessages } from '../../utils/ErrorUtils';
 
-
-export default function SignUp({setUserLoggedIn}) {
-    const [gender, setGender] = useState('');
-    const [date, setDate] = useState(null);
-    const [email, setEmail] = useState('');
-    const [isEmailValid, setEmailValid] = useState(false);
-    const [phone, setPhone] = useState('');
-    const [isPhoneValid, setPhoneValid] = useState(false);
-
+export default function SignUp() {
+    const boxStyle={ margin:"40px auto", alignItems: 'center', minWidth:300 };
+    const paperStyle={padding :40,height:'70vh',width:600, margin:"50px auto"};
+    const avatarStyle={ bgcolor: 'primary.main' };
+    const btnstyle={margin:'8px 0'};
     const { setToken } = useAuth();
+    const [backendErrors, setBackendErrors] = useState({});
     const navigate = useNavigate();
+    const initialValues = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        gender: "OTHER",
+        password: "",
+        confirm_password: ""
+    };
+    const [phone, setPhone] = useState('');
+    const [isPhoneValid, setPhoneValid] = useState(true);
+    const [date, setDate] = useState(null);
+    const [isDateValid, setDateValid] = useState(true);
 
-    function transformDate(inputDate) {
-      const [month, day, year] = inputDate.split('/');
-  
-      if (month && day && year) {
-          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      } else {
-          return null;
-      }
-    }
-
-    const handleChangeGender = (event) => {
-        setGender(event.target.value);
+    const handlePhoneChange = (newPhone) => {
+        setPhone(newPhone.replace(/\s+/g, ''));
     };
 
     const handleChangeDate = (date) => {
         setDate(date);
     };
 
-    const handleChangeEmail = (event) => {
-        const email = event.target.value;
-        setEmail(email);
-
-        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-        if (re.test(email)) {
-            setEmailValid(true);
-        }
-        else {
-            setEmailValid(false);
-        }
-    };
-
-    const handleChangePhone = (event) => {
-        const phone = event.target.value;
-        setPhone(phone);
-
-        const re = /^[0-9]{9}$/;
+    const checkPhoneValid = () => {
+        const re = /^\+\d{10,15}$/;
 
         if (re.test(phone)) {
             setPhoneValid(true);
@@ -77,165 +54,242 @@ export default function SignUp({setUserLoggedIn}) {
         }
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
+    const checkDateValid = () => {
+        const re = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+        const birthday = transformDate();
 
-        if (!isEmailValid) {
-            console.log("Wrong email");
-            return;
+        if (re.test(birthday)) {
+            setDateValid(true);
         }
-
-        if (!isPhoneValid) {
-            console.log("Wrong phone");
-            return;
+        else {
+            setDateValid(false);
         }
+    };
 
-        if (data.get('password') != data.get('conf_password')) {
-            console.log("Wrong password");
+    function transformDate() {
+        const formatedDate = new Date(date).toLocaleString().split(",")[0];
+        const [month, day, year] = formatedDate.split('/');
+    
+        if (month && day && year) {
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        } else {
+            return null;
+        }
+    };
+
+    const onSubmit = (values, props) => {
+        checkDateValid();
+        checkPhoneValid();
+        if (!isDateValid || !isPhoneValid) {
             return;
         }
 
         axios.post(
-          "http://localhost:5239/Auth/SignUp",
-          {
-            firstName: data.get('firstname'),
-            lastName: data.get('lastname'), 
-            dateOfBirth: date ? transformDate(new Date(date).toLocaleString().split(",")[0]) : "",
-            gender: gender.toUpperCase(),
-            email: email,
-            phoneNumber: phone,
-            password: data.get('password'),
-          },
-        )
-        .then((response) => {
-          setToken(response.data);
-          navigate("/", { replace: true});
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+            "http://localhost:5239/Auth/SignUp",
+            {
+              ...values,
+              phoneNumber: phone,
+              dateOfBirth: transformDate()
+            },
+          )
+          .then((response) => {
+            setToken(response.data);
+            navigate("/", { replace: true});
+          })
+          .catch((error) => {
+            const { data } = error.response;
+            setBackendErrors(parseErrorMessages(data.Message));
+          });
+
+        setTimeout(()=>{
+            props.setSubmitting(false);
+        }, 1000);
     };
 
+    const validationSchema = Yup.object().shape({
+        firstName: Yup.string()
+            .required("First Name is required"),
+        lastName: Yup.string()
+            .required("Last Name is required"),
+        email: Yup.string()
+            .required("Email is required")
+            .email("Email is invalid"),
+        password: Yup.string()
+            .required("Password is required")
+            .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, "Must contain at least one uppercase letter, one lowercase letter, and one digit with at least 8 characters"),
+        confirm_password: Yup.string()
+            .oneOf([Yup.ref('password'), null], "Passwords must match")
+            .required("Confirm password is required")
+    });
 
-    return (
-        <Container 
-          component="main" 
-          maxWidth="xs"
-        >
-          <CssBaseline />
-          <Box
-            sx={{
-              marginTop: 8,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign Up 
-            </Typography>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="firstname"
-                label="Firstname"
-                name="firstname"
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="lastname"
-                label="Lastname"
-                name="lastname"
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={['DatePicker']}>
-                      <DatePicker 
-                          label="Pick your birthday" 
-                          value={date}
-                          onChange={handleChangeDate}
-                          sx={{
-                            width: '400px',
-                          }}
-                      />
-                  </DemoContainer>
-              </LocalizationProvider>
-              <FormControl 
-                margin="normal"
-                fullWidth
-              >
-                  <InputLabel id="gender-select-label">Gender</InputLabel>
-                  <Select
-                      labelId="gender-select-label"
-                      id="gender"
-                      value={gender}
-                      label="Gender"
-                      onChange={handleChangeGender}
-                  >
-                      <MenuItem value={"Female"}>Female</MenuItem>
-                      <MenuItem value={"Male"}>Male</MenuItem>
-                  </Select>
-              </FormControl>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                value={email}
-                onChange={handleChangeEmail}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="phone"
-                label="Phone Number"
-                name="phone"
-                autoComplete="phone"
-                value={phone}
-                onChange={handleChangePhone}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="conf_password"
-                label="Confirm Password"
-                type="password"
-                id="conf_password"
-                autoComplete="current-password"
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Sign Up
-              </Button>
+    return(
+        <Grid container>
+            <Box sx={boxStyle} >
+                <img src="src/pages/login/car-intro.png" />
             </Box>
-          </Box>
-        </Container>
-      );
+            <Paper elevation={8} style={paperStyle} sx={{width: '800px'}}>
+                <Grid align='center'>
+                    <Avatar sx={avatarStyle}><LockOutlinedIcon/></Avatar>
+                    <h2>Sign Un</h2>
+                </Grid>
+                <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
+                    {(props) => (
+                        <Form>
+                            <Grid container spacing={2}>
+                                <Grid xs={6} item>
+                                    <Field 
+                                        as={TextField} 
+                                        label="First Name"
+                                        name="firstName"
+                                        placeholder='Enter first name' 
+                                        fullWidth 
+                                        required
+                                        inputProps={{maxLength: 30}}
+                                        helperText={<ErrorMessage name="firstName" />}
+                                    />
+                                </Grid>
+                                <Grid xs={6} item>
+                                    <Field 
+                                        as={TextField} 
+                                        label="Last Name"
+                                        name="lastName"
+                                        placeholder='Enter last name' 
+                                        fullWidth 
+                                        required
+                                        inputProps={{maxLength: 30}}
+                                        helperText={<ErrorMessage name="lastName" />}
+                                    />
+                                </Grid>
+                                <Grid xs={6} item>
+                                    <Field 
+                                        as={TextField} 
+                                        label='Email' 
+                                        name="email" 
+                                        placeholder='Enter email' 
+                                        type='email' 
+                                        fullWidth 
+                                        required
+                                        helperText={<ErrorMessage name="email" />}
+                                    />
+                                    {backendErrors.email && (
+                                        <Typography color="gray" variant="caption" sx={{ml:2}}>
+                                            {backendErrors.email}
+                                        </Typography>
+                                    )}
+                                </Grid>
+                                <Grid xs={6} item>
+                                    <Field as={MuiTelInput} 
+                                        value={phone} 
+                                        onChange={handlePhoneChange}
+                                        label="Phone Number"
+                                        name="phone"
+                                        autoComplete="phone" 
+                                        placeholder='Enter phone number'
+                                        fullWidth 
+                                        required
+                                        inputProps={{maxLength: 20}}
+                                    />
+                                    {backendErrors.phone && (
+                                        <Typography color="gray" variant="caption" sx={{ml:2}}>
+                                            {backendErrors.phone}
+                                        </Typography>
+                                    )}
+                                    {!isPhoneValid && (
+                                        <Typography color="gray" variant="caption" sx={{ml:2}}>
+                                            Phone is invalid
+                                        </Typography>
+                                    )}
+                                </Grid>
+                                <Grid xs={6} item>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DemoContainer components={['DateField']}>
+                                            <Field as={DateField}
+                                                label="Pick your birthday"
+                                                name="birthday"
+                                                value={date}
+                                                onChange={handleChangeDate}
+                                                required
+                                                fullWidth
+                                                sx={{ mb: 2 }}
+                                            />
+                                        </DemoContainer>
+                                    </LocalizationProvider>
+                                    {backendErrors.birthday && (
+                                        <Typography color="gray" variant="caption" sx={{ml:2}}>
+                                            {backendErrors.birthday}
+                                        </Typography>
+                                    )}
+                                    {!isDateValid && (
+                                        <Typography color="gray" variant="caption" sx={{ml:2}}>
+                                            Date is invalid
+                                        </Typography>
+                                    )}
+                                </Grid>
+                                <Grid xs={6} item>
+                                    <FormControl
+                                            fullWidth
+                                            sx={{ marginTop: 1 }}
+                                        >
+                                        <InputLabel id="gender-select-label">Gender</InputLabel>
+                                        <Field as={Select}
+                                            name="gender"
+                                            label="Gender"
+                                            required
+                                        >
+                                            <MenuItem value={"FEMALE"}>Female</MenuItem>
+                                            <MenuItem value={"MALE"}>Male</MenuItem>
+                                            <MenuItem value={"OTHER"}>Other</MenuItem>
+                                        </Field>
+                                    </FormControl>
+                                </Grid>
+                                <Grid xs={6} item>
+                                    <Field 
+                                        as={TextField} 
+                                        label='Password' 
+                                        name="password" 
+                                        placeholder='Enter password' 
+                                        type='password' 
+                                        fullWidth 
+                                        required
+                                        inputProps={{maxLength: 30}}
+                                        helperText={<ErrorMessage name="password" />}
+                                    />
+                                </Grid>
+                                <Grid xs={6} item>
+                                    <Field 
+                                        as={TextField} 
+                                        label='Confirm password' 
+                                        name="confirm_password" 
+                                        placeholder='Confirm password' 
+                                        type='password' 
+                                        fullWidth 
+                                        required
+                                        inputProps={{maxLength: 30}}
+                                        helperText={<ErrorMessage name="confirm_password" />}
+                                    />
+                                </Grid>
+                                <Grid xs={12} item>
+                                    <Button 
+                                        type='submit' 
+                                        color='primary' 
+                                        variant="contained" 
+                                        style={btnstyle} 
+                                        fullWidth
+                                        disabled={props.isSubmitting}
+                                    >{props.isSubmitting ? "Loading" : "Sign up"}
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Form>
+                    )}
+                </Formik>
+                <Box sx={{mt:2}}></Box>
+                <Typography > Already have an account ?
+                    <Link href="/login" >
+                        Log In Here
+                    </Link>
+                </Typography>
+            </Paper>
+        </Grid>
+    );
 }
-  

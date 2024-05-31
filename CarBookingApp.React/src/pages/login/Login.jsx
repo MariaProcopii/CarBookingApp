@@ -1,125 +1,121 @@
-import Avatar from '@mui/material/Avatar'; 
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
+import { Grid,Paper, Avatar, TextField, Button, Typography, Link, Box}  from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
+import { Form, Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from "yup";
+import axios from 'axios';
 import {useState} from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/provider/AuthProvider";
-import axios from 'axios';
-
+import { parseErrorMessages } from '../../utils/ErrorUtils';
 
 export default function Login() {
-    const [email, setEmail] = useState('');
-    const [isEmailValid, setEmailValid] = useState(false);
-
+    const boxStyle={ margin:"30px auto", alignItems: 'center', minWidth:300 };
+    const paperStyle={padding :40,height:'50vh',width:400, margin:"50px auto"};
+    const avatarStyle={ bgcolor: 'primary.main' };
+    const btnstyle={margin:'8px 0'};
     const { setToken } = useAuth();
+    const [backendErrors, setBackendErrors] = useState({});
     const navigate = useNavigate();
-
-    const handleChangeEmail = (event) => {
-        const email = event.target.value;
-        setEmail(email);
-
-        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-        if (re.test(email)) {
-            setEmailValid(true);
-        }
-        else {
-            setEmailValid(false);
-        }
+    const initialValues = {
+        email: "",
+        password: ""
     };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-
-        if (!isEmailValid) {
-            console.log("Wrong email");
-            return ;
-        }
+    const onSubmit = (values, props) => {
 
         axios.post(
-          "http://localhost:5239/Auth/LogIn",
-          {
-            email: data.get('email'),
-            password: data.get('password'),
-          },
-        )
-        .then((response) => {
-          setToken(response.data);
-          navigate("/", { replace: true});
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+            "http://localhost:5239/Auth/LogIn",
+            {
+              email: values.email,
+              password: values.password,
+            },
+          )
+          .then((response) => {
+            setToken(response.data);
+            navigate("/", { replace: true});
+          })
+          .catch((error) => {
+            const { data } = error.response;
+            setBackendErrors(parseErrorMessages(data.Message));
+          });
+
+        setTimeout(()=>{
+            props.resetForm();
+            props.setSubmitting(false);
+        }, 1000);
     };
 
-    return (
-      <Container 
-        component="main" 
-        maxWidth="xs"
-      >
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 10,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Log in
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={email}
-              onChange={handleChangeEmail}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-                Log In
-            </Button>
-            <Grid container>
-              <Grid item>
-                <Link href="/sign-up" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-      </Container>
+    const validationSchema = Yup.object().shape({
+        email: Yup.string()
+           .required("Email is required")
+           .email("Email is invalid"),
+        password: Yup.string()
+          .required("Password is required")
+          .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, 'Must contain at least one uppercase letter, one lowercase letter, and one digit with at least 8 characters')
+      });
+
+    return(
+        <Grid container>
+            <Box sx={boxStyle} >
+                <img src="src/pages/login/car-intro.png" />
+            </Box>
+            <Paper elevation={8} style={paperStyle}>
+                <Grid align='center'>
+                    <Avatar sx={avatarStyle}><LockOutlinedIcon/></Avatar>
+                    <h2>Sign In</h2>
+                </Grid>
+                <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
+                    {(props) => (
+                        <Form>
+                            <Field 
+                                as={TextField} 
+                                label='Email' 
+                                name="email" 
+                                sx={{ mt: 2 }} 
+                                placeholder='Enter email' 
+                                type='email' 
+                                fullWidth 
+                                required
+                                helperText={<ErrorMessage name="email" />}
+                            />
+                            {backendErrors.email && (
+                                <Typography color="error" variant="caption" sx={{ml:2}}>
+                                    {backendErrors.email}
+                                </Typography>
+                            )}
+                            <Field 
+                                as={TextField} 
+                                label='Password' 
+                                name="password" 
+                                sx={{ mt: 2 }} 
+                                placeholder='Enter password' 
+                                type='password' 
+                                fullWidth 
+                                required
+                                helperText={<ErrorMessage name="password" />}
+                            />
+                            {backendErrors.password && (
+                                <Typography color="error" variant="caption" sx={{ml:2}}>
+                                    {backendErrors.password}
+                                </Typography>
+                            )}
+                            <Button 
+                                type='submit' 
+                                color='primary' 
+                                variant="contained" 
+                                style={btnstyle} 
+                                fullWidth
+                                disabled={props.isSubmitting}
+                            >{props.isSubmitting ? "Loading" : "Log in"}</Button>
+                        </Form>
+                    )}
+                </Formik>
+                <Box sx={{mt:2}}></Box>
+                <Typography > Do you want to create an account ?
+                    <Link href="/signup" >
+                        Sign Up Here
+                    </Link>
+                </Typography>
+            </Paper>
+        </Grid>
     );
 }
