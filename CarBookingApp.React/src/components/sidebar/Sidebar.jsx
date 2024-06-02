@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
@@ -23,8 +23,11 @@ import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import TimeToLeaveRoundedIcon from '@mui/icons-material/TimeToLeaveRounded';
 import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
+import { Outlet } from 'react-router-dom';
+import { tokenDecoder } from '../../utils/TokenUtils';
 
 const drawerWidth = 240;
+const claims = tokenDecoder(localStorage.getItem("token"));
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -52,7 +55,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -114,7 +116,7 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
           return <AccountCircleRoundedIcon />;
       case 'My Rides':
           return <TimeToLeaveRoundedIcon />;
-      case 'Sign out':
+      case 'Log out':
           return <ExitToAppRoundedIcon />;
     }
   }
@@ -131,12 +133,13 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
           return "/profile";
       case 'My Rides':
           return "/my-rides";
-      case 'Sign out':
-          return "/sign-up";
+      case 'Log out':
+          return "/logout";
     }
   }
 
   return (
+    <>
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
@@ -154,7 +157,7 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Maria
+            {claims.surname + " " + claims.name}
           </Typography>
           <IconButton 
             sx={{
@@ -181,7 +184,7 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
         </DrawerHeader>
         <Divider />
         <List>
-            {['Home', 'Booked Rides', 'Create ride', 'Profile', 'My Rides', 'Sign out'].map((text, index) => (
+            {['Home', 'Booked Rides', 'Create ride', 'Profile', 'My Rides', 'Log out'].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: 'block', }}>
               <ListItemButton
                 sx={{
@@ -208,6 +211,11 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
         </List>
         <Divider />
       </Drawer>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <DrawerHeader />
+        <Outlet />
+      </Box>
     </Box>
+    </>
   );
 }

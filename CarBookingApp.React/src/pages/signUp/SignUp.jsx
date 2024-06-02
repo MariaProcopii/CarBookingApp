@@ -125,7 +125,7 @@ export default function SignUp() {
     return(
         <Grid container>
             <Box sx={boxStyle} >
-                <img src="src/pages/login/car-intro.png" />
+                <img src="src/assets/images/car-intro.png" />
             </Box>
             <Paper elevation={8} style={paperStyle} sx={{width: '800px'}}>
                 <Grid align='center'>
