@@ -1,6 +1,9 @@
 import { jwtDecode } from "jwt-decode";
 
 export function tokenDecoder(token) {
+    if (!token) {
+        return {};
+    }
     const decodedToken = jwtDecode(token);
     const originalKeys = Object.keys(decodedToken);
     const newKeys = Object.keys(decodedToken).map(claim => {
