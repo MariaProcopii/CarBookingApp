@@ -37,9 +37,8 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
     {
         int pageNumber = request.PageNumber;
         int pageSize = request.PageSize;
-
         Expression<Func<Ride, bool>> filter = r => r.Owner.Id != request.UserId 
-                                                   && r.DateOfTheRide > DateTime.UtcNow 
+                                                   && r.DateOfTheRide > DateTime.Now
                                                    && r.Passengers.Count < r.TotalSeats;
         
         if (!string.IsNullOrEmpty(request.DestinationFrom))
@@ -54,7 +53,7 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
 
         if (request.DateOfTheRide.HasValue)
         {
-            filter = filter.AndAlso(r => r.DateOfTheRide.Date == request.DateOfTheRide.Value.Date);
+            filter = filter.AndAlso(r => r.DateOfTheRide == request.DateOfTheRide.Value);
         }
         
         Expression<Func<Ride, object>> orderBy = request.OrderBy.ToLower() switch
@@ -77,6 +76,7 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
             r => r.Owner,
             r => r.RideDetail
         );
+        ridesPaginated.Items.ForEach(e => Console.WriteLine(e.DateOfTheRide));
 
         var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(ridesPaginated.Items);
 

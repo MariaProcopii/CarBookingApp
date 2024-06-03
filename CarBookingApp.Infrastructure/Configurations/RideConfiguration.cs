@@ -36,6 +36,10 @@ public class RideConfiguration : IEntityTypeConfiguration<Ride>
             .IsRequired();
         
         builder
+            .Property(r => r.DateOfTheRide)
+            .HasColumnType("timestamp without time zone");
+        
+        builder
             .Property<DateTime>("CreatedAt")
             .HasColumnType("timestamp with time zone")
             .HasDefaultValueSql("now()")

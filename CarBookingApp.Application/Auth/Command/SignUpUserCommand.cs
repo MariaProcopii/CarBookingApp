@@ -39,7 +39,6 @@ public class SignInUserCommandHandler : IRequestHandler<SignUpUserCommand, strin
 
     public async Task<string> Handle(SignUpUserCommand request, CancellationToken cancellationToken)
     {
-        Console.WriteLine(request.DateOfBirth.ToString());
         var newAppUser = new ApplicationUser
         {
             UserName = request.FirstName + request.LastName,
