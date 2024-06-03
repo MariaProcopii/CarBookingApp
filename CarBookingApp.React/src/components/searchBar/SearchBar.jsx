@@ -4,27 +4,47 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import parse from 'autosuggest-highlight/parse';
-// import match from 'autosuggest-highlight/match';
 import axios from 'axios';
+import { Form, Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from "yup";
 
 export default function SearchBar() {
-  const [destinationFrom, setDestinationFrom] = useState('');
-  const [destinationTo, setDestinationTo] = useState('');
   const [date, setDate] = useState(null);
   const [isDateValid, setDateValid] = useState(true);
   const [seats, setSeats] = useState(1);
   const [loading, setLoading] = useState(false);
   const [destinations, setDestinations] = useState([]);
 
+  const initialValues = {
+    destinationFrom: "",
+    destinationTo: "",
+    totalSeats: 1
+};
+
+  
+  const validationSchema = Yup.object().shape({
+    destinationFrom: Yup.string()
+        .required("Destination From is required"),
+    destinationTo: Yup.string()
+        .required("Destination To is required"),
+    totalSeats: Yup.number()
+        .required("Number of Seats is required")
+        .min(1, "Number of Seats must be greater than 0")
+  });
+
   useEffect(() => {
-    fetchDestinations();
+    setTimeout(() => {
+        fetchDestinations();
+      }, 1000);
   }, []);
 
   const fetchDestinations = () => {
     axios.get("http://localhost:5239/destination/pick/name")
       .then((response) => {
-        setDestinations(response.data.items);
+        const topCities = response.data.map(city => ({ label: city}));
+        setDestinations(topCities);
+        console.log(response.data);
+        console.log(destinations[0]);
       })
       .catch((error) => {
         console.error('Error fetching destinations:', error);
@@ -35,26 +55,29 @@ export default function SearchBar() {
     setDate(date);
   };
 
-const checkDateValid = () => {
-  const re = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-  const birthday = transformDate();
+  const checkDateValid = () => {
+    const re = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+    const birthday = transformDate();
 
-  if (re.test(birthday)) {
-      setDateValid(true);
-  }
-  else {
-      setDateValid(false);
-  }
+    if (re.test(birthday)) {
+        setDateValid(true);
+    }
+    else {
+        setDateValid(false);
+    }
 };
 
-const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-    { label: 'The Dark Knight', year: 2008 },
-    { label: '12 Angry Men', year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    { label: 'Pulp Fiction', year: 1994 },];
+    function transformDate() {
+        const formatedDate = new Date(date).toLocaleString().split(",")[0];
+        const [month, day, year] = formatedDate.split('/');
+
+        if (month && day && year) {
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        } else {
+            return null;
+        }
+    };
+    console.log(transformDate());
 
   const handleSearch = () => {
       setLoading(true);
@@ -84,156 +107,58 @@ const top100Films = [
       
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-      <Paper elevation={8} sx={{ width: { xs: '100%', sm: '90%', md: '90%' }, padding: 1}}>
+      <Paper elevation={8} sx={{ width: { xs: '100%' }, padding: 1}}>
         <Grid container direction="row" spacing={2} justifyContent="center" alignItems="center">
-          {/* <Grid item xs={12} sm={6} md={4} lg={2}>
-            <TextField
-              fullWidth
-              size="small"
-              inputProps={{ maxLength: 30 }}
-              label="From"
-              value={destinationFrom}
-              onChange={(e) => setDestinationFrom(e.target.value)}
-              InputLabelProps= {{
-                sx: inputBodyTextStyle
-              }}
-              InputProps= {{ sx: inputBodyTextStyle }}
-            />
-          </Grid> */}
-          {/* <Grid item xs={12} sm={6} md={4} lg={2}>
-            <TextField
-              fullWidth
-              size="small"
-              inputProps={{ maxLength: 30 }}
-              label="To"
-              value={destinationTo}
-              onChange={(e) => setDestinationTo(e.target.value)}
-              InputLabelProps= {{
-                sx: inputBodyTextStyle
-              }}
-              InputProps= {{ sx: inputBodyTextStyle }}
-            />
-          </Grid> */}
-            <Grid item xs={12} sm={6} md={4} lg={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2.2}>
           <Autocomplete
             disablePortal
-            fullWidth
-            size="small"
-            inputProps={{ minLength: 30 }}
-            label="From"
             sx={{ minWidth:'100px' }}
-            options={top100Films}
-            renderInput={(params) => <TextField {...params} label="Movie" />}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={2}>
-          <Autocomplete
-            disablePortal
-            fullWidth
-            size="small"
-            inputProps={{ minLength: 30 }}
-            label="To"
-            sx={{ minWidth:'100px' }}
-            options={top100Films}
-            renderInput={(params) => <TextField {...params} label="Movie" />}
-            />
-          </Grid>
-            {/* <Grid item xs={12} sm={6} md={4} lg={2}>
-            <Autocomplete
-              fullWidth
-              size="small"
-              options={destinations}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
+            options={destinations}
+            renderInput={(params) => (
                 <TextField
                   {...params}
+                  sx={{ minWidth:'200px' }}
                   label="From"
                   InputLabelProps={{
                     sx: inputBodyTextStyle
                   }}
                   inputProps={{
                     ...params.inputProps,
-                    maxLength: 30
+                    maxLength: 30,
+                    sx: inputBodyTextStyle
                   }}
                   fullWidth
                   size="small"
                 />
               )}
-              onChange={(event, newValue) => {
-                setDestinationFrom(newValue ? newValue.name : '');
-              }}
-              renderOption={(props, option, { inputValue }) => {
-                const matches = match(option.name, inputValue, { insideWords: true });
-                const parts = parse(option.name, matches);
-
-                return (
-                  <li {...props}>
-                    <div>
-                      {parts.map((part, index) => (
-                        <span
-                          key={index}
-                          style={{
-                            fontWeight: part.highlight ? 700 : 400,
-                          }}
-                        >
-                          {part.text}
-                        </span>
-                      ))}
-                    </div>
-                  </li>
-                );
-              }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={2}>
-            <Autocomplete
-            //   sx={{ width: 300 }}
-              options={destinations}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
+          <Grid item xs={12} sm={6} md={4} lg={2.2}>
+          <Autocomplete
+            disablePortal
+            options={destinations}
+            renderInput={(params) => (
                 <TextField
                   {...params}
+                  sx={{ minWidth:'200px' }}
                   label="To"
                   InputLabelProps={{
                     sx: inputBodyTextStyle
                   }}
                   inputProps={{
                     ...params.inputProps,
-                    maxLength: 30
+                    maxLength: 30,
+                    sx: inputBodyTextStyle
                   }}
                   fullWidth
                   size="small"
                 />
               )}
-              onChange={(event, newValue) => {
-                setDestinationTo(newValue ? newValue.name : '');
-              }}
-              renderOption={(props, option, { inputValue }) => {
-                const matches = match(option.name, inputValue, { insideWords: true });
-                const parts = parse(option.name, matches);
-
-                return (
-                  <li {...props}>
-                    <div>
-                      {parts.map((part, index) => (
-                        <span
-                          key={index}
-                          style={{
-                            fontWeight: part.highlight ? 700 : 400,
-                          }}
-                        >
-                          {part.text}
-                        </span>
-                      ))}
-                    </div>
-                  </li>
-                );
-              }}
             />
-          </Grid> */}
-          <Grid item xs={12} sm={6} md={4} lg={3} mt={-1} >
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={2.4} mt={-1} >
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['DatePicker']} sx={{ minWidth: '100px' }}>
+              <DemoContainer components={['DatePicker']} sx={{ minWidth:'220px' }} >
                 <DatePicker
                   label="Date"
                   value={date}
@@ -243,7 +168,7 @@ const top100Films = [
                     textField: 
                     {
                         // style: {overflow: 'hidden'},
-                        size: 'small', 
+                        size: 'small',
                         inputProps: { maxLength: 30 }, 
                         InputLabelProps: { sx: inputBodyTextStyle }, 
                         InputProps: { sx: inputBodyTextStyle }
@@ -253,12 +178,12 @@ const top100Films = [
               </DemoContainer>
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={2}>
+          <Grid item xs={12} sm={6} md={4} lg={2.2} >
             <TextField
               fullWidth
-              sx={{ minWidth:'100px' }}
+              sx={{ minWidth:'200px' }}
               size="small"
-              inputProps={{ maxLength: 30 }}
+              inputProps={{ maxLength: 30}}
               label="Seats"
               type="number"
               value={seats}

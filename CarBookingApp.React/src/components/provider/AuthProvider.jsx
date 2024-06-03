@@ -58,6 +58,7 @@ const AuthProvider = ({ children }) => {
     };
   
     const setTimer = (remainingTime) => {
+      console.log("timer set");
       const timeoutId = setTimeout(() => {
         isTokenExpired();
         startTime = Date.now();

@@ -25,7 +25,7 @@ function tokenDecoder(token) {
 }
 
 export function useTokenDecoder(token) {
-    const [claims, setClaims] = useState(token);
+    const [claims, setClaims] = useState(tokenDecoder(token));
 
     useEffect(() => {
         setClaims(tokenDecoder(token));
