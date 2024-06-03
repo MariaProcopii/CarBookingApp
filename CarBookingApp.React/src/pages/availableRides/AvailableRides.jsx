@@ -10,8 +10,10 @@ export default function AvailableRides() {
     const [backendErrors, setBackendErrors] = useState({});
     const [rides, setRides] = useState([]);
 
-    const fetchRides = () => {
-        axios.get("http://localhost:5239/ride/21")
+    const fetchRidesWithParams = (searchParams) => {
+      const query = `destinationFrom=${searchParams.destinationFrom}&destinationTo=${searchParams.destinationTo}&dateOfTheRide=${searchParams.date}`;
+    
+      axios.get(`http://localhost:5239/ride/21?${query}`)
         .then((response) => {
             setRides(response.data.items);
             console.log(response.data.items);
@@ -23,10 +25,20 @@ export default function AvailableRides() {
           });
     };
 
+    const fetchRides = () => {
+    
+      axios.get("http://localhost:5239/ride/21")
+        .then((response) => {
+            setRides(response.data.items);
+            console.log(response.data.items);
+        })
+        .catch((error) => {
+            const { data } = error.response;
+            console.log('here2');
+            setBackendErrors(parseErrorMessages(data.Message));
+          });
+    };
 
-  // useEffect(() => {
-  //   fetchRides();
-  // }, []);
   useEffect(() => {
     setTimeout(() => {
       fetchRides();
@@ -37,7 +49,7 @@ export default function AvailableRides() {
     <>
         <Grid container direction='row' alignItems='center' justifyContent='center'>
             <Grid item>
-                <SearchBar />
+                <SearchBar onSearch={fetchRidesWithParams} />
             </Grid>
         </Grid>
         <Box mb={5} />
