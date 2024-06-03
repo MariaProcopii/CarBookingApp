@@ -32,14 +32,14 @@ public class LogInUserCommandHandler : IRequestHandler<LogInUserCommand, string>
 
         if (user == null)
         {
-            throw new EntityNotValidException("Invalid email");
+            throw new EntityNotValidException("email: Invalid email");
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
         if (!result.Succeeded)
         {
-            throw new EntityNotValidException("Invalid password");
+            throw new EntityNotValidException("password: Invalid password");
         }
 
         var userClaims = await _userManager.GetClaimsAsync(user);

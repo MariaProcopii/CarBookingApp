@@ -39,6 +39,7 @@ public class SignInUserCommandHandler : IRequestHandler<SignUpUserCommand, strin
 
     public async Task<string> Handle(SignUpUserCommand request, CancellationToken cancellationToken)
     {
+        Console.WriteLine(request.DateOfBirth.ToString());
         var newAppUser = new ApplicationUser
         {
             UserName = request.FirstName + request.LastName,
@@ -47,44 +48,44 @@ public class SignInUserCommandHandler : IRequestHandler<SignUpUserCommand, strin
         var isEmailPresent = await _userManager.FindByEmailAsync(request.Email);
         if (isEmailPresent is not null)
         {
-            throw new EntityNotValidException("Email already used.");
+            throw new EntityNotValidException("email: Email already used.");
+        }
+        var isPhonePresent = await _repository.GetByPredicate<User>(u => u.PhoneNumber
+            .Equals(u.PhoneNumber));
+        if (isPhonePresent.Count != 0)
+        {
+            throw new EntityNotValidException("phone: Phone number already used.");
         }
 
         var result = await _userManager.CreateAsync(newAppUser, request.Password);
         var userId = await _userManager.GetUserIdAsync(newAppUser);
         var role = "User";
-        if (result.Succeeded)
+
+        var roleExists = await _roleManager.RoleExistsAsync(role);
+            
+        if (!roleExists)
         {
-            var roleExists = await _roleManager.RoleExistsAsync(role);
-                
-            if (!roleExists)
-            {
-                await _roleManager.CreateAsync(new IdentityRole<int>(role));
-            }
-                
-            await _userManager.AddToRoleAsync(newAppUser, role);
-
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.Name, request.FirstName),
-                new(ClaimTypes.Surname, request.LastName),
-                new(ClaimTypes.Email, request.Email),
-                new(ClaimTypes.Role, role),
-                new(ClaimTypes.NameIdentifier, userId)
-            };
-
-            await _userManager.AddClaimsAsync(newAppUser, claims);
-            var user = _mapper.Map<SignUpUserCommand, User>(request);
-            user.Id = int.Parse(userId);
-            await _repository.AddAsync(user);
-            await _repository.Save();
-            var token = _jwtService.GenerateAccessToken(claims);
-
-            return await Task.FromResult(token);
+            await _roleManager.CreateAsync(new IdentityRole<int>(role));
         }
-        else
+            
+        await _userManager.AddToRoleAsync(newAppUser, role);
+
+        var claims = new List<Claim>
         {
-            throw new EntityNotValidException("Something went wrong while creating the user.");
-        }
+            new(ClaimTypes.Name, request.FirstName),
+            new(ClaimTypes.Surname, request.LastName),
+            new(ClaimTypes.Email, request.Email),
+            new(ClaimTypes.Role, role),
+            new(ClaimTypes.NameIdentifier, userId)
+        };
+
+        await _userManager.AddClaimsAsync(newAppUser, claims);
+        var user = _mapper.Map<SignUpUserCommand, User>(request);
+        user.Id = int.Parse(userId);
+        await _repository.AddAsync(user);
+        await _repository.Save();
+        var token = _jwtService.GenerateAccessToken(claims);
+
+        return await Task.FromResult(token);
     }
 }

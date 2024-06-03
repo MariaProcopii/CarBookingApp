@@ -6,7 +6,7 @@ builder.Services.AddPresentationServices(builder.Configuration);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
-        b => b.WithOrigins("http://localhost:5173")
+        b => b.WithOrigins("http://localhost:5173", "http://192.168.0.9:5173")
             .AllowAnyMethod()
             .AllowAnyHeader());
 });

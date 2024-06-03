@@ -18,7 +18,11 @@ public class RideProfile : Profile
             .ForMember(dest => dest.DestinationFrom, opt =>
                 opt.MapFrom(src => src.DestinationFrom.Name))
             .ForMember(dest => dest.DestinationTo, opt =>
-                opt.MapFrom(src => src.DestinationTo.Name));
+                opt.MapFrom(src => src.DestinationTo.Name))
+            .ForMember(dest => dest.OwnerName, opt => 
+                opt.MapFrom(src => $"{src.Owner.FirstName} {src.Owner.LastName}"))
+            .ForMember(dest => dest.Price, opt => 
+                opt.MapFrom(src => src.RideDetail.Price));
         
         CreateMap<Ride, RideFullInfoDTO>()
             .ForMember(dest => dest.DestinationFrom, opt =>

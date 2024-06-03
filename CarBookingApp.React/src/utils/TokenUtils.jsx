@@ -24,13 +24,12 @@ function tokenDecoder(token) {
     return claimsObject;
 }
 
-export function useTokenDecoder(key = 'token') {
-    const [claims, setClaims] = useState(tokenDecoder(localStorage.getItem(key)));
+export function useTokenDecoder(token) {
+    const [claims, setClaims] = useState(token);
 
     useEffect(() => {
-        const currentToken = localStorage.getItem(key);
-        setClaims(tokenDecoder(currentToken));
-    }, [key]);
+        setClaims(tokenDecoder(token));
+    }, [token]);
 
     return claims;
 }

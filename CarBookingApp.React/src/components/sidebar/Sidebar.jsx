@@ -25,6 +25,7 @@ import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
 import { Outlet } from 'react-router-dom';
 import { useTokenDecoder } from '../../utils/TokenUtils';
+import { useAuth } from '../provider/AuthProvider';
 
 const drawerWidth = 240;
 
@@ -94,7 +95,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
   const [open, setOpen] = React.useState(false);
-  const claims = useTokenDecoder();
+  const { token } = useAuth();
+  const claims = useTokenDecoder(token);
 
   const handleDrawerOpen = () => {
     setOpen(true);

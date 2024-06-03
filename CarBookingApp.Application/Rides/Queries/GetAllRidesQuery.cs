@@ -47,7 +47,9 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
             ascending: request.Ascending,
             r => r.DestinationFrom,
             r => r.DestinationTo,
-            r => r.Passengers
+            r => r.Passengers,
+            r => r.Owner,
+            r => r.RideDetail
         );
 
         var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(ridesPaginated.Items);
