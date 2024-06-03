@@ -78,9 +78,12 @@ public class RideController : ControllerBase
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 9,
         [FromQuery] string orderBy = "DateOfTheRide",
-        [FromQuery] bool ascending = true)
+        [FromQuery] bool ascending = true,
+        [FromQuery] string destinationFrom = null,
+        [FromQuery] string destinationTo = null,
+        [FromQuery] DateTime? dateOfTheRide = null)
     {
-        var query = new GetAllRidesQuery(userId, pageNumber, pageSize, orderBy, ascending);
+        var query = new GetAllRidesQuery(userId, pageNumber, pageSize, orderBy, ascending, dateOfTheRide, destinationFrom, destinationTo);
         var result = await _mediator.Send(query);
         return Ok(result);
     }
