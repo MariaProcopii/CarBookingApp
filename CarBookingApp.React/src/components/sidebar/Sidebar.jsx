@@ -24,11 +24,9 @@ import TimeToLeaveRoundedIcon from '@mui/icons-material/TimeToLeaveRounded';
 import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
 import { Outlet } from 'react-router-dom';
-import { tokenDecoder } from '../../utils/TokenUtils';
-import { useEffect, useState } from "react";
+import { useTokenDecoder } from '../../utils/TokenUtils';
 
 const drawerWidth = 240;
-// let claims = tokenDecoder(localStorage.getItem("token"));
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -96,13 +94,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
   const [open, setOpen] = React.useState(false);
-  const [claims, setClaims] = useState(tokenDecoder(localStorage.getItem("token")));
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const decodedClaims = tokenDecoder(token);
-      setClaims(decodedClaims);
-  }, []);
+  const claims = useTokenDecoder();
 
   const handleDrawerOpen = () => {
     setOpen(true);

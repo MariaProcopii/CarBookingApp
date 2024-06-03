@@ -29,11 +29,11 @@ export default function AvailableRides() {
 
   return (
     <>
-        <Grid container direction='row' alignItems='center' justifyContent='center'>
+        {/* <Grid container direction='row' alignItems='center' justifyContent='center'>
             <Grid item>
                 <SearchBar />
             </Grid>
-        </Grid>
+        </Grid> */}
         <Box mb={5} />
         <Grid container spacing={5} direction='row' wrap='wrap' alignItems='center' justifyContent='center'>
         {rides.map((ride) => (

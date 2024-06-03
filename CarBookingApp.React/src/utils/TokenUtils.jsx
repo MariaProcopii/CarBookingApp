@@ -1,6 +1,7 @@
 import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from "react";
 
-export function tokenDecoder(token) {
+function tokenDecoder(token) {
     if (!token) {
         return {};
     }
@@ -21,4 +22,15 @@ export function tokenDecoder(token) {
     });
 
     return claimsObject;
+}
+
+export function useTokenDecoder(key = 'token') {
+    const [claims, setClaims] = useState(tokenDecoder(localStorage.getItem(key)));
+
+    useEffect(() => {
+        const currentToken = localStorage.getItem(key);
+        setClaims(tokenDecoder(currentToken));
+    }, [key]);
+
+    return claims;
 }
