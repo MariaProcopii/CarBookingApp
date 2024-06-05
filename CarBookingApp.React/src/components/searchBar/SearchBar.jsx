@@ -12,8 +12,9 @@ export default function SearchBar({ onSearch }) {
   const [isDateValid, setDateValid] = useState(true);
   const [seats, setSeats] = useState(1);
   const [destinations, setDestinations] = useState([]);
-  const [destinationFrom, setDestinationFrom] = useState('Chisinau');
-  const [destinationTo, setDestinationTo] = useState('Soroca');
+  const [destinationFrom, setDestinationFrom] = useState();
+  const [destinationTo, setDestinationTo] = useState();
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -61,12 +62,14 @@ export default function SearchBar({ onSearch }) {
 
 const validateInputs = () => {
     checkDateValid();
+    setShowErrorMessage(true);
     if (!isDateValid) {
         return;
     }
     if (!date || !isDateValid || !destinationFrom || !destinationTo || seats <= 0 || !seats) {
       return false;
     }
+    setShowErrorMessage(false);
     return true;
   };
 
@@ -109,6 +112,8 @@ const validateInputs = () => {
                     <Autocomplete
                         required
                         disablePortal
+                        autoSelect
+                        autoHighlight
                         sx={{ minWidth:'100px' }}
                         options={destinations}
                         onChange={(event, newValue) => setDestinationFrom(newValue ? newValue.label : '')}
@@ -130,7 +135,7 @@ const validateInputs = () => {
                             />
                         )}
                         />
-                        {!destinationFrom && (
+                        {showErrorMessage && !destinationFrom && (
                         <Typography color="gray" variant="caption" sx={{ml:2}}>
                             Destination From required
                         </Typography>
@@ -140,6 +145,8 @@ const validateInputs = () => {
                 <Autocomplete
                     required
                     disablePortal
+                    autoSelect
+                    autoHighlight
                     options={destinations}
                     onChange={(event, newValue) => setDestinationTo(newValue ? newValue.label : '')}
                     renderInput={(params) => (
@@ -160,7 +167,7 @@ const validateInputs = () => {
                         />
                     )}
                     />
-                    {!destinationTo && (
+                    {showErrorMessage && !destinationTo && (
                         <Typography color="gray" variant="caption" sx={{ml:2}}>
                             Destination To is required
                         </Typography>

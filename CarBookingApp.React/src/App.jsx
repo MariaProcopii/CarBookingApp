@@ -6,7 +6,6 @@ import AuthProvider from './components/provider/AuthProvider';
 import AppRoutes from './components/routes/AppRoutes';
 import { BrowserRouter as Router} from "react-router-dom";
 
-
 const themeOptionsLight = {
   palette: {
     type: 'light',
