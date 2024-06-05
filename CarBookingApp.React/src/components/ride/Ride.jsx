@@ -1,7 +1,11 @@
 import { Box, Avatar, Typography, Button, Divider } from "@mui/material";
 import { getDateFromISO, getTimeFromISO} from "../../utils/DateTimeUtils";
+import React, { useEffect, useState } from 'react';
+import RideDetails from "../../pages/rideDetails/RideDetails";
 
 export default function Ride({ride}) {
+    const [openRideDetails, setOpenRideDetails] = useState(false);
+
     const mainBoxStyle={
         boxShadow: 3,
         borderRadius: {
@@ -94,9 +98,14 @@ export default function Ride({ride}) {
                 <InfoItem label="Time" value={getTimeFromISO(ride.dateOfTheRide)} />
                 <InfoItem label="Price" value={ride.price + " lei"}/>
                 <InfoItem label="Seats" value={ride.totalSeats} />
-                <Button type="submit" fullWidth variant="contained" sx={buttonStyle}>
-                    Book
+                <Button fullWidth 
+                        variant="contained" 
+                        sx={buttonStyle}
+                        onClick={()=> setOpenRideDetails(true)}
+                >
+                    View Details
                 </Button>
+                <RideDetails openRideDetails={openRideDetails} setOpenRideDetails={setOpenRideDetails} rideId={ride.id}/>
             </Box>
     </Box>
   )

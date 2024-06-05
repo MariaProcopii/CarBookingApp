@@ -5,14 +5,13 @@ import axios from 'axios';
 import { parseErrorMessages } from '../../utils/ErrorUtils';
 import SearchBar from '../../components/searchBar/SearchBar';
 import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
 
 export default function AvailableRides() {
 
     const [backendErrors, setBackendErrors] = useState({});
     const [rides, setRides] = useState([]);
-    const [pageIndex, setPageIndex] = React.useState(1);
-    const [totalPages, setTotalPages] = React.useState(1);
+    const [pageIndex, setPageIndex] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
 
     const fetchRidesWithParams = (searchParams) => {
@@ -21,6 +20,7 @@ export default function AvailableRides() {
       axios.get(`http://localhost:5239/ride/21?${query}`)
         .then((response) => {
             setRides(response.data.items);
+            setTotalPages(response.data.totalPages);
         })
         .catch((error) => {
             const { data } = error.response;
@@ -82,8 +82,8 @@ export default function AvailableRides() {
                                     md: '8px',
                                     lg: '10px'
                                 }
-                            }
-                        }}
+                              }
+                          }}
               />
           </Grid>
       </Container>
