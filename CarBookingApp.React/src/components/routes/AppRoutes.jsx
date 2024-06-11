@@ -6,6 +6,7 @@ import AvailableRides from "../../pages/availableRides/AvailableRides";
 import Example from "../example/Example";
 import { Routes, Route } from 'react-router-dom';
 import Sidebar from '../sidebar/Sidebar';
+import Profile from "../../pages/profile/Profile";
 
 
 const AppRoutes = ({theme, isDarkThemeOn, setDarkTheme}) => {
@@ -22,7 +23,7 @@ const AppRoutes = ({theme, isDarkThemeOn, setDarkTheme}) => {
       <Route path="/" element={<ProtectedRoute />}>
           <Route element={<Sidebar theme={theme} isDarkThemeOn={isDarkThemeOn} setDarkTheme={setDarkTheme}/>}>
             <Route index element={<AvailableRides />} />
-            <Route path="profile" element={<div>User Profile</div>} />
+            <Route path="profile" element={<Profile />} />
             <Route path="logout" element={<Logout />} />
             <Route path="example/user" element={<Example />} />
           </Route>

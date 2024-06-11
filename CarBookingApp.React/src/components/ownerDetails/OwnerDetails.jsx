@@ -65,14 +65,16 @@ export default function OwnerDetails({ owner }) {
                             <PhoneIcon color="primary" sx={iconStyle} />
                             <Typography sx={typographyStyle}>{owner.phoneNumber}</Typography>
                         </DetailBox>
-                        {/* <DetailBox>
+                        <DetailBox>
                             <DirectionsCarIcon color="primary" sx={iconStyle} />
-                            <Typography sx={typographyStyle}>{owner.vehicheDetail.vehicle.vendor} {owner.vehicheDetail.vehicle.model} ({owner.vehicheDetail.manufactureYear})</Typography>
+                            <Typography sx={typographyStyle}>
+                                {owner.vehicleDetail.vehicle.vender} {owner.vehicleDetail.vehicle.model} ({owner.vehicleDetail.manufactureYear})
+                            </Typography>
                         </DetailBox>
                         <DetailBox>
                             <InfoIcon color="primary" sx={iconStyle} />
-                            <Typography sx={typographyStyle}>{owner.vehicheDetail.registrationNumber}</Typography>
-                        </DetailBox> */}
+                            <Typography sx={typographyStyle}>{owner.vehicleDetail.registrationNumber}</Typography>
+                        </DetailBox>
                     </Grid>
                 </Grid>
             </Box>

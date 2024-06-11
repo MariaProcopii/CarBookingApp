@@ -17,7 +17,7 @@ export default function AvailableRides() {
     const fetchRidesWithParams = (searchParams) => {
       const query = `destinationFrom=${searchParams.destinationFrom}&destinationTo=${searchParams.destinationTo}&dateOfTheRide=${searchParams.date}`;
     
-      axios.get(`http://localhost:5239/ride/21?${query}`)
+      axios.get(`http://192.168.0.9:5239/ride/21?${query}`)
         .then((response) => {
             setRides(response.data.items);
             setTotalPages(response.data.totalPages);
@@ -30,7 +30,7 @@ export default function AvailableRides() {
 
     const fetchRides = () => {
     
-      axios.get(`http://localhost:5239/ride/21?PageNumber=${pageIndex}`)
+      axios.get(`http://192.168.0.9:5239/ride/21?PageNumber=${pageIndex}`)
         .then((response) => {
             setRides(response.data.items);
             setTotalPages(response.data.totalPages);

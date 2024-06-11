@@ -23,7 +23,7 @@ export default function Login() {
     const onSubmit = (values, props) => {
 
         axios.post(
-            "http://localhost:5239/Auth/LogIn",
+            "http://192.168.0.9:5239/Auth/LogIn",
             {
               email: values.email,
               password: values.password,
