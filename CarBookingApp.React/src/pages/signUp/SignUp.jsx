@@ -13,6 +13,7 @@ import {useState} from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/provider/AuthProvider";
 import { parseErrorMessages } from '../../utils/ErrorUtils';
+import { transformDate } from '../../utils/DateTimeUtils';
 
 export default function SignUp() {
     const boxStyle={ margin:"40px auto", alignItems: 'center', minWidth:300 };
@@ -56,24 +57,13 @@ export default function SignUp() {
 
     const checkDateValid = () => {
         const re = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-        const birthday = transformDate();
+        const birthday = transformDate(date);
 
         if (re.test(birthday)) {
             setDateValid(true);
         }
         else {
             setDateValid(false);
-        }
-    };
-
-    function transformDate() {
-        const formatedDate = new Date(date).toLocaleString().split(",")[0];
-        const [month, day, year] = formatedDate.split('/');
-    
-        if (month && day && year) {
-            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        } else {
-            return null;
         }
     };
 
@@ -89,7 +79,7 @@ export default function SignUp() {
             {
               ...values,
               phoneNumber: phone,
-              dateOfBirth: transformDate()
+              dateOfBirth: transformDate(date)
             },
           )
           .then((response) => {

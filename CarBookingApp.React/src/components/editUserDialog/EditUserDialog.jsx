@@ -1,17 +1,81 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField,
-         Grid, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+         Grid, FormControl, InputLabel, Select, MenuItem, Button, Typography, IconButton, InputAdornment } from '@mui/material';
+import { MuiTelInput } from 'mui-tel-input';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateField } from '@mui/x-date-pickers/DateField';
+import { Form, Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from "yup";
+import { transformDate } from '../../utils/DateTimeUtils';
+import dayjs from 'dayjs';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo, handleSave }) {
+export default function EditUserDialog({ open, setOpen, userInfo, handleSave, backendErrors , setBackendErrors }) {
   const handleClose = () => {
     setOpen(false);
+    setBackendErrors({});
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserInfo({
-      ...userInfo,
-      [name]: value,
+  const [phone, setPhone] = useState(userInfo.phoneNumber);
+  const [isPhoneValid, setPhoneValid] = useState(true);
+  const [date, setDate] = useState(dayjs(userInfo.dateOfBirth));
+  const [isDateValid, setDateValid] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handlePhoneChange = (newPhone) => {
+    setPhone(newPhone.replace(/\s+/g, ''));
+  };
+
+  const handleChangeDate = (newDate) => {
+    setDate(newDate);
+  };
+
+  const checkPhoneValid = () => {
+    const re = /^\+\d{10,15}$/;
+    setPhoneValid(re.test(phone));
+  };
+
+  const checkDateValid = () => {
+    const re = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+    const birthday = transformDate(date);
+
+    if (re.test(birthday)) {
+        setDateValid(true);
+    }
+    else {
+        setDateValid(false);
+    }
+  };
+
+  const initialValues = {
+    firstName: userInfo.firstName,
+    lastName: userInfo.lastName,
+    email: userInfo.email,
+    gender: userInfo.gender,
+    password: "",
+  };
+
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required("First Name is required"),
+    lastName: Yup.string().required("Last Name is required"),
+    email: Yup.string().required("Email is required").email("Email is invalid"),
+    password: Yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, "Must contain at least one uppercase letter, one lowercase letter, and one digit with at least 8 characters"),
+  });
+
+  const onSubmit = (values, props) => {
+    checkDateValid();
+    checkPhoneValid();
+    if (!isDateValid || !isPhoneValid) {
+      return;
+    }
+    
+    handleSave({
+      ...values,
+      phoneNumber: phone,
+      dateOfBirth: transformDate(date),
     });
   };
 
@@ -22,16 +86,8 @@ export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo, h
         <DialogContentText>
           Update the user information below:
         </DialogContentText>
-        <Formik
-          initialValues={userInfo}
-          validationSchema={userValidationSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            handleSave(values);
-            setSubmitting(false);
-            handleClose();
-          }}
-        >
-          {({ isSubmitting }) => (
+        <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
+          {(props) => (
             <Form>
               <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid item xs={12}>
@@ -39,10 +95,9 @@ export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo, h
                     as={TextField}
                     margin="dense"
                     label="First Name"
-                    type="text"
+                    name="firstName"
                     fullWidth
                     variant="outlined"
-                    name="firstName"
                     helperText={<ErrorMessage name="firstName" />}
                   />
                 </Grid>
@@ -51,10 +106,9 @@ export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo, h
                     as={TextField}
                     margin="dense"
                     label="Last Name"
-                    type="text"
+                    name="lastName"
                     fullWidth
                     variant="outlined"
-                    name="lastName"
                     helperText={<ErrorMessage name="lastName" />}
                   />
                 </Grid>
@@ -64,45 +118,65 @@ export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo, h
                     margin="dense"
                     label="Email"
                     type="email"
+                    name="email"
                     fullWidth
                     variant="outlined"
-                    name="email"
                     helperText={<ErrorMessage name="email" />}
                   />
+                  {backendErrors.email && (
+                    <Typography color="gray" variant="caption" sx={{ml:2}}>
+                        {backendErrors.email}
+                    </Typography>
+                  )}
                 </Grid>
                 <Grid item xs={12}>
-                  <Field
-                    as={TextField}
-                    margin="dense"
+                  <MuiTelInput
+                    value={phone}
+                    onChange={handlePhoneChange}
                     label="Phone Number"
-                    type="text"
+                    name="phone"
+                    autoComplete="phone" 
                     fullWidth
-                    variant="outlined"
-                    name="phoneNumber"
-                    helperText={<ErrorMessage name="phoneNumber" />}
+                    required
                   />
+                  {!isPhoneValid && (
+                    <Typography color="error" variant="caption">
+                      Phone is invalid
+                    </Typography>
+                  )}                                    
+                  {backendErrors.phone && (
+                      <Typography color="gray" variant="caption" sx={{ml:2}}>
+                          {backendErrors.phone}
+                      </Typography>
+                  )}
                 </Grid>
                 <Grid item xs={12}>
-                  <Field
-                    as={TextField}
-                    margin="dense"
-                    label="Years of Experience"
-                    type="number"
-                    fullWidth
-                    variant="outlined"
-                    name="yearsOfExperience"
-                    helperText={<ErrorMessage name="yearsOfExperience" />}
-                  />
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DateField']}>
+                      <DateField
+                        label="Pick your birthday"
+                        name="birthday"
+                        value={date}
+                        onChange={handleChangeDate}
+                        required
+                        fullWidth
+                      />
+                    </DemoContainer>
+                  </LocalizationProvider>
+                  {!isDateValid && (
+                    <Typography color="error" variant="caption">
+                      Date is invalid
+                    </Typography>
+                  )}
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl fullWidth sx={{ marginTop: 1 }}>
                     <InputLabel id="gender-select-label">Gender</InputLabel>
-                    <Field
-                      as={Select}
+                    <Field as={Select}
                       labelId="gender-select-label"
-                      id="gender-select"
-                      label="Gender"
                       name="gender"
+                      fullWidth
+                      required
                     >
                       <MenuItem value={"FEMALE"}>Female</MenuItem>
                       <MenuItem value={"MALE"}>Male</MenuItem>
@@ -114,19 +188,34 @@ export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo, h
                   <Field
                     as={TextField}
                     margin="dense"
-                    label="New Password"
-                    type="password"
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
                     fullWidth
                     variant="outlined"
-                    name="password"
                     helperText={<ErrorMessage name="password" />}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
+                <DialogActions>
+                  <Button onClick={handleClose} color="secondary">Cancel</Button>
+                  <Button type="submit" color="primary" >
+                    Save
+                  </Button>
+                </DialogActions>
               </Grid>
-              <DialogActions>
-                <Button onClick={handleClose} color="secondary">Cancel</Button>
-                <Button type="submit" color="primary" disabled={isSubmitting}>Save</Button>
-              </DialogActions>
             </Form>
           )}
         </Formik>
