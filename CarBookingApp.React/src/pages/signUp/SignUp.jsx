@@ -20,6 +20,20 @@ export default function SignUp() {
     const paperStyle={padding :40,height:'70vh',width:600, margin:"50px auto"};
     const avatarStyle={ bgcolor: 'primary.main' };
     const btnstyle={margin:'8px 0'};
+    const imageStyle={
+        margin: "30px auto",
+        maxWidth: '100%',
+        height: 'auto',
+        width: '100%',
+        maxHeight: {
+            xs: '200px',
+            sm: '250px',
+            md: '300px',
+            lg: '350px',
+            xl: '400px',
+        },
+    };
+
     const { setToken } = useAuth();
     const [backendErrors, setBackendErrors] = useState({});
     const navigate = useNavigate();
@@ -115,7 +129,7 @@ export default function SignUp() {
     return(
         <Grid container>
             <Box sx={boxStyle} >
-                <img src="src/assets/images/car-intro.png" />
+                <img src="src/assets/images/car-intro.png" style={imageStyle}/>
             </Box>
             <Paper elevation={8} style={paperStyle} sx={{width: '800px'}}>
                 <Grid align='center'>
