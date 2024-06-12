@@ -22,7 +22,7 @@ public class CreateVehicleDetailCommandValidator : AbstractValidator<CreateVehic
 
         RuleFor(x => x.RegistrationNumber)
             .NotEmpty()
-            .Matches("^[A-Z]{3} [0-9]{3}}$")
-            .WithMessage("Invalid registration number format. Example: ABC-123");
+            .Matches("^[A-Z]{3} [0-9]{3}$")
+            .WithMessage("Invalid registration number format. Example: ABC 123");
     }
 }

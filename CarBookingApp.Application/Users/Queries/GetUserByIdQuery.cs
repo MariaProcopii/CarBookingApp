@@ -25,9 +25,14 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDTO
 
         var user = await  _repository.GetByIdAsync<User>(request.UserId);
         UserDTO userDTO;
-        if (user is Driver driver)
+        if (user is Driver)
         {
-            userDTO = _mapper.Map<Driver, UserDTO>(driver);
+            var driverInfo = await _repository.GetByIdWithInclude<Driver>(
+                request.UserId,
+                d => d.VehicleDetail,
+                d => d.VehicleDetail.Vehicle
+            );
+            userDTO = _mapper.Map<Driver, UserDTO>(driverInfo);
         }
         else
         {

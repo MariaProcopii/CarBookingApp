@@ -76,7 +76,7 @@ public class RideController : ControllerBase
     public async Task<ActionResult<PaginatedList<RideShortInfoDTO>>> GetRides(
         int userId, 
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 9,
+        [FromQuery] int pageSize = 8,
         [FromQuery] string orderBy = "DateOfTheRide",
         [FromQuery] bool ascending = true,
         [FromQuery] string destinationFrom = null,

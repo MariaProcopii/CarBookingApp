@@ -47,16 +47,26 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, strin
             var emailUser = await _userManager.FindByEmailAsync(request.Email);
             if (emailUser != null && emailUser.Id != appUser.Id)
             {
-                throw new EntityNotValidException("Email already used.");
+                throw new EntityNotValidException("email: Email already used.");
             }
             appUser.Email = request.Email;
             appUser.UserName = request.FirstName + request.LastName;
         }
         
+        if (request.PhoneNumber != existingUser.PhoneNumber)
+        {
+            var isPhonePresent = await _repository.GetByPredicate<User>(u => u.PhoneNumber
+                .Equals(request.PhoneNumber));
+            if (isPhonePresent.Count != 0)
+            {
+                throw new EntityNotValidException("phone: Phone number already used.");
+            }
+        }
+        
         var updateResult = await _userManager.UpdateAsync(appUser);
         if (!updateResult.Succeeded)
         {
-            throw new EntityNotValidException("Failed to update user.");
+            throw new EntityNotValidException("user: Failed to update user.");
         }
         
         var userClaims = await _userManager.GetClaimsAsync(appUser);
@@ -67,13 +77,17 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, strin
         {
             new(ClaimTypes.Name, request.FirstName),
             new(ClaimTypes.Surname, request.LastName),
-            new(ClaimTypes.Email, request.Email)
+            new(ClaimTypes.Email, request.Email),
+            new(ClaimTypes.NameIdentifier, appUser.Id.ToString())
         };
         newClaims.AddRange(roleClaims);
         await _userManager.AddClaimsAsync(appUser, newClaims);
-        
-        await _userManager.RemovePasswordAsync(appUser);
-        await _userManager.AddPasswordAsync(appUser, request.Password);
+
+        if (!string.IsNullOrEmpty(request.Password))
+        {
+            await _userManager.RemovePasswordAsync(appUser);
+            await _userManager.AddPasswordAsync(appUser, request.Password);
+        }
         
         var updateUser = _mapper.Map(request, existingUser);
         if (existingUser is Driver existingDriver)

@@ -15,7 +15,9 @@ public class UserProfiles : Profile
         
         CreateMap<Driver, User>();
         
-        CreateMap<Driver, UserDTO>();
+        CreateMap<Driver, UserDTO>()
+            .ForMember(dest => dest.Gender, opt =>
+                opt.MapFrom(src => src.Gender.ToString()));
         
         CreateMap<User, UserDTO>()
             .ForMember(dest => dest.Gender, opt =>

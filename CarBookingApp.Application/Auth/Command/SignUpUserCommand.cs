@@ -50,9 +50,10 @@ public class SignInUserCommandHandler : IRequestHandler<SignUpUserCommand, strin
             throw new EntityNotValidException("email: Email already used.");
         }
         var isPhonePresent = await _repository.GetByPredicate<User>(u => u.PhoneNumber
-            .Equals(u.PhoneNumber));
+            .Equals(request.PhoneNumber));
         if (isPhonePresent.Count != 0)
         {
+            Console.WriteLine();
             throw new EntityNotValidException("phone: Phone number already used.");
         }
 

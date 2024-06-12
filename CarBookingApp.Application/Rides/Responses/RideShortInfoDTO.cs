@@ -8,5 +8,6 @@ public class RideShortInfoDTO
     public string DestinationTo { get; set; }
     public int TotalSeats { get; set; }
     public string OwnerName { get; set; }
+    public string OwnerGender { get; set; }
     public decimal Price { get; set; }
 }

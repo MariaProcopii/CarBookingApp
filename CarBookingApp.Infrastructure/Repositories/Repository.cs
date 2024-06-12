@@ -58,10 +58,6 @@ public class Repository : IRepository
         }
 
         var filteredEntities = await entities.Where(predicate).ToListAsync();
-        if (!filteredEntities.Any())
-        {
-            throw new EntityNotFoundException($"Object {typeof(T).Name} not found.");
-        }
 
         return filteredEntities;
     }

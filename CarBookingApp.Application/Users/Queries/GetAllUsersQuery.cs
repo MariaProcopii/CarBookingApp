@@ -45,9 +45,30 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, Paginat
             pageSize: pageSize,
             filter: filter,
             orderBy: orderBy,
-            request.Ascending
+            ascending: request.Ascending
         );
-        var userDTOs = _mapper.Map<List<UserDTO>>(usersPaginated.Items);
+        
+        var driverIds = usersPaginated.Items.OfType<Driver>().Select(d => d.Id).ToList();
+        var drivers = await _repository.GetByPredicate<Driver>(
+            d => driverIds.Contains(d.Id),
+            d => d.VehicleDetail,
+            d => d.VehicleDetail.Vehicle
+        );
+        usersPaginated.Items.AddRange(drivers);
+        
+        var userDTOs = new List<UserDTO>();
+        foreach (var user in usersPaginated.Items)
+        {
+            if (user is Driver driver)
+            {
+                var driverWithDetails = drivers.First(d => d.Id == driver.Id);
+                userDTOs.Add(_mapper.Map<UserDTO>(driverWithDetails));
+            }
+            else
+            {
+                userDTOs.Add(_mapper.Map<UserDTO>(user));
+            }
+        }
 
         return new PaginatedList<UserDTO>(userDTOs, usersPaginated.TotalCount, usersPaginated.PageIndex, usersPaginated.PageSize);
     }

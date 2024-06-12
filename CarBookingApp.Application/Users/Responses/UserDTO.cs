@@ -1,3 +1,5 @@
+using CarBookingApp.Application.VehicleDetails.Responses;
+
 namespace CarBookingApp.Application.Users.Responses;
 
 public class UserDTO
@@ -10,4 +12,5 @@ public class UserDTO
     public string Email { get; set; }
     public string PhoneNumber { get; set; }
     public int? YearsOfExperience { get; set; }
+    public VehicleDetailDTO? VehicleDetail { get; set; }
 }

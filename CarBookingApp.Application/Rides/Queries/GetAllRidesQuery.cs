@@ -14,7 +14,7 @@ namespace CarBookingApp.Application.Rides.Queries;
 public record GetAllRidesQuery(
     int UserId,
     int PageNumber = 1,
-    int PageSize = 9,
+    int PageSize = 8,
     string OrderBy = "DateOfTheRide",
     bool Ascending = true,
     DateTime? DateOfTheRide = null,
@@ -76,7 +76,6 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
             r => r.Owner,
             r => r.RideDetail
         );
-        ridesPaginated.Items.ForEach(e => Console.WriteLine(e.DateOfTheRide));
 
         var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(ridesPaginated.Items);
 
