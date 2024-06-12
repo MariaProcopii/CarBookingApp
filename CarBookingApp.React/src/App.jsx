@@ -21,16 +21,16 @@ const themeOptionsLight = {
 
 const themeOptionsDark = {
   palette: {
-    type: 'dark',
+    mode: 'dark',
     primary: {
-      main: '#560C0C',
+      main: '#993333',
     },
     secondary: {
-      main: '#6811da',
+      main: '#993333',
     },
     background: {
-      default: '#292929',
-      paper: '#989292',
+      default: '#1E1E1D',
+      paper: '#1E1E1E',
     },
     text: {
       primary: 'rgba(255,255,255,0.87)',
@@ -38,7 +38,7 @@ const themeOptionsDark = {
       disabled: 'rgba(255,255,255,0.38)',
       hint: 'rgba(255,255,255,0.38)',
     },
-  },
+  }
 };
 
 let theme = null;

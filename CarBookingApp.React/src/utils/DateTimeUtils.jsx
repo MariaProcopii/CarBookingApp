@@ -19,12 +19,11 @@ import { differenceInYears } from 'date-fns';
 };
 
   export function transformDate(date) {
-    const formatedDate = new Date(date).toLocaleString().split(",")[0];
-    const [month, day, year] = formatedDate.split('/');
+    const transformedDate = new Date(date).toISOString().split("T")[0];
 
-    if (month && day && year) {
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    if (transformedDate) {
+        return transformedDate;
     } else {
         return null;
     }
-  };
+};

@@ -4,6 +4,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { styled } from '@mui/system';
 import { calculateAge } from '../../utils/DateTimeUtils';
+import getAvatarSrc from '../../utils/AvatarUtils';
 
 export default function PassengerDetails({ passengers }) {
     const typographyStyle = {
@@ -42,7 +43,8 @@ export default function PassengerDetails({ passengers }) {
                     <Box key={passenger.id} sx={{ p: 2 }}>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item>
-                                <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
+                                <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}
+                                        src={getAvatarSrc(passenger.gender)}>
                                     {passenger.firstName.charAt(0)}{passenger.lastName.charAt(0)}
                                 </Avatar>
                             </Grid>

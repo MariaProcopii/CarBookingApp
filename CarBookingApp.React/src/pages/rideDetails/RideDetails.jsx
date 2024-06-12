@@ -15,7 +15,7 @@ export default function RideDetails(props) {
 
     const fetchRideDetails = () => {
         console.log()
-        axios.get(`http://localhost:5239/ride/details/${rideId}`)
+        axios.get(`http://192.168.0.9:5239/ride/details/${rideId}`)
           .then((response) => {
             setRideDetails(response.data);
             console.log(rideDetails.rideDetail)

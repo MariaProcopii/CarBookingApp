@@ -4,6 +4,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { transformDate } from '../../utils/DateTimeUtils';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
@@ -23,7 +24,7 @@ export default function SearchBar({ onSearch }) {
   }, []);
 
   const fetchDestinations = () => {
-    axios.get("http://localhost:5239/destination/pick/name")
+    axios.get("http://192.168.0.9:5239/destination/pick/name")
       .then((response) => {
         const topCities = response.data.map(city => ({ label: city}));
         setDestinations(topCities);
@@ -39,7 +40,7 @@ export default function SearchBar({ onSearch }) {
 
   const checkDateValid = () => {
     const re = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-    const birthday = transformDate();
+    const birthday = transformDate(date);
 
     if (re.test(birthday)) {
         setDateValid(true);
@@ -48,17 +49,6 @@ export default function SearchBar({ onSearch }) {
         setDateValid(false);
     }
 };
-
-    function transformDate() {
-        const formatedDate = new Date(date).toLocaleString().split(",")[0];
-        const [month, day, year] = formatedDate.split('/');
-
-        if (month && day && year) {
-            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        } else {
-            return null;
-        }
-    };
 
 const validateInputs = () => {
     checkDateValid();
@@ -74,7 +64,7 @@ const validateInputs = () => {
   };
 
   const searchParams = {
-    date: transformDate(),
+    date: transformDate(date),
     destinationFrom,
     destinationTo,
     seats,

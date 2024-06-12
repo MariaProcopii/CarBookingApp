@@ -6,6 +6,7 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import InfoIcon from '@mui/icons-material/Info';
 import { styled } from '@mui/system';
 import { calculateAge } from '../../utils/DateTimeUtils';
+import getAvatarSrc from '../../utils/AvatarUtils';
 
 export default function OwnerDetails({ owner }) {
     const typographyStyle = {
@@ -39,7 +40,10 @@ export default function OwnerDetails({ owner }) {
             <Box sx={{ p: 2 }}>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item>
-                        <Avatar sx={{ bgcolor: 'secondary.main', width: 56, height: 56 }}>
+                        <Avatar 
+                            sx={{ bgcolor: 'secondary.main', width: 50, height: 50 }}
+                            src={getAvatarSrc(owner.gender)}
+                        >
                             {owner.firstName.charAt(0)}{owner.lastName.charAt(0)}
                         </Avatar>
                     </Grid>

@@ -65,7 +65,7 @@ export default function Login() {
         setTimeout(() => {
             props.resetForm();
             props.setSubmitting(false);
-        }, 1000);
+        }, 10);
     };
 
     const validationSchema = Yup.object().shape({

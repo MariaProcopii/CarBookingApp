@@ -2,6 +2,7 @@ import { Box, Avatar, Typography, Button, Divider } from "@mui/material";
 import { getDateFromISO, getTimeFromISO} from "../../utils/DateTimeUtils";
 import React, { useEffect, useState } from 'react';
 import RideDetails from "../../pages/rideDetails/RideDetails";
+import getAvatarSrc from "../../utils/AvatarUtils";
 
 export default function Ride({ride}) {
     const [openRideDetails, setOpenRideDetails] = useState(false);
@@ -85,7 +86,7 @@ export default function Ride({ride}) {
     <Box sx={mainBoxStyle}>
             <Box align='center'>
                 <Avatar 
-                    src="src/assets/images/profile-img-man.png" 
+                    src={getAvatarSrc(ride.ownerGender)}
                     sx={avatarStyle}
                 />
                 <Typography sx={headTypographyStyle} variant="body1">{ride.ownerName}</Typography>

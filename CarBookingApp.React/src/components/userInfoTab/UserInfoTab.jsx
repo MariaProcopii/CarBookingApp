@@ -1,6 +1,7 @@
 import { Box, Typography, Button, Avatar, Divider } from '@mui/material';
 import { deepPurple } from '@mui/material/colors';
 import { styled } from '@mui/system';
+import getAvatarSrc from '../../utils/AvatarUtils';
 
 export default function UserInfoTab({userInfo, setOpen}) {
 
@@ -45,7 +46,7 @@ export default function UserInfoTab({userInfo, setOpen}) {
   return (
     <Box sx={{ mt: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-      <Avatar src="src/assets/images/profile-img-man.png" 
+      <Avatar src={getAvatarSrc(userInfo.gender)}
               sx={{ bgcolor: deepPurple[500], width: 56, height: 56, mr: 2 }}
       >
         {userInfo.firstName[0]}

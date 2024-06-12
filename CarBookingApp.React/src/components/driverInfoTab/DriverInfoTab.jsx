@@ -1,6 +1,7 @@
 import { Box, Typography, Button, Divider } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import InfoIcon from '@mui/icons-material/Info';
+import { styled } from '@mui/system';
 
 export default function DriverInfoTab({ userInfo, handleUpgrade }) {
 
@@ -11,6 +12,22 @@ export default function DriverInfoTab({ userInfo, handleUpgrade }) {
           md: '1.0rem'
         }
       };
+
+    const iconStyle = {
+      fontSize: {
+        xs: '1rem',
+        sm: '1.2rem',
+        md: '1.5rem',
+        lg: '1.7rem'
+      },
+      marginRight: '8px'
+    };
+    
+    const DetailBox = styled(Box)(({ theme }) => ({
+      display: 'flex',
+      alignItems: 'center',
+      padding: theme.spacing(1)
+    }));
 
   return (
     <Box sx={{ mt: 3, px: 3 }}>

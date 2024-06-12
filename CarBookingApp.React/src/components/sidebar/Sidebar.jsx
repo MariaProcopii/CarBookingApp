@@ -164,7 +164,7 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
           <IconButton 
             sx={{
               position: "absolute", 
-              marginLeft: "92vw" 
+              marginLeft: "86vw" 
             }}
             onClick={() => {setDarkTheme(!isDarkThemeOn)}}
           >

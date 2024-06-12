@@ -1,10 +1,14 @@
-import { Grid, Box, Container }  from '@mui/material';
+import { Grid, Box, Container, Dialog, DialogContent, useMediaQuery, Button }  from '@mui/material';
 import Ride from '../../components/ride/Ride';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { parseErrorMessages } from '../../utils/ErrorUtils';
 import SearchBar from '../../components/searchBar/SearchBar';
 import Pagination from '@mui/material/Pagination';
+import { useTheme } from '@mui/material/styles';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import { useAuth } from '../../components/provider/AuthProvider';
+import { useTokenDecoder } from '../../utils/TokenUtils';
 
 export default function AvailableRides() {
 
@@ -12,12 +16,26 @@ export default function AvailableRides() {
     const [rides, setRides] = useState([]);
     const [pageIndex, setPageIndex] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [open, setOpen] = useState(false);
+    const { token } = useAuth();
+    const claims = useTokenDecoder(token);
 
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const buttonStyle={
+        fontSize: {
+            xs: '0.6rem',
+            sm: '0.7rem',
+            md: '0.8rem',
+            lg: '0.9rem'
+            }  
+    };
 
     const fetchRidesWithParams = (searchParams) => {
+      handleClose();
       const query = `destinationFrom=${searchParams.destinationFrom}&destinationTo=${searchParams.destinationTo}&dateOfTheRide=${searchParams.date}`;
-    
-      axios.get(`http://192.168.0.9:5239/ride/21?${query}`)
+      axios.get(`http://192.168.0.9:5239/ride/${claims.nameidentifier}?${query}`)
         .then((response) => {
             setRides(response.data.items);
             setTotalPages(response.data.totalPages);
@@ -30,7 +48,7 @@ export default function AvailableRides() {
 
     const fetchRides = () => {
     
-      axios.get(`http://192.168.0.9:5239/ride/21?PageNumber=${pageIndex}`)
+      axios.get(`http://192.168.0.9:5239/ride/${claims.nameidentifier}?PageNumber=${pageIndex}`)
         .then((response) => {
             setRides(response.data.items);
             setTotalPages(response.data.totalPages);
@@ -47,12 +65,37 @@ export default function AvailableRides() {
     }, 10);
   }, [pageIndex]);
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
       <Container sx={{ display: 'flex', flexDirection: 'column', minHeight: '80vh', justifyContent: 'center'}}>
           <Grid container direction='row' alignItems='center' justifyContent='center'>
-              <Grid item>
-                  <SearchBar onSearch={fetchRidesWithParams} />
-              </Grid>
+                {isSmallScreen ? (
+                <Grid item>
+                    <Button variant="contained" 
+                            startIcon={<ManageSearchIcon fontSize='large' color='black' />}
+                            sx={buttonStyle}
+                            onClick={handleClickOpen}
+                    >
+                            Search
+                        </Button>
+                    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
+                        <DialogContent>
+                            <SearchBar onSearch={fetchRidesWithParams} />
+                        </DialogContent>
+                    </Dialog>
+                </Grid>
+                ) : (
+                <Grid item>
+                    <SearchBar onSearch={fetchRidesWithParams} />
+                </Grid>
+                )}
           </Grid>
           <Box mb={5} />
           <Grid container spacing={5} direction='row' wrap='wrap' alignItems='center' justifyContent='center' flexGrow={2}>
