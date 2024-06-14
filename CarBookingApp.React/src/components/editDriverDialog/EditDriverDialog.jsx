@@ -6,13 +6,19 @@ import {
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { useAuth } from '../provider/AuthProvider';
+import { useTokenDecoder } from '../../utils/TokenUtils';
+import { parseErrorMessages } from '../../utils/ErrorUtils';
 
 const steps = ['Vehicle Details', 'Vendor', 'Model'];
 
-export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleSave }) {
+export default function EditDriverDialog({ open, setOpen, vehicleDetail, setVehicleDetail }) {
   const [activeStep, setActiveStep] = useState(0);
   const [vendors, setVendors] = useState([]);
   const [models, setModels] = useState([]);
+  const { token, setToken } = useAuth();
+  const claims = useTokenDecoder(token);
+  const [backendErrors, setBackendErrors] = useState({});
 
   const initialValues = {
     manufactureYear: vehicleDetail.manufactureYear,
@@ -53,6 +59,18 @@ export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleS
       });
   };
 
+  const handleUpdateVehicleDetail = (updatedInfo) => {
+    axios.put(`http://192.168.0.9:5239/vehicledetail/info/update/${claims.nameidentifier}`, updatedInfo)
+      .then(response => {
+        setOpen(false);
+        setVehicleDetail(response.data);
+      })
+      .catch((error) => {
+        const { data } = error.response;
+        setBackendErrors(parseErrorMessages(data.Message));
+      });
+  };
+
   const validationSchemas = [
     Yup.object().shape({
       manufactureYear: Yup.number()
@@ -77,6 +95,7 @@ export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleS
   const handleClose = () => {
     setOpen(false);
     setActiveStep(0);
+    setBackendErrors({});
   };
 
   const handleNext = (isValid) => {
@@ -99,8 +118,15 @@ export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleS
         }
     };
 
-    handleSave(formatedValues);
+    handleUpdateVehicleDetail(formatedValues);
     handleClose();
+  };
+
+  function isStepFailed(step) {
+    if (step === 0 && (backendErrors.manufactureYear || backendErrors.registrationNumber)) return true;
+    if (step === 1 && backendErrors.vender) return true;
+    if (step === 2 && backendErrors.model) return true;
+    return false;
   };
 
   return (
@@ -117,100 +143,110 @@ export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleS
             <Form>
               <Box sx={{ maxWidth: 400 }}>
                 <Stepper activeStep={activeStep} orientation="vertical">
-                  {steps.map((label, index) => (
-                    <Step key={label}>
-                      <StepLabel>
-                        {label}
-                      </StepLabel>
-                      <StepContent>
-                        <Box sx={{ mb: 2 }}>
-                          {index === 0 && (
-                            <>
-                              <Field
-                                as={TextField}
-                                margin="dense"
-                                label="Manufacture Year"
-                                name="manufactureYear"
-                                fullWidth
-                                variant="outlined"
-                                helperText={<ErrorMessage name="manufactureYear" />}
-                              />
-                              <Field
-                                as={TextField}
-                                margin="dense"
-                                label="Registration Number"
-                                name="registrationNumber"
-                                fullWidth
-                                variant="outlined"
-                                helperText={<ErrorMessage name="registrationNumber" />}
-                              />
-                            </>
-                          )}
-                          {index === 1 && (
-                            <>
-                              <Field
-                                as={TextField}
-                                margin="dense"
-                                label="Vendor"
-                                name="vender"
-                                select
-                                fullWidth
-                                variant="outlined"
-                                helperText={<ErrorMessage name="vender" />}
-                                onChange={(event) => {
-                                    const vendor = event.target.value;
-                                    setFieldValue('vender', vendor);
-                                    setFieldValue('model', '');
-                                    fetchModels(vendor);
-                                  }}
-                              >
-                                {vendors.map((vendor) => (
-                                  <MenuItem key={vendor} value={vendor}>
-                                    {vendor}
-                                  </MenuItem>
-                                ))}
-                              </Field>
-                            </>
-                          )}
-                          {index === 2 && (
-                            <>
-                              <Field
-                                as={TextField}
-                                margin="dense"
-                                label="Model"
-                                name="model"
-                                select
-                                fullWidth
-                                variant="outlined"
-                                helperText={<ErrorMessage name="model" />}
-                              >
-                                {models.map((model) => (
-                                  <MenuItem key={model} value={model}>
-                                    {model}
-                                  </MenuItem>
-                                  ))}
-                              </Field>
-                            </>
-                          )}
-                          <DialogActions>
-                            {activeStep !== 0 && (
-                              <Button onClick={handleBack}>
-                                Back
-                              </Button>
+                  {steps.map((label, index) => {
+                    const labelProps = {};
+                    if (backendErrors && isStepFailed(index)) {
+                      labelProps.optional = (
+                        <Typography variant="caption" color="error">
+                          {backendErrors[Object.keys(backendErrors)[0]]}
+                        </Typography>
+                      );
+                      setOpen(true);
+                      labelProps.error = true;
+                    }
+                    return (
+                      <Step key={label}>
+                        <StepLabel {...labelProps}>{label}</StepLabel>
+                        <StepContent>
+                          <Box sx={{ mb: 2 }}>
+                            {index === 0 && (
+                              <>
+                                <Field
+                                  as={TextField}
+                                  margin="dense"
+                                  label="Manufacture Year"
+                                  name="manufactureYear"
+                                  fullWidth
+                                  variant="outlined"
+                                  helperText={<ErrorMessage name="manufactureYear" />}
+                                />
+                                <Field
+                                  as={TextField}
+                                  margin="dense"
+                                  label="Registration Number"
+                                  name="registrationNumber"
+                                  fullWidth
+                                  variant="outlined"
+                                  helperText={<ErrorMessage name="registrationNumber" />}
+                                />
+                              </>
                             )}
-                            <Button
-                              variant="contained"
-                              onClick={() => handleNext(isValid)}
-                              disabled={!isValid}
-                              sx={{ mt: 1, mr: 1 }}
-                            >
-                              {index === steps.length - 1 ? 'Finish' : 'Continue'}
-                            </Button>
-                          </DialogActions>
-                        </Box>
-                      </StepContent>
-                    </Step>
-                  ))}
+                            {index === 1 && (
+                              <>
+                                <Field
+                                  as={TextField}
+                                  margin="dense"
+                                  label="Vendor"
+                                  name="vender"
+                                  select
+                                  fullWidth
+                                  variant="outlined"
+                                  helperText={<ErrorMessage name="vender" />}
+                                  onChange={(event) => {
+                                      const vendor = event.target.value;
+                                      setFieldValue('vender', vendor);
+                                      setFieldValue('model', '');
+                                      fetchModels(vendor);
+                                    }}
+                                >
+                                  {vendors.map((vendor) => (
+                                    <MenuItem key={vendor} value={vendor}>
+                                      {vendor}
+                                    </MenuItem>
+                                  ))}
+                                </Field>
+                              </>
+                            )}
+                            {index === 2 && (
+                              <>
+                                <Field
+                                  as={TextField}
+                                  margin="dense"
+                                  label="Model"
+                                  name="model"
+                                  select
+                                  fullWidth
+                                  variant="outlined"
+                                  helperText={<ErrorMessage name="model" />}
+                                >
+                                  {models.map((model) => (
+                                    <MenuItem key={model} value={model}>
+                                      {model}
+                                    </MenuItem>
+                                    ))}
+                                </Field>
+                              </>
+                            )}
+                            <DialogActions>
+                              {activeStep !== 0 && (
+                                <Button onClick={handleBack}>
+                                  Back
+                                </Button>
+                              )}
+                              <Button
+                                variant="contained"
+                                onClick={() => handleNext(isValid)}
+                                disabled={!isValid}
+                                sx={{ mt: 1, mr: 1 }}
+                              >
+                                {index === steps.length - 1 ? 'Finish' : 'Continue'}
+                              </Button>
+                            </DialogActions>
+                          </Box>
+                        </StepContent>
+                      </Step>
+                    );
+                  })}
                 </Stepper>
                 {activeStep === steps.length && (
                   <Paper square elevation={0} sx={{ p: 3 }}>

@@ -64,19 +64,6 @@ export default function Profile() {
       });
   };
 
-  const handleUpdateVehicleDetail = (updatedInfo) => {
-    axios.put(`http://192.168.0.9:5239/vehicledetail/info/update/${claims.nameidentifier}`, updatedInfo)
-      .then(response => {
-        setOpenDriverDialog(false);
-        setVehicleDetail(response.data);
-      })
-      .catch((error) => {
-        const { data } = error.response;
-        console.log(data.Message);
-        console.log(error);
-      });
-  };
-
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -121,15 +108,15 @@ export default function Profile() {
           {vehicleDetail && <EditDriverDialog 
                               open={openDriverDialog}
                               setOpen={setOpenDriverDialog}
-                              vehicleDetail={vehicleDetail} 
-                              handleSave={handleUpdateVehicleDetail} 
+                              vehicleDetail={vehicleDetail}
+                              setVehicleDetail={setVehicleDetail}
                             />
           }
           <UpgradeUserDialog 
             open={openUpgradeDialog} 
             setOpen={setOpenUpgradeDialog}
             setVehicleDetail={setVehicleDetail}
-            userInfo={setUserInfo}
+            userInfo={userInfo}
             setUserInfo={setUserInfo}
           />
           </> 
