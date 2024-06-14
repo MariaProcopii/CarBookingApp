@@ -129,7 +129,7 @@ export default function Profile() {
             open={openUpgradeDialog} 
             setOpen={setOpenUpgradeDialog}
             setVehicleDetail={setVehicleDetail}
-            userInfo={userInfo}
+            userInfo={setUserInfo}
             setUserInfo={setUserInfo}
           />
           </> 

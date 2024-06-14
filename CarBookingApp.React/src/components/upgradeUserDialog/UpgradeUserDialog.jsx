@@ -16,22 +16,25 @@ export default function UpgradeUserDialog({ open, setOpen, setVehicleDetail, use
   const [activeStep, setActiveStep] = useState(0);
   const [vendors, setVendors] = useState([]);
   const [models, setModels] = useState([]);
-  const [loadingModels, setLoadingModels] = useState(false);
   const { token, setToken } = useAuth();
   const claims = useTokenDecoder(token);
   const [backendErrors, setBackendErrors] = useState({});
 
   const initialValues = {
-    yearsOfExperience: "",
-    manufactureYear: "",
-    registrationNumber: "",
-    vender: "",
-    model: ""
+    yearsOfExperience: 1,
+    manufactureYear: 2024,
+    registrationNumber: "ABC 123",
+    vender: "Toyota",
+    model: "Corolla"
   };
 
   useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  useEffect(() => {
     setTimeout(() => {
-        fetchVendors();
+        fetchModels(initialValues.vender);
       }, 10);
   }, []);
 
@@ -46,11 +49,9 @@ export default function UpgradeUserDialog({ open, setOpen, setVehicleDetail, use
   };
 
   const fetchModels = (vendorName) => {
-    setLoadingModels(true);
     axios.get(`http://192.168.0.9:5239/vehicle/pick/model?vendor=${vendorName}`)
       .then((response) => {
         setModels(response.data);
-        setLoadingModels(false);
       })
       .catch((error) => {
         console.error('Error fetching models:', error);
@@ -62,15 +63,13 @@ export default function UpgradeUserDialog({ open, setOpen, setVehicleDetail, use
       .post(`http://192.168.0.9:5239/user/info/upgrade/${claims.nameidentifier}`, yearsOfExperience)
       .then((response) => {
         setToken(response.data);
-        setUserInfo(
-            {
-                ...userInfo,
-                ...yearsOfExperience
-            }
-        );
+        setUserInfo({
+          ...userInfo,
+          ...yearsOfExperience
+        });
       })
       .catch((error) => {
-        console.log(error.data);
+        console.error(error.data);
       });
   };
 
@@ -79,44 +78,38 @@ export default function UpgradeUserDialog({ open, setOpen, setVehicleDetail, use
       .post(`http://192.168.0.9:5239/vehicledetail/create/${claims.nameidentifier}`, vehicleDetail)
       .then((response) => {
         setVehicleDetail(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         const { data } = error.response;
         setBackendErrors(parseErrorMessages(data.Message));
       });
-    };
+  };
 
   const validationSchemas = [
     Yup.object().shape({
-        yearsOfExperience: Yup.number()
+      yearsOfExperience: Yup.number()
         .required("Years of experience are required")
         .min(1, "Years of experience must be greater than 0"),
     }),
     Yup.object().shape({
-        manufactureYear: Yup.number()
+      manufactureYear: Yup.number()
         .required("Manufacture Year is required")
-        .min(1990, "Year must be greather than 1990"),
-        registrationNumber: Yup.string()
+        .min(1990, "Year must be greater than 1990"),
+      registrationNumber: Yup.string()
         .required("Registration Number is required")
         .matches(/^[A-Z]{3} [0-9]{3}$/, "Invalid registration number format. Example: ABC 123")
     }),
     Yup.object().shape({
-        vender: Yup.string()
+      vender: Yup.string()
         .required("Vendor is required")
         .max(50, "Maximum length is 50 characters"),
     }),
     Yup.object().shape({
-        model: Yup.string()
+      model: Yup.string()
         .required("Model is required")
         .max(50, "Maximum length is 50 characters")
     })
   ];
-
-  const handleClose = () => {
-    setOpen(false);
-    setActiveStep(0);
-  };
 
   const handleNext = (isValid) => {
     if (isValid) {
@@ -128,24 +121,37 @@ export default function UpgradeUserDialog({ open, setOpen, setVehicleDetail, use
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleSubmit = (values) => {
+  const handleClose = () => {
+    setOpen(false);
     setActiveStep(0);
+    setBackendErrors({});
+  };
+
+  const handleSubmit = (values) => {
     const vehicleDetail = {
-        manufactureYear: values.manufactureYear,
-        registrationNumber: values.registrationNumber,
-        vehicle: {
-            vender: values.vender,
-            model: values.model
-        }
+      manufactureYear: values.manufactureYear,
+      registrationNumber: values.registrationNumber,
+      vehicle: {
+        vender: values.vender,
+        model: values.model
+      }
     };
 
     const yearsOfExperience = {
-        yearsOfExperience: values.yearsOfExperience
+      yearsOfExperience: values.yearsOfExperience
     }
 
-    upgradeUser(yearsOfExperience);
     createVehicleDetail(vehicleDetail);
+    upgradeUser(yearsOfExperience);
     handleClose();
+  };
+
+  function isStepFailed(step) {
+    if (step === 0 && backendErrors.yearsOfExperience) return true;
+    if (step === 1 && (backendErrors.manufactureYear || backendErrors.registrationNumber)) return true;
+    if (step === 2 && backendErrors.vender) return true;
+    if (step === 3 && backendErrors.model) return true;
+    return false;
   };
 
   return (
@@ -162,48 +168,56 @@ export default function UpgradeUserDialog({ open, setOpen, setVehicleDetail, use
             <Form>
               <Box sx={{ maxWidth: 400 }}>
                 <Stepper activeStep={activeStep} orientation="vertical">
-                  {steps.map((label, index) => (
-                    <Step key={label}>
-                      <StepLabel>
-                        {label}
-                      </StepLabel>
-                      <StepContent>
-                        <Box sx={{ mb: 2 }}>
-                        {index === 0 && (
-                            <Field
-                            as={TextField}
-                            margin="dense"
-                            label="Years of Experience"
-                            name="yearsOfExperience"
-                            fullWidth
-                            variant="outlined"
-                            helperText={<ErrorMessage name="yearsOfExperience" />}
-                            />
-                          )}
-                          {index === 1 && (
-                            <>
+                  {steps.map((label, index) => {
+                    const labelProps = {};
+                    if (backendErrors && isStepFailed(index)) {
+                      labelProps.optional = (
+                        <Typography variant="caption" color="error">
+                          {backendErrors[Object.keys(backendErrors)[0]]}
+                        </Typography>
+                      );
+                      setOpen(true);
+                      labelProps.error = true;
+                    }
+                    return (
+                      <Step key={label}>
+                        <StepLabel {...labelProps}>{label}</StepLabel>
+                        <StepContent>
+                          <Box sx={{ mb: 2 }}>
+                            {index === 0 && (
                               <Field
                                 as={TextField}
                                 margin="dense"
-                                label="Manufacture Year"
-                                name="manufactureYear"
+                                label="Years of Experience"
+                                name="yearsOfExperience"
                                 fullWidth
                                 variant="outlined"
-                                helperText={<ErrorMessage name="manufactureYear" />}
+                                helperText={<ErrorMessage name="yearsOfExperience" />}
                               />
-                              <Field
-                                as={TextField}
-                                margin="dense"
-                                label="Registration Number"
-                                name="registrationNumber"
-                                fullWidth
-                                variant="outlined"
-                                helperText={<ErrorMessage name="registrationNumber" />}
-                              />
-                            </>
-                          )}
-                          {index === 2 && (
-                            <>
+                            )}
+                            {index === 1 && (
+                              <>
+                                <Field
+                                  as={TextField}
+                                  margin="dense"
+                                  label="Manufacture Year"
+                                  name="manufactureYear"
+                                  fullWidth
+                                  variant="outlined"
+                                  helperText={<ErrorMessage name="manufactureYear" />}
+                                />
+                                <Field
+                                  as={TextField}
+                                  margin="dense"
+                                  label="Registration Number"
+                                  name="registrationNumber"
+                                  fullWidth
+                                  variant="outlined"
+                                  helperText={<ErrorMessage name="registrationNumber" />}
+                                />
+                              </>
+                            )}
+                            {index === 2 && (
                               <Field
                                 as={TextField}
                                 margin="dense"
@@ -214,22 +228,20 @@ export default function UpgradeUserDialog({ open, setOpen, setVehicleDetail, use
                                 variant="outlined"
                                 helperText={<ErrorMessage name="vender" />}
                                 onChange={(event) => {
-                                    const vendor = event.target.value;
-                                    setFieldValue('vender', vendor);
-                                    setFieldValue('model', '');
-                                    fetchModels(vendor);
-                                  }}
+                                  const vendor = event.target.value;
+                                  setFieldValue('vender', vendor);
+                                  setFieldValue('model', '');
+                                  fetchModels(vendor);
+                                }}
                               >
                                 {vendors.map((vendor) => (
-                                  <MenuItem key={vendor} value={vendor}>
+                                    <MenuItem key={vendor} value={vendor}>
                                     {vendor}
-                                  </MenuItem>
+                                    </MenuItem>
                                 ))}
                               </Field>
-                            </>
-                          )}
-                          {index === 3 && (
-                            <>
+                            )}
+                            {index === 3 && (
                               <Field
                                 as={TextField}
                                 margin="dense"
@@ -240,43 +252,37 @@ export default function UpgradeUserDialog({ open, setOpen, setVehicleDetail, use
                                 variant="outlined"
                                 helperText={<ErrorMessage name="model" />}
                               >
-                                {loadingModels ? (
-                                  <MenuItem disabled>
-                                    <CircularProgress size={24} />
-                                  </MenuItem>
-                                ) : (
-                                  models.map((model) => (
+                                {models.map((model) => (
                                     <MenuItem key={model} value={model}>
-                                      {model}
+                                        {model}
                                     </MenuItem>
-                                  ))
-                                )}
+                                ))}
                               </Field>
-                            </>
-                          )}
-                          <DialogActions>
-                            {activeStep !== 0 && (
-                              <Button onClick={handleBack}>
-                                Back
-                              </Button>
                             )}
-                            <Button
-                              variant="contained"
-                              onClick={() => handleNext(isValid)}
-                              disabled={!isValid || !dirty}
-                              sx={{ mt: 1, mr: 1 }}
-                            >
-                              {index === steps.length - 1 ? 'Finish' : 'Continue'}
-                            </Button>
-                          </DialogActions>
-                        </Box>
-                      </StepContent>
-                    </Step>
-                  ))}
+                            <DialogActions>
+                              {activeStep !== 0 && (
+                                <Button onClick={handleBack}>
+                                  Back
+                                </Button>
+                              )}
+                              <Button
+                                variant="contained"
+                                onClick={() => handleNext(isValid)}
+                                disabled={!isValid}
+                                sx={{ mt: 1, mr: 1 }}
+                              >
+                                {index === steps.length - 1 ? 'Finish' : 'Continue'}
+                              </Button>
+                            </DialogActions>
+                          </Box>
+                        </StepContent>
+                      </Step>
+                    );
+                  })}
                 </Stepper>
                 {activeStep === steps.length && (
                   <Paper square elevation={0} sx={{ p: 3 }}>
-                    <Typography>All steps completed - save changes ?</Typography>
+                    <Typography>All steps completed - save changes?</Typography>
                     <Button onClick={handleClose} sx={{ mt: 1, mr: 1 }}>
                       Close
                     </Button>

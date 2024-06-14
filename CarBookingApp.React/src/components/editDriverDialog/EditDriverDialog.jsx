@@ -13,7 +13,6 @@ export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleS
   const [activeStep, setActiveStep] = useState(0);
   const [vendors, setVendors] = useState([]);
   const [models, setModels] = useState([]);
-  const [loadingModels, setLoadingModels] = useState(false);
 
   const initialValues = {
     manufactureYear: vehicleDetail.manufactureYear,
@@ -45,11 +44,9 @@ export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleS
   };
 
   const fetchModels = (vendorName) => {
-    setLoadingModels(true);
     axios.get(`http://192.168.0.9:5239/vehicle/pick/model?vendor=${vendorName}`)
       .then((response) => {
         setModels(response.data);
-        setLoadingModels(false);
       })
       .catch((error) => {
         console.error('Error fetching models:', error);
@@ -93,7 +90,6 @@ export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleS
   };
 
   const handleSubmit = (values) => {
-    setActiveStep(0);
     const formatedValues = {
         manufactureYear: values.manufactureYear,
         registrationNumber: values.registrationNumber,
@@ -188,17 +184,11 @@ export default function EditDriverDialog({ open, setOpen, vehicleDetail, handleS
                                 variant="outlined"
                                 helperText={<ErrorMessage name="model" />}
                               >
-                                {loadingModels ? (
-                                  <MenuItem disabled>
-                                    <CircularProgress size={24} />
+                                {models.map((model) => (
+                                  <MenuItem key={model} value={model}>
+                                    {model}
                                   </MenuItem>
-                                ) : (
-                                  models.map((model) => (
-                                    <MenuItem key={model} value={model}>
-                                      {model}
-                                    </MenuItem>
-                                  ))
-                                )}
+                                  ))}
                               </Field>
                             </>
                           )}
