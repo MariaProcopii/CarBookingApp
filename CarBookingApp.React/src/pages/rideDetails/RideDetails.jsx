@@ -18,7 +18,6 @@ export default function RideDetails(props) {
         axios.get(`http://192.168.0.9:5239/ride/details/${rideId}`)
           .then((response) => {
             setRideDetails(response.data);
-            console.log(rideDetails.rideDetail)
           })
           .catch((error) => {
               console.log(error);

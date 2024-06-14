@@ -7,11 +7,14 @@ import EditUserDialog from '../../components/editUserDialog/EditUserDialog';
 import { useAuth } from '../../components/provider/AuthProvider';
 import { useTokenDecoder } from '../../utils/TokenUtils';
 import { parseErrorMessages } from '../../utils/ErrorUtils';
+import EditDriverDialog from '../../components/editDriverDialog/EditDriverDialog';
 
 export default function Profile() {
   const [backendErrors, setBackendErrors] = useState({});
-  const [open, setOpen] = useState(false);
+  const [openUserDialog, setOpenUserDialog] = useState(false);
+  const [openDriverDialog, setOpenDriverDialog] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const [vehicleDetail, setVehicleDetail] = useState(null);
   const [tabValue, setTabValue] = useState(0);
   const { token, setToken } = useAuth();
   const claims = useTokenDecoder(token);
@@ -24,12 +27,12 @@ export default function Profile() {
     }
   };
 
-  const fetchUserInfo = () => {
+  const fetchInfo = () => {
       
     axios.get(`http://192.168.0.9:5239/user/info/${claims.nameidentifier}`)
       .then((response) => {
           setUserInfo(response.data);
-          console.log(response.data);
+          setVehicleDetail(response.data.vehicleDetail);
       })
       .catch((error) => {
           const { data } = error.response;
@@ -39,22 +42,36 @@ export default function Profile() {
 
   useEffect(() => {
     setTimeout(() => {
-      fetchUserInfo();
+      fetchInfo();
     }, 10);
   }, []);
 
-  const handleSave = (updatedInfo) => {
+  const handleUpdateUser = (updatedInfo) => {
     axios.put(`http://192.168.0.9:5239/user/info/update/${claims.nameidentifier}`, updatedInfo)
       .then(response => {
-        setOpen(false);
+        console.log(updatedInfo);
+        setOpenUserDialog(false);
         setUserInfo(updatedInfo);
         setToken(response.data);
       })
       .catch((error) => {
         const { data } = error.response;
-        console.log(data.Message)
+        console.log(data.Message);
         setBackendErrors(parseErrorMessages(data.Message));
         console.log(backendErrors);
+      });
+  };
+
+  const handleUpdateVehicleDetail = (updatedInfo) => {
+    axios.put(`http://192.168.0.9:5239/vehicledetail/info/update/${claims.nameidentifier}`, updatedInfo)
+      .then(response => {
+        setOpenDriverDialog(false);
+        setVehicleDetail(response.data);
+      })
+      .catch((error) => {
+        const { data } = error.response;
+        console.log(data.Message);
+        console.log(error);
       });
   };
 
@@ -83,12 +100,15 @@ export default function Profile() {
         </Paper>
         {tabValue === 0 && (
           <>
-            {userInfo && <UserInfoTab userInfo={userInfo} setOpen={setOpen}/>}
-            {userInfo && <EditUserDialog open={open} setOpen={setOpen} userInfo={userInfo} handleSave={handleSave} backendErrors={backendErrors} setBackendErrors={setBackendErrors}/>}
+            {userInfo && <UserInfoTab userInfo={userInfo} setOpen={setOpenUserDialog}/>}
+            {userInfo && <EditUserDialog open={openUserDialog} setOpen={setOpenUserDialog} userInfo={userInfo} handleSave={handleUpdateUser} backendErrors={backendErrors} setBackendErrors={setBackendErrors}/>}
           </>
         )}
         {tabValue === 1 && (
-          <DriverInfoTab userInfo={userInfo} handleUpgrade={handleUpgrade}/>
+          <>
+          <DriverInfoTab vehicleDetail={vehicleDetail} handleUpgrade={handleUpgrade} setOpen={setOpenDriverDialog}/>
+          <EditDriverDialog open={openDriverDialog} setOpen={setOpenDriverDialog} vehicleDetail={vehicleDetail} handleSave={handleUpdateVehicleDetail} />
+          </> 
         )}
       </Box>
     </Box>

@@ -33,3 +33,10 @@ export function useTokenDecoder(token) {
 
     return claims;
 }
+
+export function hasRole(claims, requiredRole) {
+    if (Array.isArray(claims.role)) {
+      return claims.role.includes(requiredRole);
+    }
+    return false;
+  }

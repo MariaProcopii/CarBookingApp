@@ -7,7 +7,6 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [token, setToken_] = useState(localStorage.getItem("token"));
 
-
   const setToken = (newToken) => {
     setToken_(newToken);
   };
@@ -84,7 +83,7 @@ const AuthProvider = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       token,
-      setToken,
+      setToken
     }),
     [token]
   );

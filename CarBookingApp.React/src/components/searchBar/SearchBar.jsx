@@ -20,7 +20,7 @@ export default function SearchBar({ onSearch }) {
   useEffect(() => {
     setTimeout(() => {
         fetchDestinations();
-      }, 1000);
+      }, 10);
   }, []);
 
   const fetchDestinations = () => {

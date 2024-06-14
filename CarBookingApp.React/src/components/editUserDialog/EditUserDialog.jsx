@@ -56,12 +56,14 @@ export default function EditUserDialog({ open, setOpen, userInfo, handleSave, ba
     email: userInfo.email,
     gender: userInfo.gender,
     password: "",
+    yearsOfExperience: userInfo.yearsOfExperience
   };
 
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required("First Name is required"),
     lastName: Yup.string().required("Last Name is required"),
     email: Yup.string().required("Email is required").email("Email is invalid"),
+    yearsOfExperience: Yup.string().required("Years of experience are required").min(1, "Years of experience must be greater than 0"),
     password: Yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, "Must contain at least one uppercase letter, one lowercase letter, and one digit with at least 8 characters"),
   });
 
@@ -176,13 +178,24 @@ export default function EditUserDialog({ open, setOpen, userInfo, handleSave, ba
                       labelId="gender-select-label"
                       name="gender"
                       fullWidth
-                      required
                     >
                       <MenuItem value={"FEMALE"}>Female</MenuItem>
                       <MenuItem value={"MALE"}>Male</MenuItem>
                       <MenuItem value={"OTHER"}>Other</MenuItem>
                     </Field>
                   </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    as={TextField}
+                    required
+                    margin="dense"
+                    label="Years of experience"
+                    name="yearsOfExperience"
+                    fullWidth
+                    variant="outlined"
+                    helperText={<ErrorMessage name="yearsOfExperience" />}
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <Field
