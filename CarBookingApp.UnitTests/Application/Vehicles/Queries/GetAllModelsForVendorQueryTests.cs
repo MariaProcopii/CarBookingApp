@@ -22,7 +22,7 @@ public class GetAllModelsForVendorQueryTests
     public async Task GetAllModelsForVendor_WhenVendorExists_ShouldReturnListOfModels()
     {
         var vendor = "Toyota";
-        var query = new GetAllModelsForVendorQuery { Vendor = vendor };
+        var query = new GetAllModelsForVendorQuery(vendor);
         var vehicles = new List<Vehicle>
         {
             new() { Vender = "Toyota", Model = "Corolla" },
@@ -47,7 +47,7 @@ public class GetAllModelsForVendorQueryTests
     public async Task GetAllModelsForVendor_WhenVendorDoesNotExists_ShouldReturnEmptyList()
     {
         var vendor = "NonExistingVendor";
-        var query = new GetAllModelsForVendorQuery { Vendor = vendor };
+        var query = new GetAllModelsForVendorQuery(vendor);
         var vehicles = new List<Vehicle>();
         _mockRepository.Setup(repo => repo
             .GetByPredicate(It.IsAny<Expression<Func<Vehicle, bool>>>())).ReturnsAsync(vehicles);

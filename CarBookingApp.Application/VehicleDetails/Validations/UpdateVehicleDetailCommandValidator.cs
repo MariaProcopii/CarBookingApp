@@ -18,11 +18,11 @@ public class UpdateVehicleDetailCommandValidator : AbstractValidator<UpdateVehic
 
         RuleFor(x => x.ManufactureYear)
             .NotEmpty()
-            .InclusiveBetween(1900, 2100);
+            .GreaterThan(1990);
 
         RuleFor(x => x.RegistrationNumber)
             .NotEmpty()
-            .Matches("^[A-Z]{3} [0-9]{3}}$")
-            .WithMessage("Invalid registration number format (Example: ABC-123).");
+            .Matches("^[A-Z]{3} [0-9]{3}$")
+            .WithMessage("Invalid registration number format (Example: ABC 123).");
     }
 }

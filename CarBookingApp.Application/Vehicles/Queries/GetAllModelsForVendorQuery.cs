@@ -3,11 +3,7 @@ using CarBookingApp.Domain.Model;
 using MediatR;
 
 namespace CarBookingApp.Application.Vehicles.Queries;
-
-public class GetAllModelsForVendorQuery() : IRequest<List<String>>
-{
-    public string Vendor { get; set; }
-}
+public record GetAllModelsForVendorQuery(string Vendor) : IRequest<List<String>>;
 
 public class GetAllModelsForVendorQueryHandler : IRequestHandler<GetAllModelsForVendorQuery, List<String>>
 {

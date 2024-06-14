@@ -31,7 +31,7 @@ public class VehicleDetailController : ControllerBase
     
     [HttpPut]
     [Route("info/update/{userId}")]
-    [Authorize("Driver")]
+    [Authorize(Roles ="Driver")]
     public async Task<ActionResult<VehicleDetailDTO>> UpdateVehicleDetail(int userId, [FromBody] UpdateVehicleDetailCommand updateVehicleDetailCommand)
     {
         updateVehicleDetailCommand.UserId = userId;
@@ -41,7 +41,7 @@ public class VehicleDetailController : ControllerBase
     
     [HttpGet]
     [Route("info/{userId}")]
-    [Authorize("User, Driver")]
+    [Authorize(Roles = "User, Driver")]
 
     public async Task<ActionResult<VehicleDetailDTO>> GetVehicleDetailById(int userId)
     {

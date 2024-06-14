@@ -29,9 +29,10 @@ public class VehicleController : ControllerBase
     [HttpGet]
     [Route("pick/model")]
     [Authorize(Roles = "User, Driver")]
-    public async Task<ActionResult<List<String>>> GetAllModelsForVendor([FromBody] GetAllModelsForVendorQuery getAllModelsForVendorQuery)
+    public async Task<ActionResult<List<String>>> GetAllModelsForVendor([FromQuery] string vendor)
     {
-        var result = await _mediator.Send(getAllModelsForVendorQuery);
+        var request = new GetAllModelsForVendorQuery(vendor);
+        var result = await _mediator.Send(request);
         return Ok(result);
     }
 }

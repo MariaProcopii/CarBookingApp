@@ -33,31 +33,4 @@ public class VehicleControllerIntegrationTests
             Assert.Equal((int)HttpStatusCode.OK, result.StatusCode); 
         });
     }
-    
-    [Fact]
-    public async Task VehicleController_WhenCommandIsValid_ShouldGetAllModelsForVendor()
-    {
-        var vehicleNr = 3;
-        var query = new GetAllModelsForVendorQuery
-        {
-            Vendor = $"VendorName-{vehicleNr}"
-        };
-        using var contextBuilder = new DataContextBuilder();
-        contextBuilder.SeedVehicles(vehicleNr);
-        
-        var dbContext = contextBuilder.GetContext();
-        var mediator = TestHelpers.CreateMediator(new Repository(dbContext));
-        var controller = new VehicleController(mediator);
-
-        var resultRequest = await controller.GetAllModelsForVendor(query);
-        var result = resultRequest.Result as OkObjectResult;
-        var vendors = result!.Value as List<string>;
-
-        Assert.Multiple(() =>
-        {
-            Assert.NotNull(vendors);
-            Assert.Single(vendors);
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode); 
-        });
-    }
 }

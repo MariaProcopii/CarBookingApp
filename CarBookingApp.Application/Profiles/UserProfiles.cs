@@ -27,6 +27,10 @@ public class UserProfiles : Profile
             .ForMember(dest => dest.Gender, opt => 
                 opt.MapFrom(src => Enum.Parse<Gender>(src.Gender)));
         
+        CreateMap<UpdateUserCommand, Driver>()
+            .ForMember(dest => dest.Gender, opt => 
+                opt.MapFrom(src => Enum.Parse<Gender>(src.Gender)));
+        
         CreateMap<SignUpUserCommand, User>()
             .ForMember(dest => dest.Gender, opt => 
                 opt.MapFrom(src => Enum.Parse<Gender>(src.Gender)));
