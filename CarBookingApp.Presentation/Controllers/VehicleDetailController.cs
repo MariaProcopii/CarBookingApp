@@ -21,7 +21,7 @@ public class VehicleDetailController : ControllerBase
     
     [HttpPost]
     [Route("create/{userId}")]
-    [Authorize(Roles ="Driver")]
+    [Authorize(Roles ="User")]
     public async Task<ActionResult<VehicleDetailDTO>> CreateVehicleDetail(int userId, [FromBody] CreateVehicleDetailCommand createVehicleDetailCommand)
     {
         createVehicleDetailCommand.UserId = userId;

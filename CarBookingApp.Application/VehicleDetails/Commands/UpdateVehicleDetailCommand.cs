@@ -1,5 +1,6 @@
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
+using CarBookingApp.Application.Common.Exceptions;
 using CarBookingApp.Application.VehicleDetails.Responses;
 using CarBookingApp.Application.Vehicles.Responses;
 using CarBookingApp.Domain.Model;
@@ -34,6 +35,13 @@ public class UpdateVehicleDetailCommandHandler : IRequestHandler<UpdateVehicleDe
                                                                                && v.Model == request.Vehicle.Model);
 
         var vehicleDetailToUpdate = await _repository.GetByIdAsync<VehicleDetail>(request.UserId);
+        
+        var existingVehicleDetails = await _repository.GetByPredicate<VehicleDetail>(
+            vd => vd.RegistrationNumber.Equals(request.RegistrationNumber));
+        if (existingVehicleDetails.Count != 0 && existingVehicleDetails.First().Id != request.UserId)
+        {
+            throw new EntityNotValidException("registrationNumber: Registration Number already used.");
+        }
         
         vehicleDetailToUpdate.ManufactureYear = request.ManufactureYear;
         vehicleDetailToUpdate.RegistrationNumber = request.RegistrationNumber;

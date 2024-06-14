@@ -32,12 +32,13 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleDetailCo
     {
         List<Vehicle> vehicle = await _repository.GetByPredicate<Vehicle>(v => v.Vender == request.Vehicle.Vender 
                                                                                && v.Model == request.Vehicle.Model);
-        var user = await _repository.GetByIdAsync<User>(request.UserId);
-        if (user is not Driver)
+        var isRegistrationNumberPresent = await _repository.GetByPredicate<VehicleDetail>(
+            vd => vd.RegistrationNumber.Equals(request.RegistrationNumber));
+        if (isRegistrationNumberPresent.Count != 0)
         {
-            throw new ActionNotAllowedException($"User with id {request.UserId} should be a driver.");
+            throw new EntityNotValidException("registrationNumber: Registration Number already used.");
         }
-        
+
         var vehicleDetail = new VehicleDetail
         {
             ManufactureYear = request.ManufactureYear,
