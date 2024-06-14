@@ -2,8 +2,14 @@ import { Box, Typography, Button, Avatar, Divider } from "@mui/material";
 import { deepPurple } from "@mui/material/colors";
 import { styled } from "@mui/system";
 import getAvatarSrc from "../../utils/AvatarUtils";
+import { useTokenDecoder, hasRole } from "../../utils/TokenUtils";
+import { useAuth } from '../provider/AuthProvider';
 
 export default function UserInfoTab({ userInfo, setOpen }) {
+
+  const { token, setToken } = useAuth();
+  const claims = useTokenDecoder(token);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -93,7 +99,7 @@ export default function UserInfoTab({ userInfo, setOpen }) {
         </Typography>
         <Typography sx={typographyStyle}>{userInfo.phoneNumber}</Typography>
       </DetailBox>
-      {userInfo.yearsOfExperience && 
+      {hasRole(claims, "Driver") && 
           <DetailBox>
           <Typography
             sx={{ ...typographyStyle, fontWeight: "bold", width: "150px" }}

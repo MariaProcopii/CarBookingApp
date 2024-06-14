@@ -4,15 +4,30 @@ import InfoIcon from '@mui/icons-material/Info';
 import { styled } from '@mui/system';
 import { useTokenDecoder, hasRole } from '../../utils/TokenUtils';
 import { useAuth } from '../provider/AuthProvider';
+import axios from 'axios';
 
-export default function DriverInfoTab({ vehicleDetail, handleUpgrade, setOpen }) {
+export default function DriverInfoTab({ vehicleDetail, setOpenEdit, setOpenUpgrade }) {
 
-    const { token } = useAuth();
+    const { token, setToken } = useAuth();
     const claims = useTokenDecoder(token);
 
+    const handleDowngrade = () => {
+      axios.put(`http://192.168.0.9:5239/user/info/downgrade/${claims.nameidentifier}`)
+        .then(response => {
+          setToken(response.data);
+        })
+        .catch((error) => {
+          const { data } = error.response;
+          console.log(data);
+        });
+    };
 
-    const handleClickOpen = () => {
-      setOpen(true);
+    const handleOpenEditDialog = () => {
+      setOpenEdit(true);
+    };
+
+    const handleOpenUpgradeDialog = () => {
+      setOpenUpgrade(true);
     };
 
     const typographyStyle = {
@@ -60,6 +75,14 @@ export default function DriverInfoTab({ vehicleDetail, handleUpgrade, setOpen })
         md: '0.9rem'
       }  
     };
+
+    const buttonInfoStyle = {
+      fontSize: {
+        xs: "0.8rem",
+        sm: "0.8rem",
+        md: "0.9rem",
+      },
+    };
   
 
     const DetailBox = styled(Box)(({ theme }) => ({
@@ -74,7 +97,7 @@ export default function DriverInfoTab({ vehicleDetail, handleUpgrade, setOpen })
       Driver Detail
     </Typography>
     <Divider sx={{ mb: 2 }} />
-    {hasRole(claims, "Driver") ? (
+    {hasRole(claims, "Driver") && vehicleDetail ? (
       <>
         <DetailBox>
           <DirectionsCarIcon color="primary" sx={iconStyle} />
@@ -87,10 +110,10 @@ export default function DriverInfoTab({ vehicleDetail, handleUpgrade, setOpen })
           <Typography sx={typographyStyle}>{vehicleDetail.registrationNumber}</Typography>
         </DetailBox>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <Button variant="contained" color="primary" sx={buttonStyleLeft} onClick={handleClickOpen}>
+          <Button variant="contained" color="primary" sx={buttonStyleLeft} onClick={handleOpenEditDialog}>
               Edit driver info
           </Button>
-          <Button variant="contained" color="primary" sx={buttonStyleRight} >
+          <Button variant="contained" color="primary" sx={buttonStyleRight} onClick={handleDowngrade} >
               Stop being a Driver
           </Button>
         </Box>
@@ -100,7 +123,7 @@ export default function DriverInfoTab({ vehicleDetail, handleUpgrade, setOpen })
         <Typography variant="body1" gutterBottom>
           By upgrading to a driver, you will be able to create rides and enjoy various benefits.
         </Typography>
-        <Button variant="contained" color="primary" onClick={handleUpgrade}>
+        <Button variant="contained" color="primary" sx={buttonInfoStyle} onClick={handleOpenUpgradeDialog}>
           Upgrade to Driver
         </Button>
       </>

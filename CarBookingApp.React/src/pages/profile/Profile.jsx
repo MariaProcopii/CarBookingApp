@@ -8,11 +8,13 @@ import { useAuth } from '../../components/provider/AuthProvider';
 import { useTokenDecoder } from '../../utils/TokenUtils';
 import { parseErrorMessages } from '../../utils/ErrorUtils';
 import EditDriverDialog from '../../components/editDriverDialog/EditDriverDialog';
+import UpgradeUserDialog from '../../components/upgradeUserDialog/UpgradeUserDialog';
 
 export default function Profile() {
   const [backendErrors, setBackendErrors] = useState({});
   const [openUserDialog, setOpenUserDialog] = useState(false);
   const [openDriverDialog, setOpenDriverDialog] = useState(false);
+  const [openUpgradeDialog, setOpenUpgradeDialog] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [vehicleDetail, setVehicleDetail] = useState(null);
   const [tabValue, setTabValue] = useState(0);
@@ -75,10 +77,6 @@ export default function Profile() {
       });
   };
 
-  const handleUpgrade = () => {
-    // Logic to upgrade to a driver
-  };
-
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -101,13 +99,39 @@ export default function Profile() {
         {tabValue === 0 && (
           <>
             {userInfo && <UserInfoTab userInfo={userInfo} setOpen={setOpenUserDialog}/>}
-            {userInfo && <EditUserDialog open={openUserDialog} setOpen={setOpenUserDialog} userInfo={userInfo} handleSave={handleUpdateUser} backendErrors={backendErrors} setBackendErrors={setBackendErrors}/>}
+            {userInfo && <EditUserDialog 
+                            open={openUserDialog} 
+                            setOpen={setOpenUserDialog} 
+                            userInfo={userInfo} 
+                            handleSave={handleUpdateUser} 
+                            backendErrors={backendErrors}
+                            setBackendErrors={setBackendErrors}
+                          />
+            }
           </>
         )}
         {tabValue === 1 && (
           <>
-          <DriverInfoTab vehicleDetail={vehicleDetail} handleUpgrade={handleUpgrade} setOpen={setOpenDriverDialog}/>
-          <EditDriverDialog open={openDriverDialog} setOpen={setOpenDriverDialog} vehicleDetail={vehicleDetail} handleSave={handleUpdateVehicleDetail} />
+          <DriverInfoTab 
+            vehicleDetail={vehicleDetail} 
+            setOpenEdit={setOpenDriverDialog} 
+            setOpenUpgrade ={setOpenUpgradeDialog}
+          />
+
+          {vehicleDetail && <EditDriverDialog 
+                              open={openDriverDialog}
+                              setOpen={setOpenDriverDialog}
+                              vehicleDetail={vehicleDetail} 
+                              handleSave={handleUpdateVehicleDetail} 
+                            />
+          }
+          <UpgradeUserDialog 
+            open={openUpgradeDialog} 
+            setOpen={setOpenUpgradeDialog}
+            setVehicleDetail={setVehicleDetail}
+            userInfo={userInfo}
+            setUserInfo={setUserInfo}
+          />
           </> 
         )}
       </Box>
