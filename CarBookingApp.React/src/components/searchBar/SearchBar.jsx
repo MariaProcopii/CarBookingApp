@@ -122,6 +122,7 @@ const validateInputs = () => {
                             }}
                             fullWidth
                             size="small"
+                            required
                             />
                         )}
                         />
@@ -154,6 +155,7 @@ const validateInputs = () => {
                         }}
                         fullWidth
                         size="small"
+                        required
                         />
                     )}
                     />

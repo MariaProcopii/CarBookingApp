@@ -3,11 +3,10 @@ import Login from "../../pages/login/Login";
 import SignUp from "../../pages/signUp/SignUp";
 import Logout from "../../pages/logout/Logout";
 import AvailableRides from "../../pages/availableRides/AvailableRides";
-import Example from "../example/Example";
 import { Routes, Route } from 'react-router-dom';
 import Sidebar from '../sidebar/Sidebar';
 import Profile from "../../pages/profile/Profile";
-
+import CreateRide from "../../pages/createRide/CreateRide";
 
 const AppRoutes = ({theme, isDarkThemeOn, setDarkTheme}) => {
 
@@ -25,7 +24,7 @@ const AppRoutes = ({theme, isDarkThemeOn, setDarkTheme}) => {
             <Route index element={<AvailableRides />} />
             <Route path="profile" element={<Profile />} />
             <Route path="logout" element={<Logout />} />
-            <Route path="example/user" element={<Example />} />
+            <Route path="create-ride" element={<CreateRide />} />
           </Route>
       </Route>
     </Routes>
