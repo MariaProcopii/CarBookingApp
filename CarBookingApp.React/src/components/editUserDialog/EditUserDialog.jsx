@@ -8,22 +8,42 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateField } from '@mui/x-date-pickers/DateField';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from "yup";
+import axios from 'axios';
 import { transformDate } from '../../utils/DateTimeUtils';
 import dayjs from 'dayjs';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useAuth } from '../../components/provider/AuthProvider';
+import { useTokenDecoder } from '../../utils/TokenUtils';
+import { parseErrorMessages } from '../../utils/ErrorUtils';
 
-export default function EditUserDialog({ open, setOpen, userInfo, handleSave, backendErrors , setBackendErrors }) {
-  const handleClose = () => {
-    setOpen(false);
-    setBackendErrors({});
-  };
+export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo }) {
 
   const [phone, setPhone] = useState(userInfo.phoneNumber);
   const [isPhoneValid, setPhoneValid] = useState(true);
   const [date, setDate] = useState(dayjs(userInfo.dateOfBirth));
   const [isDateValid, setDateValid] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [backendErrors, setBackendErrors] = useState({});
+  const { token, setToken } = useAuth();
+  const claims = useTokenDecoder(token);
+
+  const initialValues = {
+    firstName: userInfo.firstName,
+    lastName: userInfo.lastName,
+    email: userInfo.email,
+    gender: userInfo.gender,
+    password: "",
+    yearsOfExperience: userInfo.yearsOfExperience
+  };
+
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required("First Name is required"),
+    lastName: Yup.string().required("Last Name is required"),
+    email: Yup.string().required("Email is required").email("Email is invalid"),
+    yearsOfExperience: Yup.string().required("Years of experience are required").min(1, "Years of experience must be greater than 0"),
+    password: Yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, "Must contain at least one uppercase letter, one lowercase letter, and one digit with at least 8 characters"),
+  });
 
   const handlePhoneChange = (newPhone) => {
     setPhone(newPhone.replace(/\s+/g, ''));
@@ -31,6 +51,11 @@ export default function EditUserDialog({ open, setOpen, userInfo, handleSave, ba
 
   const handleChangeDate = (newDate) => {
     setDate(newDate);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setBackendErrors({});
   };
 
   const checkPhoneValid = () => {
@@ -50,23 +75,6 @@ export default function EditUserDialog({ open, setOpen, userInfo, handleSave, ba
     }
   };
 
-  const initialValues = {
-    firstName: userInfo.firstName,
-    lastName: userInfo.lastName,
-    email: userInfo.email,
-    gender: userInfo.gender,
-    password: "",
-    yearsOfExperience: userInfo.yearsOfExperience
-  };
-
-  const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("First Name is required"),
-    lastName: Yup.string().required("Last Name is required"),
-    email: Yup.string().required("Email is required").email("Email is invalid"),
-    yearsOfExperience: Yup.string().required("Years of experience are required").min(1, "Years of experience must be greater than 0"),
-    password: Yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, "Must contain at least one uppercase letter, one lowercase letter, and one digit with at least 8 characters"),
-  });
-
   const onSubmit = (values, props) => {
     checkDateValid();
     checkPhoneValid();
@@ -74,11 +82,24 @@ export default function EditUserDialog({ open, setOpen, userInfo, handleSave, ba
       return;
     }
     
-    handleSave({
+    handleUpdateUser({
       ...values,
       phoneNumber: phone,
       dateOfBirth: transformDate(date),
     });
+  };
+
+  const handleUpdateUser = (updatedInfo) => {
+    axios.put(`http://192.168.0.9:5239/user/info/update/${claims.nameidentifier}`, updatedInfo)
+      .then(response => {
+        setUserInfo(updatedInfo);
+        setToken(response.data);
+        handleClose();
+      })
+      .catch((error) => {
+        const { data } = error.response;
+        setBackendErrors(parseErrorMessages(data.Message));
+      });
   };
 
   return (

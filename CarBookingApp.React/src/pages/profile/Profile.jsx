@@ -18,7 +18,7 @@ export default function Profile() {
   const [userInfo, setUserInfo] = useState(null);
   const [vehicleDetail, setVehicleDetail] = useState(null);
   const [tabValue, setTabValue] = useState(0);
-  const { token, setToken } = useAuth();
+  const { token } = useAuth();
   const claims = useTokenDecoder(token);
 
   const typographyStyle = {
@@ -48,22 +48,6 @@ export default function Profile() {
     }, 10);
   }, []);
 
-  const handleUpdateUser = (updatedInfo) => {
-    axios.put(`http://192.168.0.9:5239/user/info/update/${claims.nameidentifier}`, updatedInfo)
-      .then(response => {
-        console.log(updatedInfo);
-        setOpenUserDialog(false);
-        setUserInfo(updatedInfo);
-        setToken(response.data);
-      })
-      .catch((error) => {
-        const { data } = error.response;
-        console.log(data.Message);
-        setBackendErrors(parseErrorMessages(data.Message));
-        console.log(backendErrors);
-      });
-  };
-
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -85,40 +69,45 @@ export default function Profile() {
         </Paper>
         {tabValue === 0 && (
           <>
-            {userInfo && <UserInfoTab userInfo={userInfo} setOpen={setOpenUserDialog}/>}
-            {userInfo && <EditUserDialog 
-                            open={openUserDialog} 
-                            setOpen={setOpenUserDialog} 
-                            userInfo={userInfo} 
-                            handleSave={handleUpdateUser} 
-                            backendErrors={backendErrors}
-                            setBackendErrors={setBackendErrors}
-                          />
+            {userInfo && 
+              <UserInfoTab 
+                userInfo={userInfo} 
+                setOpen={setOpenUserDialog}
+              />
+            }
+            {userInfo &&
+              <EditUserDialog 
+                open={openUserDialog} 
+                setOpen={setOpenUserDialog} 
+                userInfo={userInfo}
+                setUserInfo={setUserInfo}
+              />
             }
           </>
         )}
         {tabValue === 1 && (
           <>
-          <DriverInfoTab 
-            vehicleDetail={vehicleDetail} 
-            setOpenEdit={setOpenDriverDialog} 
-            setOpenUpgrade ={setOpenUpgradeDialog}
-          />
+            <DriverInfoTab 
+              vehicleDetail={vehicleDetail} 
+              setOpenEdit={setOpenDriverDialog} 
+              setOpenUpgrade ={setOpenUpgradeDialog}
+            />
 
-          {vehicleDetail && <EditDriverDialog 
-                              open={openDriverDialog}
-                              setOpen={setOpenDriverDialog}
-                              vehicleDetail={vehicleDetail}
-                              setVehicleDetail={setVehicleDetail}
-                            />
-          }
-          <UpgradeUserDialog 
-            open={openUpgradeDialog} 
-            setOpen={setOpenUpgradeDialog}
-            setVehicleDetail={setVehicleDetail}
-            userInfo={userInfo}
-            setUserInfo={setUserInfo}
-          />
+            {vehicleDetail &&
+              <EditDriverDialog 
+                open={openDriverDialog}
+                setOpen={setOpenDriverDialog}
+                vehicleDetail={vehicleDetail}
+                setVehicleDetail={setVehicleDetail}
+              />
+            }
+            <UpgradeUserDialog 
+              open={openUpgradeDialog} 
+              setOpen={setOpenUpgradeDialog}
+              setVehicleDetail={setVehicleDetail}
+              userInfo={userInfo}
+              setUserInfo={setUserInfo}
+            />
           </> 
         )}
       </Box>
