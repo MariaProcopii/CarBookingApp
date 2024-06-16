@@ -37,9 +37,10 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
     {
         int pageNumber = request.PageNumber;
         int pageSize = request.PageSize;
-        Expression<Func<Ride, bool>> filter = r => r.Owner.Id != request.UserId 
+        Expression<Func<Ride, bool>> filter = r => r.Owner.Id != request.UserId     
                                                    && r.DateOfTheRide > DateTime.Now
-                                                   && r.Passengers.Count < r.TotalSeats;
+                                                   && r.Passengers.Count < r.TotalSeats
+                                                   && !r.Passengers.Select(p => p.Id).Contains(request.UserId);
         
         if (!string.IsNullOrEmpty(request.DestinationFrom))
         {

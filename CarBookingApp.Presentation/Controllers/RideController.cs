@@ -94,11 +94,26 @@ public class RideController : ControllerBase
     public async Task<ActionResult<PaginatedList<RideShortInfoDTO>>> GetBookedRides(
         int userId,
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 9,
+        [FromQuery] int pageSize = 8,
         [FromQuery] string orderBy = "DateOfTheRide",
         [FromQuery] bool ascending = true)
     {
         var query = new GetBookedRidesQuery(userId, pageNumber, pageSize, orderBy, ascending);
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+    
+    [HttpGet]
+    [Route("created/{userId}")]
+    [Authorize(Roles = "Driver")]
+    public async Task<ActionResult<PaginatedList<RideShortInfoDTO>>> GetCreatedRides(
+        int userId,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 8,
+        [FromQuery] string orderBy = "DateOfTheRide",
+        [FromQuery] bool ascending = true)
+    {
+        var query = new GetCreatedRidesQuery(userId, pageNumber, pageSize, orderBy, ascending);
         var result = await _mediator.Send(query);
         return Ok(result);
     }
@@ -109,7 +124,7 @@ public class RideController : ControllerBase
     public async Task<ActionResult<PaginatedList<RideShortInfoDTO>>> GetPendingRides(
         int userId,
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 9,
+        [FromQuery] int pageSize = 8,
         [FromQuery] string orderBy = "DateOfTheRide",
         [FromQuery] bool ascending = true)
     {

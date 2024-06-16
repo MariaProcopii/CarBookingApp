@@ -12,7 +12,7 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
-export default function RideForm({rideData, handleSubmit}) {
+export default function RideForm({rideData, handleSubmit, titleText}) {
     
     const [dateTime, setDateTime] = useState(rideData.dateOfTheRide);
     const [destinationFrom, setDestinationFrom] = useState(rideData.destinationFrom);
@@ -23,10 +23,10 @@ export default function RideForm({rideData, handleSubmit}) {
     const theme = useTheme();
 
     const initialValues = {
-        totalSeats: rideData.TotalSeats,
-        pickUpSpot: rideData.RideDetail.PickUpSpot,
-        price: rideData.RideDetail.Price,
-        facilities: rideData.RideDetail.Facilities,
+        totalSeats: rideData.totalSeats,
+        pickUpSpot: rideData.rideDetail.pickUpSpot,
+        price: rideData.rideDetail.price,
+        facilities: rideData.rideDetail.facilities,
     };
 
     const paperStyle = {
@@ -122,13 +122,13 @@ export default function RideForm({rideData, handleSubmit}) {
 
         const rideData = {
             dateOfTheRide: transformDateTime(dateTime),
-            DestinationFrom: destinationFrom,
-            DestinationTo: destinationTo,
-            TotalSeats: values.totalSeats,
-            RideDetail: {
-                PickUpSpot: values.pickUpSpot,
-                Price: values.price,
-                Facilities: values.facilities,
+            destinationFrom: destinationFrom,
+            destinationTo: destinationTo,
+            totalSeats: values.totalSeats,
+            rideDetail: {
+                pickUpSpot: values.pickUpSpot,
+                price: values.price,
+                facilities: values.facilities,
             },
         };
 
@@ -141,7 +141,7 @@ export default function RideForm({rideData, handleSubmit}) {
             <Paper elevation={8} style={paperStyle} >
                 <Grid align='center'>
                     <Typography variant='h5' mb={2}>
-                        Create Ride
+                        {titleText}
                     </Typography>
                 </Grid>
                 <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
@@ -155,6 +155,7 @@ export default function RideForm({rideData, handleSubmit}) {
                                         autoSelect
                                         autoHighlight
                                         options={destinations}
+                                        value={rideData.destinationFrom}
                                         onChange={(event, newValue) => setDestinationFrom(newValue ? newValue.label : '')}
                                         renderInput={(params) => (
                                             <TextField
@@ -171,7 +172,11 @@ export default function RideForm({rideData, handleSubmit}) {
                                 <Grid item xs={12} md={6}>
                                     <Autocomplete
                                         fullWidth
+                                        disablePortal
+                                        autoSelect
+                                        autoHighlight
                                         options={destinations}
+                                        value={rideData.destinationTo}
                                         onChange={(event, newValue) => setDestinationTo(newValue ? newValue.label : '')}
                                         renderInput={(params) => (
                                             <TextField
@@ -247,8 +252,8 @@ export default function RideForm({rideData, handleSubmit}) {
                                         <Field
                                             as={Select}
                                             name='facilities'
-                                            multiple
                                             label='Facilities'
+                                            multiple
                                             renderValue={(selected) => selected.join(', ')}
                                         >
                                             {facilities.map((facility) => (
@@ -268,7 +273,7 @@ export default function RideForm({rideData, handleSubmit}) {
                                         fullWidth
                                         sx={buttonStyle}
                                     >
-                                        Create Ride
+                                        {titleText}
                                     </Button>
                                 </Grid>
                             </Grid>

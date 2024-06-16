@@ -1,10 +1,10 @@
 import { Box, Avatar, Typography, Button, Divider } from "@mui/material";
 import { getDateFromISO, getTimeFromISO} from "../../utils/DateTimeUtils";
 import React, { useEffect, useState } from 'react';
-import RideDetails from "../../pages/rideDetails/RideDetails";
+import RideDetails from "../rideDetails/RideDetails";
 import getAvatarSrc from "../../utils/AvatarUtils";
 
-export default function Ride({ride}) {
+export default function Ride({ride, edit}) {
     const [openRideDetails, setOpenRideDetails] = useState(false);
 
     const mainBoxStyle={
@@ -106,7 +106,12 @@ export default function Ride({ride}) {
                 >
                     View Details
                 </Button>
-                <RideDetails openRideDetails={openRideDetails} setOpenRideDetails={setOpenRideDetails} rideId={ride.id}/>
+                <RideDetails 
+                    openRideDetails={openRideDetails} 
+                    setOpenRideDetails={setOpenRideDetails}
+                    rideId={ride.id}
+                    edit={edit}
+                />
             </Box>
     </Box>
   )

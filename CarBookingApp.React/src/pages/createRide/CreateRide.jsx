@@ -11,13 +11,13 @@ export default function CreateRide() {
 
     const rideDefaultData = {
         dateOfTheRide: dayjs(),
-        DestinationFrom: "",
-        DestinationTo: "",
-        TotalSeats: 1,
-        RideDetail: {
-            PickUpSpot: "",
-            Price: "",
-            Facilities: [],
+        destinationFrom: "",
+        destinationTo: "",
+        totalSeats: 1,
+        rideDetail: {
+            pickUpSpot: "",
+            price: "",
+            facilities: [],
         },
     };
     
@@ -48,12 +48,13 @@ export default function CreateRide() {
             <RideForm 
                 rideData={rideData}
                 handleSubmit={createRide}
+                titleText={"Create Ride"}
             />
             <CustomSnackbar 
                 open={snackbar.open} 
                 message={snackbar.message} 
                 severity={snackbar.severity} 
-                onClose={handleCloseSnackbar} 
+                onClose={handleCloseSnackbar}
             />
         </>
     );

@@ -1,4 +1,4 @@
-import { Grid, Box, Container, Dialog, DialogContent, useMediaQuery, Button }  from '@mui/material';
+import { Grid, Box, Container, Dialog, DialogContent, useMediaQuery, Button, Grow }  from '@mui/material';
 import Ride from '../../components/ride/Ride';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -101,7 +101,11 @@ export default function AvailableRides() {
           <Grid container spacing={5} direction='row' wrap='wrap' alignItems='center' justifyContent='center' flexGrow={2}>
               {rides.map((ride) => (
                   <Grid item xs={6} sm={5} md={4} lg={3} key={ride.id}>
-                      <Ride ride={ride}/>
+                        <Grow in={true} timeout={500}>
+                            <div>
+                                <Ride ride={ride} edit={false} />
+                            </div>
+                        </Grow>
                   </Grid>
               ))}
           </Grid>
