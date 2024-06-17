@@ -155,7 +155,7 @@ export default function RideForm({rideData, handleSubmit, titleText}) {
                                         autoSelect
                                         autoHighlight
                                         options={destinations}
-                                        value={rideData.destinationFrom}
+                                        value={destinationFrom}
                                         onChange={(event, newValue) => setDestinationFrom(newValue ? newValue.label : '')}
                                         renderInput={(params) => (
                                             <TextField
@@ -176,7 +176,7 @@ export default function RideForm({rideData, handleSubmit, titleText}) {
                                         autoSelect
                                         autoHighlight
                                         options={destinations}
-                                        value={rideData.destinationTo}
+                                        value={destinationTo}
                                         onChange={(event, newValue) => setDestinationTo(newValue ? newValue.label : '')}
                                         renderInput={(params) => (
                                             <TextField

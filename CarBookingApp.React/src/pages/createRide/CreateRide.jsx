@@ -28,6 +28,7 @@ export default function CreateRide() {
     const theme = useTheme();
 
     const createRide = (rideData) => {
+        console.log(rideData);
         axios.post(`http://192.168.0.9:5239/ride/create/${claims.nameidentifier}`, rideData)
             .then((response) => {
                 setSnackbar({ open: true, message: 'Ride created successfully!', severity: 'success' });

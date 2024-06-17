@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import RideDetails from "../rideDetails/RideDetails";
 
-export default function SmallRideCard({ride, edit}) {
+export default function SmallRideCard({ride, action}) {
     const [openRideDetails, setOpenRideDetails] = useState(false);
     const theme = useTheme();
 
@@ -105,7 +105,7 @@ export default function SmallRideCard({ride, edit}) {
             openRideDetails={openRideDetails} 
             setOpenRideDetails={setOpenRideDetails}
             rideId={ride.id}
-            edit={edit}
+            action={action}
         />
   </Card>
   )

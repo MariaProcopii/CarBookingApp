@@ -2,6 +2,7 @@ using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.Common.Exceptions;
 using CarBookingApp.Application.Rides.Responses;
+using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
@@ -32,7 +33,10 @@ public class BookRideCommandHandler : IRequestHandler<BookRideCommand, RideShort
                                 r => r.Owner,
                                 r => r.Passengers);
         
-        if (ride.TotalSeats <= ride.Passengers.Count)
+        var approvedUserRides = await _repository.GetByPredicate<UserRide>(
+            ur => ur.BookingStatus == BookingStatus.APPROVED && ur.Ride.Id == request.RideId);
+        
+        if (ride.TotalSeats <= approvedUserRides.Count)
         {
             throw new ActionNotAllowedException("No available seats");
         }
@@ -41,6 +45,8 @@ public class BookRideCommandHandler : IRequestHandler<BookRideCommand, RideShort
         {
             throw new ActionNotAllowedException("Owner cannot book his ride");
         }
+        
+        Console.WriteLine($">>>>>>>>>>>{request.PassengerId}>>>>>>>>>>>>{request.RideId}");
 
         var userRide = new UserRide()
         {

@@ -3,13 +3,11 @@ using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.Common.Models;
 using CarBookingApp.Application.Rides.Responses;
+using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
 namespace CarBookingApp.Application.Rides.Queries;
-
-// public record GetAllRidesQuery(int UserId, int PageNumber = 1, int PageSize = 9, 
-//     string OrderBy = "DateOfTheRide", bool Ascending = true) : IRequest<PaginatedList<RideShortInfoDTO>>;
 
 public record GetAllRidesQuery(
     int UserId,
@@ -33,20 +31,27 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
         _mapper = mapper;
     }
 
-    public async Task<PaginatedList<RideShortInfoDTO>> Handle(GetAllRidesQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<RideShortInfoDTO>> Handle(GetAllRidesQuery request,
+        CancellationToken cancellationToken)
     {
         int pageNumber = request.PageNumber;
         int pageSize = request.PageSize;
-        Expression<Func<Ride, bool>> filter = r => r.Owner.Id != request.UserId     
+
+        var approvedUserRides = await _repository.GetByPredicate<UserRide>(
+            ur => ur.BookingStatus == BookingStatus.APPROVED,
+            ur => ur.Ride);
+
+        var approvedPassengersLookup = approvedUserRides.ToLookup(ur => ur.RideId, ur => ur);
+
+        Expression<Func<Ride, bool>> filter = r => r.Owner.Id != request.UserId
                                                    && r.DateOfTheRide > DateTime.Now
-                                                   && r.Passengers.Count < r.TotalSeats
                                                    && !r.Passengers.Select(p => p.Id).Contains(request.UserId);
-        
+
         if (!string.IsNullOrEmpty(request.DestinationFrom))
         {
             filter = filter.AndAlso(r => r.DestinationFrom.Name == request.DestinationFrom);
         }
-        
+
         if (!string.IsNullOrEmpty(request.DestinationTo))
         {
             filter = filter.AndAlso(r => r.DestinationTo.Name == request.DestinationTo);
@@ -56,7 +61,7 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
         {
             filter = filter.AndAlso(r => r.DateOfTheRide == request.DateOfTheRide.Value);
         }
-        
+
         Expression<Func<Ride, object>> orderBy = request.OrderBy.ToLower() switch
         {
             "dateoftheride" => r => r.DateOfTheRide,
@@ -65,7 +70,7 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
             _ => r => r.DateOfTheRide
         };
 
-        var ridesPaginated = await _repository.GetAllPaginatedAsync(
+        var rides = await _repository.GetAllPaginatedAsync(
             pageNumber: pageNumber,
             pageSize: pageSize,
             filter: filter,
@@ -78,15 +83,20 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
             r => r.RideDetail
         );
 
-        var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(ridesPaginated.Items);
+        var filteredRides = rides.Items.Where(r =>
+            (!approvedPassengersLookup.Contains(r.Id) || approvedPassengersLookup[r.Id].Count() < r.TotalSeats)
+        ).ToList();
 
-        return new PaginatedList<RideShortInfoDTO>(rideDTOs, ridesPaginated.TotalCount, ridesPaginated.PageIndex, ridesPaginated.PageSize);
+        var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(filteredRides);
+
+        return new PaginatedList<RideShortInfoDTO>(rideDTOs, filteredRides.Count, rides.PageIndex, rides.PageSize);
     }
 }
 
 public static class ExpressionExtensions
 {
-    public static Expression<Func<T, bool>> AndAlso<T>(this Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2)
+    public static Expression<Func<T, bool>> AndAlso<T>(this Expression<Func<T, bool>> expr1,
+        Expression<Func<T, bool>> expr2)
     {
         var parameter = Expression.Parameter(typeof(T));
 

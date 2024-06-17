@@ -103,7 +103,7 @@ export default function AvailableRides() {
                   <Grid item xs={6} sm={5} md={4} lg={3} key={ride.id}>
                         <Grow in={true} timeout={500}>
                             <div>
-                                <Ride ride={ride} edit={false} />
+                                <Ride ride={ride} action={"book"} />
                             </div>
                         </Grow>
                   </Grid>

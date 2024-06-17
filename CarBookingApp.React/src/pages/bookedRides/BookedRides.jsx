@@ -89,7 +89,7 @@ export default function BookedRides() {
                             <Grid item xs={6} sm={5} md={4} lg={3} key={ride.id}>
                                 <Grow in={true} timeout={500}>
                                     <div>
-                                        <SmallRideCard ride={ride} edit={true} />
+                                        <SmallRideCard ride={ride} action={"unsubscribe"} />
                                     </div>
                                 </Grow>
                             </Grid>

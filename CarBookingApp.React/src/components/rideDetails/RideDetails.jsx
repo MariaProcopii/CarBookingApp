@@ -18,7 +18,8 @@ import EditRideDialog from "../editRideDialog/EditRideDialog";
 export default function RideDetails(props) {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const {openRideDetails, setOpenRideDetails, rideId} = props;
-    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+    const [isEditBDisabled, setEditBDisabled] = useState(false);
+    const [isUnsubscribeBDisabled, setUnsubscribeBDisabled] = useState(false);
     const [rideDetails, setRideDetails] = useState();
     const [openEditRide, setOpenEditRide] = useState(false);
     const { token } = useAuth();
@@ -47,6 +48,17 @@ export default function RideDetails(props) {
             });
       };
 
+      const unsubscribeFromRide = (infoParam) => {
+        axios.put("http://192.168.0.9:5239/ride/info/unsubscribe", infoParam)
+          .then((response) => {
+            setSnackbar({ open: true, message: 'Unsubscribed from ride successfully!', severity: 'success' });
+          })
+          .catch((error) => {
+              console.log(error);
+              setSnackbar({ open: true, message: 'Failed to unsubscribe from ride!', severity: 'error' });
+            });
+      };
+
       useEffect(() => {
         if (openRideDetails) {
             fetchRideDetails();
@@ -64,7 +76,22 @@ export default function RideDetails(props) {
         }
 
         bookRide(infoParam);
-        setIsButtonDisabled(true);
+        setEditBDisabled(true);
+
+        setTimeout(() => {
+            setOpenRideDetails(false);
+            window.location.reload();
+          }, 1000);
+    }
+
+    const handleUnsubscribeFromRide = () => {
+        const infoParam = {
+            rideId : rideId,
+            passengerId : claims.nameidentifier
+        }
+
+        unsubscribeFromRide(infoParam);
+        setUnsubscribeBDisabled(true);
 
         setTimeout(() => {
             setOpenRideDetails(false);
@@ -159,7 +186,7 @@ export default function RideDetails(props) {
                             <Box mt={2}>
                                 <PassengerDetails passengers={rideDetails.passengers} />
                             </Box>
-                            {hasRole(claims, "Driver") && props.edit ? (
+                            {hasRole(claims, "Driver") && props.action === "edit" && (
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                                     <Button
                                         fullWidth 
@@ -171,17 +198,32 @@ export default function RideDetails(props) {
                                         Edit ride
                                     </Button>
                                 </Box>
-                            ) : (
+                            )}
+                            {props.action === "book" && (
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                                     <Button 
                                         fullWidth  
                                         variant="contained" 
                                         color="primary"
-                                        disabled={isButtonDisabled}
+                                        disabled={isEditBDisabled}
                                         sx={buttonStyle} 
                                         onClick={handleBookRide}
                                     >
                                         Book Ride
+                                    </Button>
+                                </Box>
+                            )}
+                            {props.action === "unsubscribe" && (
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                    <Button 
+                                        fullWidth  
+                                        variant="contained" 
+                                        color="primary"
+                                        disabled={isUnsubscribeBDisabled}
+                                        sx={buttonStyle} 
+                                        onClick={handleUnsubscribeFromRide}
+                                    >
+                                        Unsubscribe
                                     </Button>
                                 </Box>
                             )}

@@ -108,7 +108,7 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Destinations");
+                    b.ToTable("Destinations", (string)null);
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Facility", b =>
@@ -125,7 +125,7 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Facilities");
+                    b.ToTable("Facilities", (string)null);
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Ride", b =>
@@ -327,7 +327,7 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.HasIndex("RideId");
 
-                    b.ToTable("UserRide");
+                    b.ToTable("UserRide", (string)null);
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.Vehicle", b =>
@@ -348,7 +348,7 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vehicles");
+                    b.ToTable("Vehicles", (string)null);
                 });
 
             modelBuilder.Entity("CarBookingApp.Domain.Model.VehicleDetail", b =>
@@ -373,7 +373,7 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("VehicleDetails");
+                    b.ToTable("VehicleDetails", (string)null);
                 });
 
             modelBuilder.Entity("FacilityRideDetail", b =>
@@ -388,7 +388,7 @@ namespace CarBookingApp.Infrastructure.Migrations
 
                     b.HasIndex("RideDetailId");
 
-                    b.ToTable("FacilityRideDetail");
+                    b.ToTable("FacilityRideDetail", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>

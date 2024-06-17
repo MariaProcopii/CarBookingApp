@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import RideDetails from "../rideDetails/RideDetails";
 import getAvatarSrc from "../../utils/AvatarUtils";
 
-export default function Ride({ride, edit}) {
+export default function Ride({ride, action}) {
     const [openRideDetails, setOpenRideDetails] = useState(false);
 
     const mainBoxStyle={
@@ -110,7 +110,7 @@ export default function Ride({ride, edit}) {
                     openRideDetails={openRideDetails} 
                     setOpenRideDetails={setOpenRideDetails}
                     rideId={ride.id}
-                    edit={edit}
+                    action={action}
                 />
             </Box>
     </Box>

@@ -1,6 +1,7 @@
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.Rides.Responses;
+using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
@@ -20,6 +21,12 @@ public class GetRideInfoByIdQueryHandler : IRequestHandler<GetRideInfoByIdQuery,
 
     public async Task<RideFullInfoDTO> Handle(GetRideInfoByIdQuery request, CancellationToken cancellationToken)
     {
+        var approvedUserRides = await _repository.GetByPredicate<UserRide>(
+            ur => ur.BookingStatus == BookingStatus.APPROVED && ur.Ride.Id == request.RideId);
+
+        var approvedPassengersIdList = approvedUserRides.Select(ur => ur.PassengerId).ToList();
+        
+        
         var ride = await _repository
             .GetByIdWithInclude<Ride>(request.RideId, 
                 r => r.DestinationFrom, 
@@ -31,6 +38,8 @@ public class GetRideInfoByIdQueryHandler : IRequestHandler<GetRideInfoByIdQuery,
                 r => r.RideDetail.Facilities,
                 r => r.Passengers);
         
+        var filteredPassengers = ride.Passengers.Where(u => approvedPassengersIdList.Contains(u.Id)).ToList();
+        ride.Passengers = filteredPassengers;
         return _mapper.Map<Ride, RideFullInfoDTO>(ride);
     }
 }
