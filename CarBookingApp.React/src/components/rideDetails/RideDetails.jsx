@@ -20,6 +20,7 @@ export default function RideDetails(props) {
     const {openRideDetails, setOpenRideDetails, rideId} = props;
     const [isEditBDisabled, setEditBDisabled] = useState(false);
     const [isUnsubscribeBDisabled, setUnsubscribeBDisabled] = useState(false);
+    const [isDeleteBDisabled, setDeleteBDisabled] = useState(false);
     const [rideDetails, setRideDetails] = useState();
     const [openEditRide, setOpenEditRide] = useState(false);
     const { token } = useAuth();
@@ -59,6 +60,17 @@ export default function RideDetails(props) {
             });
       };
 
+      const deleteRide = () => {
+        axios.delete(`http://192.168.0.9:5239/ride/delete/${rideId}`)
+          .then((response) => {
+            setSnackbar({ open: true, message: 'Delete ride successfully!', severity: 'success' });
+          })
+          .catch((error) => {
+              console.log(error);
+              setSnackbar({ open: true, message: 'Failed to delete from ride!', severity: 'error' });
+            });
+      };
+
       useEffect(() => {
         if (openRideDetails) {
             fetchRideDetails();
@@ -92,6 +104,16 @@ export default function RideDetails(props) {
 
         unsubscribeFromRide(infoParam);
         setUnsubscribeBDisabled(true);
+
+        setTimeout(() => {
+            setOpenRideDetails(false);
+            window.location.reload();
+          }, 1000);
+    }
+
+    const handleDeleteRide = () => {
+        deleteRide();
+        setDeleteBDisabled(true);
 
         setTimeout(() => {
             setOpenRideDetails(false);
@@ -187,6 +209,7 @@ export default function RideDetails(props) {
                                 <PassengerDetails passengers={rideDetails.passengers} />
                             </Box>
                             {hasRole(claims, "Driver") && props.action === "edit" && (
+                                <>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                                     <Button
                                         fullWidth 
@@ -198,6 +221,19 @@ export default function RideDetails(props) {
                                         Edit ride
                                     </Button>
                                 </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                    <Button
+                                        fullWidth 
+                                        variant="contained" 
+                                        color="primary" 
+                                        disabled={isDeleteBDisabled}
+                                        sx={buttonStyle} 
+                                        onClick={handleDeleteRide}
+                                    >
+                                        Delete ride
+                                    </Button>
+                                </Box>
+                                </>
                             )}
                             {props.action === "book" && (
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>

@@ -45,8 +45,6 @@ public class BookRideCommandHandler : IRequestHandler<BookRideCommand, RideShort
         {
             throw new ActionNotAllowedException("Owner cannot book his ride");
         }
-        
-        Console.WriteLine($">>>>>>>>>>>{request.PassengerId}>>>>>>>>>>>>{request.RideId}");
 
         var userRide = new UserRide()
         {
