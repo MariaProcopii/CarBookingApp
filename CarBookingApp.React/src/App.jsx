@@ -8,7 +8,7 @@ import { BrowserRouter as Router} from "react-router-dom";
 
 const themeOptionsLight = {
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: {
       main: '#a41116',
     },

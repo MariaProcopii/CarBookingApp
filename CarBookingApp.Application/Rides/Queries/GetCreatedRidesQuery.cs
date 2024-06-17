@@ -8,9 +8,9 @@ using MediatR;
 
 namespace CarBookingApp.Application.Rides.Queries;
 public record GetCreatedRidesQuery(int UserId, int PageNumber = 1, int PageSize = 9,
-    string OrderBy = "DateOfTheRide", bool Ascending = true) : IRequest<PaginatedList<RideShortInfoDTO>>;
+    string OrderBy = "DateOfTheRide", bool Ascending = true) : IRequest<PaginatedList<RideCreatedInfoDTO>>;
 
-public class GetCreatedRidesQueryHandler : IRequestHandler<GetCreatedRidesQuery, PaginatedList<RideShortInfoDTO>>
+public class GetCreatedRidesQueryHandler : IRequestHandler<GetCreatedRidesQuery, PaginatedList<RideCreatedInfoDTO>>
 {
     private readonly IRepository _repository;
     private readonly IMapper _mapper;
@@ -21,7 +21,7 @@ public class GetCreatedRidesQueryHandler : IRequestHandler<GetCreatedRidesQuery,
         _mapper = mapper;
     }
 
-    public async Task<PaginatedList<RideShortInfoDTO>> Handle(GetCreatedRidesQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<RideCreatedInfoDTO>> Handle(GetCreatedRidesQuery request, CancellationToken cancellationToken)
     {
         int pageNumber = request.PageNumber;
         int pageSize = request.PageSize;
@@ -50,8 +50,8 @@ public class GetCreatedRidesQueryHandler : IRequestHandler<GetCreatedRidesQuery,
 
         var rides = ridesPaginated.Items;
         
-        var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(rides);
+        var rideDTOs = _mapper.Map<List<RideCreatedInfoDTO>>(rides);
 
-        return new PaginatedList<RideShortInfoDTO>(rideDTOs, ridesPaginated.TotalCount, ridesPaginated.PageIndex, ridesPaginated.PageSize);
+        return new PaginatedList<RideCreatedInfoDTO>(rideDTOs, ridesPaginated.TotalCount, ridesPaginated.PageIndex, ridesPaginated.PageSize);
     }
 }

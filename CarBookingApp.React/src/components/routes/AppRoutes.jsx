@@ -8,6 +8,7 @@ import Sidebar from '../sidebar/Sidebar';
 import Profile from "../../pages/profile/Profile";
 import CreateRide from "../../pages/createRide/CreateRide";
 import MyRides from "../../pages/myRides/MyRides";
+import BookedRides from "../../pages/bookedRides/BookedRides";
 
 const AppRoutes = ({theme, isDarkThemeOn, setDarkTheme}) => {
 
@@ -27,6 +28,7 @@ const AppRoutes = ({theme, isDarkThemeOn, setDarkTheme}) => {
             <Route path="logout" element={<Logout />} />
             <Route path="create-ride" element={<CreateRide />} />
             <Route path="my-rides" element={<MyRides />} />
+            <Route path="booked-rides" element={<BookedRides />} />
           </Route>
       </Route>
     </Routes>

@@ -2,9 +2,9 @@ import { Grid, Box, Container, Grow }  from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../components/provider/AuthProvider';
 import { useTokenDecoder } from '../../utils/TokenUtils';
-import Ride from '../../components/ride/Ride';
 import axios from 'axios';
 import Pagination from '@mui/material/Pagination';
+import SmallRideCard from '../../components/smallRideCard/SmallRideCard';
 
 export default function MyRides() {
 
@@ -20,7 +20,6 @@ export default function MyRides() {
           .then((response) => {
               setRides(response.data.items);
               setTotalPages(response.data.totalPages);
-              console.log(response.data.items);
           })
           .catch((error) => {
               const { data } = error.response;
@@ -42,7 +41,7 @@ export default function MyRides() {
                     <Grid item xs={6} sm={5} md={4} lg={3} key={ride.id}>
                         <Grow in={true} timeout={500}>
                             <div>
-                                <Ride ride={ride} edit={true} />
+                                <SmallRideCard ride={ride} edit={true} />
                             </div>
                         </Grow>
                     </Grid>

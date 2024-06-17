@@ -29,5 +29,11 @@ public class RideProfile : Profile
                 opt.MapFrom(src => src.DestinationFrom.Name))
             .ForMember(dest => dest.DestinationTo, opt =>
                 opt.MapFrom(src => src.DestinationTo.Name));
+        
+        CreateMap<Ride, RideCreatedInfoDTO>()
+            .ForMember(dest => dest.DestinationFrom, opt =>
+                opt.MapFrom(src => src.DestinationFrom.Name))
+            .ForMember(dest => dest.DestinationTo, opt =>
+                opt.MapFrom(src => src.DestinationTo.Name));
     }
 }

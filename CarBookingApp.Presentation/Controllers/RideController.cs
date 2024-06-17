@@ -106,7 +106,7 @@ public class RideController : ControllerBase
     [HttpGet]
     [Route("created/{userId}")]
     [Authorize(Roles = "Driver")]
-    public async Task<ActionResult<PaginatedList<RideShortInfoDTO>>> GetCreatedRides(
+    public async Task<ActionResult<PaginatedList<RideCreatedInfoDTO>>> GetCreatedRides(
         int userId,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 8,
