@@ -24,6 +24,7 @@ export default function AvailableRides() {
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     const buttonStyle={
+        mr: 2,
         fontSize: {
             xs: '0.6rem',
             sm: '0.7rem',
@@ -86,14 +87,16 @@ export default function AvailableRides() {
                             Search
                         </Button>
                     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
-                        <DialogContent>
-                            <SearchBar onSearch={fetchRidesWithParams} />
+                        <DialogContent >
+                                <SearchBar onSearch={fetchRidesWithParams} />
                         </DialogContent>
                     </Dialog>
                 </Grid>
                 ) : (
                 <Grid item>
-                    <SearchBar onSearch={fetchRidesWithParams} />
+                    <Box sx={{mr: 6}}>
+                        <SearchBar onSearch={fetchRidesWithParams} />
+                    </Box>
                 </Grid>
                 )}
           </Grid>

@@ -66,7 +66,6 @@ export default function MyRides() {
 
     return (
         <Container sx={{ display: 'flex', flexDirection: 'column', minHeight: '80vh', justifyContent: 'center'}}>
-            <Box mb={5} />
             {rides.length === 0 ? (
                 <Box sx={{ textAlign: 'center', marginTop: 5 }}>
                     <Typography 
@@ -85,7 +84,7 @@ export default function MyRides() {
                 </Box>
             ) : (
                 <>
-                    <Grid container spacing={5} direction='row' wrap='wrap' alignItems='center' justifyContent='center' flexGrow={2}>
+                    <Grid container spacing={2} direction='row' wrap='wrap' alignItems='center' justifyContent='center' flexGrow={2}>
                         {rides.map((ride) => (
                             <Grid item xs={6} sm={5} md={4} lg={3} key={ride.id}>
                                 <Grow in={true} timeout={500}>
@@ -96,7 +95,7 @@ export default function MyRides() {
                             </Grid>
                         ))}
                     </Grid>
-                    <Box mb={10} />
+                    <Box mb={5} />
                     <Grid container direction='row' alignItems='center' justifyContent='center' >
                         <Pagination count={totalPages} 
                                     variant="outlined" 
