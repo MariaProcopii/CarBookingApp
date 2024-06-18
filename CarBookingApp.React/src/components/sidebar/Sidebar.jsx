@@ -18,6 +18,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import PlaceIcon from '@mui/icons-material/Place';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import TimeToLeaveRoundedIcon from '@mui/icons-material/TimeToLeaveRounded';
@@ -112,6 +114,10 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
           return <HomeIcon />;
       case 'Booked Rides':
           return <PlaceIcon />;
+      case 'Pending Rides':
+          return <HourglassBottomIcon />;
+      case 'Pending Passengers':
+        return <GroupAddIcon />;
       case 'Create ride':
           return <EventAvailableIcon />;
       case 'Profile':
@@ -129,6 +135,10 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
           return "/";
       case 'Booked Rides':
           return "/booked-rides";
+      case 'Pending Rides':
+          return "/pending-rides";
+      case 'Pending Passengers':
+          return "/pending-passengers";
       case 'Create ride':
           return "/create-ride";
       case 'Profile':
@@ -186,7 +196,7 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
         </DrawerHeader>
         <Divider />
         <List>
-            {['Home', 'Booked Rides', 'Create ride', 'Profile', 'My Rides', 'Log out'].map((text, index) => (
+            {['Home', 'Booked Rides', 'Pending Rides','Pending Passengers' ,'Create ride', 'Profile', 'My Rides', 'Log out'].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: 'block', }}>
               <ListItemButton
                 sx={{

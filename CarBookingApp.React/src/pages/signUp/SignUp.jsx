@@ -1,5 +1,5 @@
 import { Grid,Paper, Avatar, TextField, Button, Typography, Link, Box, FormControl,
-         InputLabel, Select, MenuItem, CssBaseline}  from '@mui/material';
+         InputLabel, Select, MenuItem, CssBaseline, useTheme}  from '@mui/material';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -16,22 +16,35 @@ import { parseErrorMessages } from '../../utils/ErrorUtils';
 import { transformDate } from '../../utils/DateTimeUtils';
 
 export default function SignUp() {
+    const theme = useTheme();
     const boxStyle={ margin:"40px auto", alignItems: 'center', minWidth:300 };
     const paperStyle={padding :40,height:'75vh',width:600, margin:"50px auto"};
     const avatarStyle={ bgcolor: 'primary.main' };
     const btnstyle={margin:'8px 0'};
-    const imageStyle={
+    const imageStyle = {
         margin: "30px auto",
-        maxWidth: '100%',
-        height: 'auto',
-        width: '100%',
-        maxHeight: {
-            xs: '200px',
-            sm: '250px',
-            md: '300px',
-            lg: '350px',
-            xl: '400px',
+        maxWidth: "100%",
+        height: "auto",
+        [theme.breakpoints.down('sm')]: {
+          width: "100%",
         },
+        [theme.breakpoints.up('sm')]: {
+          width: "80%",
+        },
+        [theme.breakpoints.up('md')]: {
+          width: "60%",
+        },
+        [theme.breakpoints.up('lg')]: {
+          width: "50%",
+        },
+    };
+
+    const getImagePath = () => {
+        if (theme.palette.mode === 'dark') {
+            return "src/assets/images/car-intro-dark.png";
+        } else {
+            return "src/assets/images/car-intro-light.png";
+        }
     };
 
     const { setToken } = useAuth();
@@ -131,7 +144,7 @@ export default function SignUp() {
         <CssBaseline />
             <Grid container>
                 <Box sx={boxStyle} >
-                    <img src="src/assets/images/car-intro.png" style={imageStyle}/>
+                    <img src={getImagePath()} style={imageStyle}/>
                 </Box>
                 <Paper elevation={8} style={paperStyle} sx={{width: '800px'}}>
                     <Grid align='center'>

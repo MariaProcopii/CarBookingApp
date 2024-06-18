@@ -7,7 +7,7 @@ import Pagination from '@mui/material/Pagination';
 import SmallRideCard from '../../components/smallRideCard/SmallRideCard';
 import { useTheme } from '@mui/material/styles';
 
-export default function BookedRides() {
+export default function PendingRides() {
 
     const [rides, setRides] = useState([]);
     const [pageIndex, setPageIndex] = useState(1);
@@ -16,8 +16,8 @@ export default function BookedRides() {
     const claims = useTokenDecoder(token);
     const theme = useTheme();
 
-    const fetchRides = () => {
-        axios.get(`http://192.168.0.9:5239/ride/booked/${claims.nameidentifier}?PageNumber=${pageIndex}`)
+    const fetchPendingRides = () => {
+        axios.get(`http://192.168.0.9:5239/ride/pending/${claims.nameidentifier}?PageNumber=${pageIndex}`)
             .then((response) => {
                 setRides(response.data.items);
                 setTotalPages(response.data.totalPages);
@@ -30,7 +30,7 @@ export default function BookedRides() {
 
     useEffect(() => {
         setTimeout(() => {
-            fetchRides();
+            fetchPendingRides();
         }, 10);
     }, [pageIndex]);
 
@@ -72,7 +72,7 @@ export default function BookedRides() {
                         color="textSecondary" 
                         sx={typographyStyle}
                     >
-                        No booked rides
+                        No pending rides
                     </Typography>
                     <CardMedia
                         component="img"

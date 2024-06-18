@@ -9,6 +9,8 @@ import Profile from "../../pages/profile/Profile";
 import CreateRide from "../../pages/createRide/CreateRide";
 import MyRides from "../../pages/myRides/MyRides";
 import BookedRides from "../../pages/bookedRides/BookedRides";
+import PendingRides from "../../pages/pendingRides/PendingRides";
+import PendingPassengers from "../../pages/pendingPassengers/PendingPassengers";
 
 const AppRoutes = ({theme, isDarkThemeOn, setDarkTheme}) => {
 
@@ -29,6 +31,8 @@ const AppRoutes = ({theme, isDarkThemeOn, setDarkTheme}) => {
             <Route path="create-ride" element={<CreateRide />} />
             <Route path="my-rides" element={<MyRides />} />
             <Route path="booked-rides" element={<BookedRides />} />
+            <Route path="pending-rides" element={<PendingRides />}/>
+            <Route path="pending-passengers" element={<PendingPassengers />}/>
           </Route>
       </Route>
     </Routes>

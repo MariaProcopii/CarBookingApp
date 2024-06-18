@@ -115,7 +115,7 @@ public class UserController : ControllerBase
     [HttpGet]
     [Route("pending/{userId}")]
     [Authorize(Roles = "Driver")]
-    public async Task<ActionResult<PaginatedList<UserDTO>>> GetPendingPassengers(
+    public async Task<ActionResult<PaginatedList<PendingUserDTO>>> GetPendingPassengers(
         int userId, 
         [FromQuery] int pageNumber = 1, 
         [FromQuery] int pageSize = 10, 

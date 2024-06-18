@@ -23,7 +23,14 @@ import { useAuth } from "../../components/provider/AuthProvider";
 import { parseErrorMessages } from "../../utils/ErrorUtils";
 
 export default function Login() {
-  const boxStyle = { margin: "30px auto", alignItems: "center", minWidth: 300 };
+
+  const theme = useTheme();
+  const boxStyle = { 
+    margin: "30px auto", 
+    alignItems: "center", 
+    minWidth: 300
+  };
+
   const paperStyle = {
     padding: 40,
     height: "60vh",
@@ -35,16 +42,27 @@ export default function Login() {
     margin: "30px auto",
     maxWidth: "100%",
     height: "auto",
-    width: "100%",
-    maxHeight: {
-      xs: "200px",
-      sm: "250px",
-      md: "300px",
-      lg: "300px",
-      xl: "300px",
+    [theme.breakpoints.down('sm')]: {
+      width: "100%",
+    },
+    [theme.breakpoints.up('sm')]: {
+      width: "80%",
+    },
+    [theme.breakpoints.up('md')]: {
+      width: "60%",
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: "50%",
     },
   };
-  const theme = useTheme();
+
+  const getImagePath = () => {
+    if (theme.palette.mode === 'dark') {
+        return "src/assets/images/car-intro-dark.png";
+    } else {
+        return "src/assets/images/car-intro-light.png";
+    }
+  };
 
   const btnstyle = { margin: "8px 0" };
   const { setToken } = useAuth();
@@ -100,7 +118,8 @@ export default function Login() {
       <CssBaseline />
       <Grid container>
         <Box sx={boxStyle}>
-          <img src="src/assets/images/car-intro.png" style={imageStyle} />
+          <img src={getImagePath()} style={imageStyle}
+          />
         </Box>
         <Paper elevation={8} style={paperStyle}>
           <Grid align="center">

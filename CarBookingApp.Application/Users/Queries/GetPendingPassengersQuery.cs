@@ -2,15 +2,16 @@ using System.Linq.Expressions;
 using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.Common.Models;
+using CarBookingApp.Application.Rides.Responses;
 using CarBookingApp.Application.Users.Responses;
 using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
 namespace CarBookingApp.Application.Users.Queries;
-public record GetPendingPassengersQuery(int UserId, int PageNumber = 1, int PageSize = 9, string OrderBy = "Name", bool Ascending = true) : IRequest<PaginatedList<UserDTO>>;
+public record GetPendingPassengersQuery(int UserId, int PageNumber = 1, int PageSize = 9, string OrderBy = "Name", bool Ascending = true) : IRequest<PaginatedList<PendingUserDTO>>;
 
-public class GetPendingPassengersQueryHandler : IRequestHandler<GetPendingPassengersQuery, PaginatedList<UserDTO>>
+public class GetPendingPassengersQueryHandler : IRequestHandler<GetPendingPassengersQuery, PaginatedList<PendingUserDTO>>
 {
     private readonly IRepository _repository;
     private readonly IMapper _mapper;
@@ -21,7 +22,7 @@ public class GetPendingPassengersQueryHandler : IRequestHandler<GetPendingPassen
         _mapper = mapper;
     }
 
-    public async Task<PaginatedList<UserDTO>> Handle(GetPendingPassengersQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<PendingUserDTO>> Handle(GetPendingPassengersQuery request, CancellationToken cancellationToken)
     {
         Expression<Func<UserRide, bool>> filter = ur => ur.BookingStatus == BookingStatus.PENDING 
                                                         && ur.Ride.Owner.Id == request.UserId;
@@ -42,11 +43,16 @@ public class GetPendingPassengersQueryHandler : IRequestHandler<GetPendingPassen
             filter: filter, 
             orderBy: orderBy,
             ascending: request.Ascending ,
-            ur => ur.Passenger, ur => ur.Ride.Owner);
+            ur => ur.Passenger,
+            ur => ur.Ride,
+            ur => ur.Ride.DestinationFrom,
+            ur => ur.Ride.DestinationTo);
 
-        var rides = userRidesPaginated.Items.Select(ur => ur.Passenger).ToList();
-        var userDTOs = _mapper.Map<List<User>, List<UserDTO>>(rides);
+        var pendingUserDtos = userRidesPaginated.Items.Select(ur => new PendingUserDTO(){
+                UserInfo = _mapper.Map<User, UserDTO>(ur.Passenger), 
+                RideInfo = _mapper.Map<Ride, RideCreatedInfoDTO>(ur.Ride)
+        }).ToList();
 
-        return new PaginatedList<UserDTO>(userDTOs, userRidesPaginated.TotalCount, userRidesPaginated.PageIndex, userRidesPaginated.PageSize);
+        return new PaginatedList<PendingUserDTO>(pendingUserDtos, userRidesPaginated.TotalCount, userRidesPaginated.PageIndex, userRidesPaginated.PageSize);
     }
 }
