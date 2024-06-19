@@ -1,5 +1,5 @@
 import { Grid, Box, Container, Grow, Typography, CardMedia }  from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../components/provider/AuthProvider';
 import { useTokenDecoder } from '../../utils/TokenUtils';
 import axios from 'axios';

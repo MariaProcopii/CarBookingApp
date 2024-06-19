@@ -7,8 +7,24 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
 }
 
+let backgroundColor;
+
+switch (severity) {
+    case 'success':
+        backgroundColor = '#569c79';
+        break;
+    case 'error':
+        backgroundColor = '#a41116';
+        break;
+    case 'warning':
+        backgroundColor = '#d39b32';
+        break;
+    default:
+        backgroundColor = '#000';
+}
+
 const alertStyles = {
-    backgroundColor: severity === 'success' ? '#569c79' : '#a41116',
+    backgroundColor: backgroundColor,
     color: '#fff',
 };
 

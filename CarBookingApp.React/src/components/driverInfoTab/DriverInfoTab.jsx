@@ -4,14 +4,18 @@ import InfoIcon from '@mui/icons-material/Info';
 import { styled } from '@mui/system';
 import { useTokenDecoder, hasRole } from '../../utils/TokenUtils';
 import { useAuth } from '../provider/AuthProvider';
+import { useState, useEffect } from 'react'
 import axios from 'axios';
+import CustomSnackbar from '../customSnackbar/CustomSnackbar';
 
 export default function DriverInfoTab({ vehicleDetail, setOpenEdit, setOpenUpgrade }) {
 
     const { token, setToken } = useAuth();
     const claims = useTokenDecoder(token);
+    const [rides, setRides] = useState([]);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-    const handleDowngrade = () => {
+    const downgradeUser = () => {
       axios.put(`http://192.168.0.9:5239/user/info/downgrade/${claims.nameidentifier}`)
         .then(response => {
           setToken(response.data);
@@ -22,6 +26,25 @@ export default function DriverInfoTab({ vehicleDetail, setOpenEdit, setOpenUpgra
         });
     };
 
+    const fetchCreatedRides = () => {
+    
+      axios.get(`http://192.168.0.9:5239/ride/created/${claims.nameidentifier}?PageNumber=1`)
+        .then((response) => {
+            setRides(response.data.items);
+            setTotalPages(response.data.totalPages);
+        })
+        .catch((error) => {
+            const { data } = error.response;
+            setBackendErrors(parseErrorMessages(data.Message));
+          });
+    };
+
+    useEffect(() => {
+      setTimeout(() => {
+        fetchCreatedRides();
+      }, 10);
+    }, []);
+
     const handleOpenEditDialog = () => {
       setOpenEdit(true);
     };
@@ -29,6 +52,21 @@ export default function DriverInfoTab({ vehicleDetail, setOpenEdit, setOpenUpgra
     const handleOpenUpgradeDialog = () => {
       setOpenUpgrade(true);
     };
+
+    const handleDowngrade = () => {
+      if(rides.length === 0){
+        downgradeUser();
+      }
+      else {
+      setSnackbar(prev => ({ ...prev, open: false })),
+      setTimeout(() => {
+          setSnackbar({ open: true, message: 'First you need to finish or delete created rides.', severity: 'warning' });
+      }, 100);
+    }};
+
+    const handleCloseSnackbar = () => {
+      setSnackbar({ ...snackbar, open: false });
+  };
 
     const typographyStyle = {
         fontSize: {
@@ -117,6 +155,12 @@ export default function DriverInfoTab({ vehicleDetail, setOpenEdit, setOpenUpgra
               Stop being a Driver
           </Button>
         </Box>
+        <CustomSnackbar 
+            open={snackbar.open} 
+            message={snackbar.message} 
+            severity={snackbar.severity} 
+            onClose={handleCloseSnackbar}
+        />
       </>
     ) : (
       <>
