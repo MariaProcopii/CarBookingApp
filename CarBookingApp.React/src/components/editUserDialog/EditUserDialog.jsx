@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useAuth } from '../../components/provider/AuthProvider';
-import { useTokenDecoder } from '../../utils/TokenUtils';
+import { useTokenDecoder, hasRole } from '../../utils/TokenUtils';
 import { parseErrorMessages } from '../../utils/ErrorUtils';
 
 export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo }) {
@@ -206,18 +206,20 @@ export default function EditUserDialog({ open, setOpen, userInfo, setUserInfo })
                     </Field>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    as={TextField}
-                    required
-                    margin="dense"
-                    label="Years of experience"
-                    name="yearsOfExperience"
-                    fullWidth
-                    variant="outlined"
-                    helperText={<ErrorMessage name="yearsOfExperience" />}
-                  />
-                </Grid>
+                {hasRole(claims, "Driver") && (
+                  <Grid item xs={12}>
+                    <Field
+                      as={TextField}
+                      required
+                      margin="dense"
+                      label="Years of experience"
+                      name="yearsOfExperience"
+                      fullWidth
+                      variant="outlined"
+                      helperText={<ErrorMessage name="yearsOfExperience" />}
+                    />
+                  </Grid>
+                )}
                 <Grid item xs={12}>
                   <Field
                     as={TextField}

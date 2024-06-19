@@ -26,7 +26,7 @@ import TimeToLeaveRoundedIcon from '@mui/icons-material/TimeToLeaveRounded';
 import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
 import { Outlet } from 'react-router-dom';
-import { useTokenDecoder } from '../../utils/TokenUtils';
+import { useTokenDecoder, hasRole } from '../../utils/TokenUtils';
 import { useAuth } from '../provider/AuthProvider';
 
 const drawerWidth = 240;
@@ -95,7 +95,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
+export default function Sidebar({ theme, isDarkThemeOn, setDarkTheme }) {
   const [open, setOpen] = React.useState(false);
   const { token } = useAuth();
   const claims = useTokenDecoder(token);
@@ -111,48 +111,69 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
   const pickMenuIcon = (name) => {
     switch (name) {
       case 'Home':
-          return <HomeIcon />;
+        return <HomeIcon />;
       case 'Booked Rides':
-          return <PlaceIcon />;
+        return <PlaceIcon />;
       case 'Pending Rides':
-          return <HourglassBottomIcon />;
+        return <HourglassBottomIcon />;
       case 'Pending Passengers':
         return <GroupAddIcon />;
       case 'Create ride':
-          return <EventAvailableIcon />;
+        return <EventAvailableIcon />;
       case 'Profile':
-          return <AccountCircleRoundedIcon />;
+        return <AccountCircleRoundedIcon />;
       case 'My Rides':
-          return <TimeToLeaveRoundedIcon />;
+        return <TimeToLeaveRoundedIcon />;
       case 'Log out':
-          return <ExitToAppRoundedIcon />;
+        return <ExitToAppRoundedIcon />;
+      default:
+        return null;
     }
-  }
+  };
 
   const pickMenuRoute = (name) => {
     switch (name) {
       case 'Home':
-          return "/";
+        return "/";
       case 'Booked Rides':
-          return "/booked-rides";
+        return "/booked-rides";
       case 'Pending Rides':
-          return "/pending-rides";
+        return "/pending-rides";
       case 'Pending Passengers':
-          return "/pending-passengers";
+        return "/pending-passengers";
       case 'Create ride':
-          return "/create-ride";
+        return "/create-ride";
       case 'Profile':
-          return "/profile";
+        return "/profile";
       case 'My Rides':
-          return "/my-rides";
+        return "/my-rides";
       case 'Log out':
-          return "/logout";
+        return "/logout";
+      default:
+        return "/";
     }
-  }
+  };
+
+  const menuItems = [
+    'Home', 
+    'Booked Rides', 
+    'Pending Rides', 
+    'Pending Passengers', 
+    'Create ride', 
+    'Profile', 
+    'My Rides', 
+    'Log out'
+  ];
+
+  const driverMenuItems = [
+    'Create ride',
+    'My Rides',
+    'Pending Passengers',
+  ];
 
   return (
     <>
-    <Box sx={{ ml: 10, mb: 5, mr: 2}}>
+      <Box sx={{ ml: 10, mb: 5, mr: 2 }}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
           <AppBar position="fixed" open={open}>
@@ -177,14 +198,12 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
                   position: "absolute", 
                   marginLeft: "86vw" 
                 }}
-                onClick={() => {setDarkTheme(!isDarkThemeOn)}}
+                onClick={() => { setDarkTheme(!isDarkThemeOn) }}
               >
                 {
                   isDarkThemeOn
-                  ?
-                  <Brightness6Icon sx={{color: "white"}} />
-                  :
-                  <Brightness6Icon sx={{color: "black"}} />
+                    ? <Brightness6Icon sx={{ color: "white" }} />
+                    : <Brightness6Icon sx={{ color: "black" }} />
                 }
               </IconButton>
             </Toolbar>
@@ -197,30 +216,35 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
             </DrawerHeader>
             <Divider />
             <List>
-                {['Home', 'Booked Rides', 'Pending Rides','Pending Passengers' ,'Create ride', 'Profile', 'My Rides', 'Log out'].map((text, index) => (
-                <ListItem key={text} disablePadding sx={{ display: 'block', }}>
-                  <ListItemButton
-                    sx={{
-                      minHeight: 48,
-                      justifyContent: open ? 'initial' : 'center',
-                      px: 2.5,
-                    }}
-                    component="a"
-                    href={pickMenuRoute(text)}
-                  >
-                    <ListItemIcon
+              {menuItems.map((text) => {
+                if (driverMenuItems.includes(text) && !hasRole(claims, "Driver")) {
+                  return null;
+                }
+                return (
+                  <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                    <ListItemButton
                       sx={{
-                        minWidth: 0,
-                        mr: open ? 2 : 'auto',
-                        justifyContent: 'center',
+                        minHeight: 48,
+                        justifyContent: open ? 'initial' : 'center',
+                        px: 2.5,
                       }}
+                      component="a"
+                      href={pickMenuRoute(text)}
                     >
-                      {pickMenuIcon(text)}
-                    </ListItemIcon>
-                    <ListItemText primary={text} sx={{ opacity: open ? 1 : 0}} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: open ? 2 : 'auto',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {pickMenuIcon(text)}
+                      </ListItemIcon>
+                      <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
             </List>
             <Divider />
           </Drawer>
@@ -228,8 +252,8 @@ export default function Sidebar({theme, isDarkThemeOn, setDarkTheme}) {
             <DrawerHeader />
           </Box>
         </Box>
-      <Outlet />
-    </Box>
+        <Outlet />
+      </Box>
     </>
   );
 }
