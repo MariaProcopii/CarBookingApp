@@ -18,6 +18,12 @@ public static class ServiceCollectionExtension
         svcs.AddEndpointsApiExplorer();
         svcs.AddAuthToSwagger();
         
+        var payPalSettings = new PayPalSettings();
+        conf.Bind(nameof(PayPalSettings), payPalSettings);
+        
+        var payPalSection = conf.GetSection(nameof(PayPalSettings));
+        svcs.Configure<PayPalSettings>(payPalSection);
+        
         var jwtSettings = new JwtSettings();
         conf.Bind(nameof(JwtSettings), jwtSettings);
 
