@@ -29,6 +29,7 @@ public class GetBookedRidesQueryHandler : IRequestHandler<GetBookedRidesQuery, P
         int pageSize = request.PageSize;
         
         Expression<Func<UserRide, bool>> filter = ur => ur.BookingStatus == BookingStatus.APPROVED
+                                                        && ur.RideStatus == RideStatus.UPCOMING
                                                         && ur.PassengerId == request.UserId;
 
         Expression<Func<UserRide, object>> orderBy = request.OrderBy.ToLower() switch

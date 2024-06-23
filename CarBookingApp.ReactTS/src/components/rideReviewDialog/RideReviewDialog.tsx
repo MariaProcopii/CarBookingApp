@@ -130,8 +130,8 @@ export default function RideReviewDialog({ open, handleClose, owner}: Props) {
     <TipDialog
         open={openTipDialog}
         onClose={() => setOpenTipDialog(false)}
-        driverEmail={"sb-yi8si31297448@business.example.com"}
-        tipperEmail={"sb-hg6lf31201930@personal.example.com"}
+        driverEmail={owner.email}
+        tipperEmail={claims.emailaddress as string}
     />
     <CustomSnackbar 
         open={snackbar.open} 
