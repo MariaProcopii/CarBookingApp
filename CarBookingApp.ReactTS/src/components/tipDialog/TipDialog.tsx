@@ -14,74 +14,74 @@ interface Props {
 
 export default function TipDialog({ open, onClose, driverEmail, tipperEmail }: Props) {
 
-  const { instance } = useAPI();
-  const { createPayment } = PaymentService(instance);
+    const { instance } = useAPI();
+    const { createPayment } = PaymentService(instance);
 
-  const handleSubmit = async (values: any, formikHelpers: FormikHelpers<any>) => {
-    const createPaymentProps = {
-      amount: values.amount,
-      tipperEmail: tipperEmail,
-      driverEmail: driverEmail
-    }
+    const initialValues = {
+        amount: 1
+    };
 
-    await createPayment(createPaymentProps);
+    const validationSchema = Yup.object().shape({
+        amount: Yup.number()
+            .required("Amount is required")
+            .min(1.00, "At least 1 lei is required.")
+    });
 
-    setTimeout(() => {
-      formikHelpers.resetForm();
-      formikHelpers.setSubmitting(false);
-    }, 5000);
-  }
-  
-  const initialValues = {
-    amount: 0
-  };
+    const handleSubmit = async (values: any, formikHelpers: FormikHelpers<any>) => {
+        const createPaymentProps = {
+            amount: values.amount,
+            tipperEmail: tipperEmail,
+            driverEmail: driverEmail
+        };
 
-  const validationSchema = Yup.object().shape({
-    amount: Yup.number()
-        .required("Amount is required")
-        .min(1.00, "At least 1 lei is required.")
-  });
+        await createPayment(createPaymentProps);
+
+        setTimeout(() => {
+            formikHelpers.resetForm();
+            formikHelpers.setSubmitting(false);
+        }, 5000);
+    };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        Leave a Tip for the Driver
-        <IconButton
-          onClick={onClose}
-          sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent>
-      <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={validationSchema}>
-        {(props) => (
-          <Form>
-            <Field as={TextField}
-              autoFocus
-              required
-              margin="dense"
-              label="Tip Amount (USD)"
-              placeholder="Enter amount"
-              type="number"
-              fullWidth
-              variant="outlined"
-              name="amount"
-              helperText={<ErrorMessage name="amount" />}
-            />
-            <Button
-              type="submit"
-              color="primary"
-              variant="contained"
-              fullWidth
-              disabled={props.isSubmitting}
+        <DialogTitle>
+            Leave a Tip for the Driver
+            <IconButton
+                onClick={onClose}
+                sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
             >
-              {props.isSubmitting ? "Loading" : "Pay via PayPal"}
-            </Button>
-          </Form>
-        )}
-      </Formik>
-      </DialogContent>
+                <CloseIcon />
+            </IconButton>
+        </DialogTitle>
+        <DialogContent>
+            <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={validationSchema}>
+                {(props) => (
+                    <Form>
+                        <Field as={TextField}
+                            autoFocus
+                            required
+                            margin="dense"
+                            label="Tip Amount (USD)"
+                            placeholder="Enter amount"
+                            type="number"
+                            fullWidth
+                            variant="outlined"
+                            name="amount"
+                            helperText={<ErrorMessage name="amount" />}
+                        />
+                        <Button
+                            type="submit"
+                            color="primary"
+                            variant="contained"
+                            fullWidth
+                            disabled={props.isSubmitting}
+                        >
+                            {props.isSubmitting ? "Loading" : "Pay via PayPal"}
+                        </Button>
+                    </Form>
+                )}
+            </Formik>
+        </DialogContent>
     </Dialog>
   );
 };

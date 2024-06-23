@@ -17,7 +17,8 @@ public record GetAllRidesQuery(
     bool Ascending = true,
     DateTime? DateOfTheRide = null,
     string? DestinationFrom = null,
-    string? DestinationTo = null
+    string? DestinationTo = null,
+    int TotalSeats = 0
 ) : IRequest<PaginatedList<RideShortInfoDTO>>;
 
 public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, PaginatedList<RideShortInfoDTO>>
@@ -40,8 +41,12 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
         var approvedUserRides = await _repository.GetByPredicate<UserRide>(
             ur => ur.BookingStatus == BookingStatus.APPROVED,
             ur => ur.Ride);
+        
+        var completedUserRides = await _repository.GetByPredicate<UserRide>(
+            ur => ur.RideStatus == RideStatus.COMPLETED);
 
         var approvedPassengersLookup = approvedUserRides.ToLookup(ur => ur.RideId, ur => ur);
+        var completedUserRidesLookup = completedUserRides.ToLookup(ur => ur.RideId, ur => ur);
 
         Expression<Func<Ride, bool>> filter = r => r.Owner.Id != request.UserId
                                                    && r.DateOfTheRide > DateTime.Now
@@ -55,6 +60,11 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
         if (!string.IsNullOrEmpty(request.DestinationTo))
         {
             filter = filter.AndAlso(r => r.DestinationTo.Name == request.DestinationTo);
+        }
+        
+        if (request.TotalSeats != 0)
+        {
+            filter = filter.AndAlso(r => r.TotalSeats == request.TotalSeats);
         }
 
         if (request.DateOfTheRide.HasValue)
@@ -84,7 +94,8 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
         );
 
         var filteredRides = rides.Items.Where(r =>
-            (!approvedPassengersLookup.Contains(r.Id) || approvedPassengersLookup[r.Id].Count() < r.TotalSeats)
+            ((!approvedPassengersLookup.Contains(r.Id) || approvedPassengersLookup[r.Id].Count() < r.TotalSeats) 
+             && !completedUserRidesLookup.Contains(r.Id))
         ).ToList();
 
         var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(filteredRides);

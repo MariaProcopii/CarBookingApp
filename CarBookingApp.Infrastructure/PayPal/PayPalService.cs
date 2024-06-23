@@ -78,7 +78,7 @@ public class PayPalService : IPaymentService
         };
 
         var createdPayment = payment.Create(apiContext);
-        // var approvalUrl = createdPayment.links.FirstOrDefault(x => x.rel == "approval_url")?.href;
+
         return await Task.FromResult(createdPayment);
     }
 

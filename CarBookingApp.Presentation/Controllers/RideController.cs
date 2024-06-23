@@ -2,6 +2,7 @@ using CarBookingApp.Application.Common.Models;
 using CarBookingApp.Application.Rides.Commands;
 using CarBookingApp.Application.Rides.Queries;
 using CarBookingApp.Application.Rides.Responses;
+using CarBookingApp.Application.Users.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,15 @@ public class RideController : ControllerBase
     {
         var result = await _mediator.Send(new DeleteRideCommand(rideId));
         return Ok(result);
+    }
+    
+    [HttpPut]
+    [Route("complete/{rideId}")]
+    [Authorize(Roles = "Driver")]
+    public async Task<IActionResult> CompleteRide(int rideId)
+    {
+        await _mediator.Send(new CompleteRideCommand(rideId));
+        return Ok();
     }
     
     [HttpPut]
@@ -81,9 +91,11 @@ public class RideController : ControllerBase
         [FromQuery] bool ascending = true,
         [FromQuery] string destinationFrom = null,
         [FromQuery] string destinationTo = null,
-        [FromQuery] DateTime? dateOfTheRide = null)
+        [FromQuery] DateTime? dateOfTheRide = null,
+        [FromQuery] int totalSeats = 0)
     {
-        var query = new GetAllRidesQuery(userId, pageNumber, pageSize, orderBy, ascending, dateOfTheRide, destinationFrom, destinationTo);
+        var query = new GetAllRidesQuery(userId, pageNumber, pageSize, orderBy, ascending, 
+                                        dateOfTheRide, destinationFrom, destinationTo, totalSeats);
         var result = await _mediator.Send(query);
         return Ok(result);
     }
@@ -139,6 +151,16 @@ public class RideController : ControllerBase
     public async Task<ActionResult<RideFullInfoDTO>> GetRideInfoById(int rideId)
     {
         var result = await _mediator.Send(new GetRideInfoByIdQuery(rideId));
+        return Ok(result);
+    }
+    
+    [HttpGet]
+    [Route("completed/{userId}")]
+    [Authorize(Roles = "User, Driver")]
+    public async Task<ActionResult<List<UserDTO>>> GetInfoCompletedRides( int userId )
+    {
+        var query = new GetInfoCompletedRidesQuery(userId);
+        var result = await _mediator.Send(query);
         return Ok(result);
     }
 }

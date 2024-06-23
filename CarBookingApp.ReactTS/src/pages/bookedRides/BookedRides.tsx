@@ -29,6 +29,26 @@ export default function BookedRides() {
         fontFamily: "Raleway",
         marginBottom: 2,
     };
+    const mainTypographyStyle = {
+        fontSize: {
+            xs: "1.4rem",
+            sm: "1.6rem",
+            md: "1.8rem",
+            lg: "2.0rem",
+        },
+        fontFamily: "Raleway",
+        marginBottom: 2,
+        mr: {
+            xs: 0,
+            sm: 10,
+            md: 20,
+            lg: 10,
+        },
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center"
+    };
     const imageStyle = {
         width: {
             xs: "70%",
@@ -105,6 +125,12 @@ export default function BookedRides() {
                 </Box>
             ) : (
                 <>
+                    <Typography
+                        color="textSecondary"
+                        sx={mainTypographyStyle}
+                    >
+                        Booked rides
+                    </Typography>
                     <Grid container spacing={2} direction="row" wrap="wrap" alignItems="center" justifyContent="center" flexGrow={2}>
                         {rides.map((ride) => (
                             <Grid item xs={6} sm={5} md={4} lg={3} key={ride.id}>
