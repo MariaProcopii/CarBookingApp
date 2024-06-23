@@ -7,6 +7,7 @@ import {
     SearchParams, 
     VehicleDetailsParams,
 } from "./types";
+import { TOwner } from "../../models/Owner";
 
 function RideService(instance: AxiosInstance | null) {
 
@@ -34,7 +35,7 @@ function RideService(instance: AxiosInstance | null) {
     ): Promise<void> {
         try {
             handleClose();
-            const query = `destinationFrom=${searchParams.destinationFrom}&destinationTo=${searchParams.destinationTo}&dateOfTheRide=${searchParams.date}`;
+            const query = `destinationFrom=${searchParams.destinationFrom}&destinationTo=${searchParams.destinationTo}&dateOfTheRide=${searchParams.date}&totalSeats=${searchParams.seats}`;
             const response = await instance?.get(`/ride/${nameIdentifier}?${query}`);
             setRides(response?.data.items);
             setTotalPages(response?.data.totalPages);
@@ -218,6 +219,19 @@ function RideService(instance: AxiosInstance | null) {
         }
     }
 
+    async function completeRide(
+        rideID: number,
+        setSnackbar: (obj: {open: boolean; message: string; severity: string;}) => void,
+    ): Promise<void> {
+        try {
+            await instance?.put(`/ride/complete/${rideID}`);
+            setSnackbar({ open: true, message: "Complete ride successfully!", severity: "success" });
+        } catch(error) {
+            setSnackbar({ open: true, message: "Can't complete the ride witch doesn't contain passenger.", severity: "error" });
+            console.log(error);
+        }
+    }
+
     async function fetchPendingRides(
         nameIdentifier: string,
         pageIndex: number,
@@ -263,6 +277,19 @@ function RideService(instance: AxiosInstance | null) {
         }
     }
 
+    async function fetchCompletedRidesOwnerInfo(
+        nameIdentifier: string,
+        setCompletedRidesOwner: (newRidesOwnerInfo: TOwner[]) => void
+    ): Promise<void> {
+        try {
+            const response = await instance?.get(`/ride/completed/${nameIdentifier}`);
+            setCompletedRidesOwner(response?.data);
+            console.log(response?.data);
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
     return {
         fetchRides,
         fetchRidesWithParams,
@@ -279,9 +306,11 @@ function RideService(instance: AxiosInstance | null) {
         unsubscribeFromRide,
         fetchBookedRides,
         deleteRide,
+        completeRide,
         fetchPendingRides,
         fetchCreatedRides,
         fetchUserPendingRides,
+        fetchCompletedRidesOwnerInfo
     };
 }
 

@@ -18,5 +18,10 @@ public class UserRideConfiguration : IEntityTypeConfiguration<UserRide>
             .HasConversion(r => r.ToString(), 
                 r => Enum.Parse<RideStatus>(r))
             .HasDefaultValue(RideStatus.UPCOMING);
+        
+        builder.Property(pr => pr.ReviewDialog)
+            .HasConversion(r => r.ToString(), 
+                r => Enum.Parse<ReviewDialog>(r))
+            .HasDefaultValue(ReviewDialog.NOTSENT);
     }
 }

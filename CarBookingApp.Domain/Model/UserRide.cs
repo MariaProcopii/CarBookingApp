@@ -10,5 +10,6 @@ public class UserRide : Entity
     public Ride Ride { get; set; }
     public BookingStatus BookingStatus { get; set; }
     public RideStatus RideStatus { get; set; }
+    public ReviewDialog ReviewDialog { get; set; }
 
 }

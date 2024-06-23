@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import useAuth from "../../context/auth/UseAuth";
 import { hasRole, useTokenDecoder } from "../../utils/TokenUtils";
-import TipDialog from "../tipDialog/TipDialog";
 
 interface Props {
     openRideDetails: boolean;
@@ -61,8 +60,8 @@ export default function RideDetails({ openRideDetails, setOpenRideDetails, rideI
     const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
     const [isUnsubscribeBDisabled, setUnsubscribeBDisabled] = useState(false);
     const [isDeleteBDisabled, setDeleteBDisabled] = useState(false);
+    const [isCompleteBDisabled, setCompleteBDisabled] = useState(false);
     const [openEditRide, setOpenEditRide] = useState(false);
-    const [openTipDialog, setOpenTipDialog] = useState(false);
 
     const { token } = useAuth();
     const claims = useTokenDecoder(token ? token : "");
@@ -73,6 +72,7 @@ export default function RideDetails({ openRideDetails, setOpenRideDetails, rideI
         bookRide,
         unsubscribeFromRide,
         deleteRide,
+        completeRide
     } = RideService(instance);
 
     useEffect(() => {
@@ -125,14 +125,20 @@ export default function RideDetails({ openRideDetails, setOpenRideDetails, rideI
           }, 1000);
     }
 
+    const handleCompleteRide = () => {
+        completeRide(rideId, setSnackbar);
+        setCompleteBDisabled(true);
+
+        setTimeout(() => {
+            setOpenRideDetails(false);
+            window.location.reload();
+          }, 1000);
+    }
+
     const handleOpenEditRideDialog = () => {
         setOpenRideDetails(false);
         setOpenEditRide(true)
     }
-
-    const handleOpenTipDialog = () => {
-        setOpenTipDialog(true);
-    };
 
     return (
         <>
@@ -211,6 +217,18 @@ export default function RideDetails({ openRideDetails, setOpenRideDetails, rideI
                                                     fullWidth
                                                     variant="contained"
                                                     color="primary"
+                                                    disabled={isCompleteBDisabled}
+                                                    sx={buttonStyle}
+                                                    onClick={handleCompleteRide}
+                                                >
+                                                    Complete ride
+                                                </Button>
+                                            </Box>
+                                            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+                                                <Button
+                                                    fullWidth
+                                                    variant="contained"
+                                                    color="primary"
                                                     disabled={isDeleteBDisabled}
                                                     sx={buttonStyle}
                                                     onClick={handleDeleteRide}
@@ -248,19 +266,6 @@ export default function RideDetails({ openRideDetails, setOpenRideDetails, rideI
                                             </Button>
                                         </Box>
                                     )}
-                                    {action === "tip" && (
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                            <Button
-                                                fullWidth
-                                                variant="contained"
-                                                color="primary"
-                                                sx={buttonStyle}
-                                                onClick={handleOpenTipDialog}
-                                            >
-                                                Leave a Tip
-                                            </Button>
-                                        </Box>
-                                    )}
                                 </Container>
                             </DialogContent>
                             <CustomSnackbar
@@ -278,12 +283,6 @@ export default function RideDetails({ openRideDetails, setOpenRideDetails, rideI
                                 setRideDetails={setRideDetails}
                             />
                         }
-                        <TipDialog
-                            open={openTipDialog}
-                            onClose={() => setOpenTipDialog(false)}
-                            driverEmail={"sb-yi8si31297448@business.example.com"}
-                            tipperEmail={"sb-hg6lf31201930@personal.example.com"}
-                        />
                     </>
                     :
                     <></>

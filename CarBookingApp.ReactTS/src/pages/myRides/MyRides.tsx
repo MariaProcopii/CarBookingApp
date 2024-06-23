@@ -11,8 +11,6 @@ import {
 } from "@mui/material";
 import useAPI from "../../context/api/UseAPI";
 import RideService from "../../services/rideService/RideService";
-import CustomSnackbar from "../../components/customSnackbar/CustomSnackbar";
-import { useLocation } from 'react-router-dom';
 
 export default function MyRides() {
     const containerStyle = {
@@ -30,6 +28,26 @@ export default function MyRides() {
         },
         fontFamily: "Raleway",
         marginBottom: 2,
+    };
+    const mainTypographyStyle = {
+        fontSize: {
+            xs: "1.4rem",
+            sm: "1.6rem",
+            md: "1.8rem",
+            lg: "2.0rem",
+        },
+        fontFamily: "Raleway",
+        marginBottom: 2,
+        mr: {
+            xs: 0,
+            sm: 10,
+            md: 20,
+            lg: 10,
+        },
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center"
     };
     const imageStyle = {
         width: {
@@ -61,9 +79,6 @@ export default function MyRides() {
     const [pageIndex, setPageIndex] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    const location = useLocation();
-    const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
     const { theme } = useTheme();
 
     const { token } = useAuth();
@@ -71,16 +86,6 @@ export default function MyRides() {
 
     const { instance } = useAPI();
     const { fetchCreatedRides } = RideService(instance);
-
-    useEffect(() => {
-        if (location.state) {
-        setSnackbar({
-            open: location.state.open,
-            message: location.state.message,
-            severity: location.state.severity
-        });
-        }
-    }, [location.state]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -120,12 +125,18 @@ export default function MyRides() {
                 </Box>
             ) : (
                 <>
+                    <Typography
+                        color="textSecondary"
+                        sx={mainTypographyStyle}
+                    >
+                        My rides
+                    </Typography>
                     <Grid container spacing={2} direction="row" wrap="wrap" alignItems="center" justifyContent="center" flexGrow={2}>
                         {rides.map((ride) => (
                             <Grid item xs={6} sm={5} md={4} lg={3} key={ride.id}>
                                 <Grow in={true} timeout={500}>
                                     <div>
-                                        <SmallRideCard ride={ride} action={"tip"} />
+                                        <SmallRideCard ride={ride} action={"edit"} />
                                     </div>
                                 </Grow>
                             </Grid>
@@ -140,12 +151,6 @@ export default function MyRides() {
                             sx={paginationStyle}
                         />
                     </Grid>
-                    <CustomSnackbar 
-                        open={snackbar.open} 
-                        message={snackbar.message} 
-                        severity={snackbar.severity} 
-                        onClose={() => setSnackbar({ ...snackbar, open: false })}
-                    />
                 </>
             )}
         </Container>

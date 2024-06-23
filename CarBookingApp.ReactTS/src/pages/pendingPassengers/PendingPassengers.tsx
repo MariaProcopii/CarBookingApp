@@ -24,6 +24,26 @@ export default function PendingPassengers() {
         fontFamily: "Raleway",
         marginBottom: 2
     };
+    const mainTypographyStyle = {
+        fontSize: {
+            xs: "1.4rem",
+            sm: "1.6rem",
+            md: "1.8rem",
+            lg: "2.0rem",
+        },
+        fontFamily: "Raleway",
+        marginBottom: 2,
+        mr: {
+            xs: 0,
+            sm: 10,
+            md: 20,
+            lg: 10,
+        },
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center"
+    };
     const imageStyle = {
         width: {
             xs: "70%",
@@ -101,7 +121,7 @@ export default function PendingPassengers() {
                         color="textSecondary"
                         sx={typographyStyle}
                     >
-                        No pending users
+                        No Pending Passengers
                     </Typography>
                     <CardMedia
                         component="img"
@@ -112,6 +132,12 @@ export default function PendingPassengers() {
                 </Box>
             ) : (
                 <>
+                    <Typography
+                        color="textSecondary"
+                        sx={mainTypographyStyle}
+                    >
+                        Pending Passengers
+                    </Typography>
                     <Grid container spacing={5} direction="row" wrap="wrap" alignItems="center" justifyContent="center">
                         {pendingUsersInfo.map((user: any) => (
                             <Grid item xs={12} sm={9} md={7} lg={6} key={user.userInfo.Id}>

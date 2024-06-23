@@ -5,11 +5,15 @@ import useAPI from "../../context/api/UseAPI";
 import RideService from "../../services/rideService/RideService";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import { TRide } from "../../models/Ride";
+import { TOwner } from "../../models/Owner";
 import { useEffect, useState } from "react";
 import { Grid, Box, Container, useMediaQuery, Button, Dialog, DialogContent, Grow } from "@mui/material";
 import useAuth from "../../context/auth/UseAuth";
 import { useTokenDecoder } from "../../utils/TokenUtils";
 import { useTheme } from "@mui/material/styles";
+import RideReviewDialog from "../../components/rideReviewDialog/RideReviewDialog";
+import CustomSnackbar from "../../components/customSnackbar/CustomSnackbar";
+import { useLocation } from 'react-router-dom';
 
 export default function AvailableRides() {
     const containerStyle = {
@@ -45,9 +49,13 @@ export default function AvailableRides() {
     };
 
     const [rides, setRides] = useState<TRide[]>([] as TRide[]);
+    const [completedRidesOwner, setCompletedRidesOwner] = useState<TOwner[]>([] as TOwner[]);
     const [pageIndex, setPageIndex] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [open, setOpen] = useState(false);
+    const [openRideReview, setOpenRideReview] = useState<boolean[]>([] as boolean[]);
+    const location = useLocation();
+    const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -56,7 +64,7 @@ export default function AvailableRides() {
     const claims = useTokenDecoder(token ? token : "");
 
     const { instance } = useAPI();
-    const { fetchRides } = RideService(instance);
+    const { fetchRides, fetchCompletedRidesOwnerInfo } = RideService(instance);
 
     useEffect(() => {
         setTimeout(() => {
@@ -69,12 +77,42 @@ export default function AvailableRides() {
         }, 10);
     }, [pageIndex]);
 
+    useEffect(() => {
+        setTimeout(() => {
+            fetchCompletedRidesOwnerInfo(
+                claims.nameidentifier as string,
+                (owners) => {
+                    setCompletedRidesOwner(owners);
+                    setOpenRideReview(new Array(owners.length).fill(true));
+                }
+            );
+        }, 30);
+    }, [pageIndex]);
+
+    useEffect(() => {
+        if (location.state) {
+        setSnackbar({
+            open: location.state.open,
+            message: location.state.message,
+            severity: location.state.severity
+        });
+        }
+    }, [location.state]);
+
     const handleClickOpen = () => {
         setOpen(true);
     };
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleCloseRideReview = (index: number) => {
+        setOpenRideReview((prev) => {
+            const newOpenRideReview = [...prev];
+            newOpenRideReview[index] = false;
+            return newOpenRideReview;
+        });
     };
 
     return (
@@ -131,6 +169,14 @@ export default function AvailableRides() {
                     </Grid>
                 ))}
             </Grid>
+            {completedRidesOwner.map((owner, index) => (
+                <RideReviewDialog 
+                    key={owner.id}
+                    open={openRideReview[index]}
+                    handleClose={() => handleCloseRideReview(index)}
+                    owner={owner}
+                />
+            ))}
             <Box mb={10} />
             <Grid container direction="row" alignItems="center" justifyContent="center" >
                 <Pagination count={totalPages}
@@ -140,6 +186,12 @@ export default function AvailableRides() {
                     sx={paginationStyle}
                 />
             </Grid>
+            <CustomSnackbar 
+                open={snackbar.open} 
+                message={snackbar.message} 
+                severity={snackbar.severity} 
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            />
         </Container >
     )
 }

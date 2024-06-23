@@ -4,5 +4,5 @@ public enum RideStatus
 {
     UPCOMING,
     ONGOING,
-    COMLETED
+    COMPLETED
 }

@@ -223,7 +223,7 @@ export default function SearchBar({ setRides, setTotalPages, handleClose }: Prop
                             sx={{ minWidth: "200px" }}
                             size="small"
                             inputProps={{ maxLength: 30 }}
-                            label="Seats"
+                            label="Total Seats"
                             type="number"
                             value={seats}
                             onChange={(e) => setSeats(parseInt(e.target.value, 10))}

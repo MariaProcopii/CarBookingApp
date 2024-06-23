@@ -3,6 +3,7 @@ using AutoMapper;
 using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Application.Common.Models;
 using CarBookingApp.Application.Rides.Responses;
+using CarBookingApp.Domain.Enum;
 using CarBookingApp.Domain.Model;
 using MediatR;
 
@@ -26,6 +27,10 @@ public class GetCreatedRidesQueryHandler : IRequestHandler<GetCreatedRidesQuery,
         int pageNumber = request.PageNumber;
         int pageSize = request.PageSize;
 
+        var completedUserRides = await _repository.GetByPredicate<UserRide>(
+            ur => ur.RideStatus == RideStatus.COMPLETED);
+        var completedUserRidesLookup = completedUserRides.ToLookup(ur => ur.RideId, ur => ur);
+        
         Expression<Func<Ride, bool>> filter = r => r.Owner.Id.Equals(request.UserId);
 
         Expression<Func<Ride, object>> orderBy = request.OrderBy.ToLower() switch
@@ -48,7 +53,7 @@ public class GetCreatedRidesQueryHandler : IRequestHandler<GetCreatedRidesQuery,
             r => r.RideDetail
         );
 
-        var rides = ridesPaginated.Items;
+        var rides = ridesPaginated.Items.Where(r => !completedUserRidesLookup.Contains(r.Id));
         
         var rideDTOs = _mapper.Map<List<RideCreatedInfoDTO>>(rides);
 
