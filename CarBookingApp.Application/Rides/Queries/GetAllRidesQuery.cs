@@ -38,16 +38,6 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
         int pageNumber = request.PageNumber;
         int pageSize = request.PageSize;
 
-        var approvedUserRides = await _repository.GetByPredicate<UserRide>(
-            ur => ur.BookingStatus == BookingStatus.APPROVED,
-            ur => ur.Ride);
-        
-        var completedUserRides = await _repository.GetByPredicate<UserRide>(
-            ur => ur.RideStatus == RideStatus.COMPLETED);
-
-        var approvedPassengersLookup = approvedUserRides.ToLookup(ur => ur.RideId, ur => ur);
-        var completedUserRidesLookup = completedUserRides.ToLookup(ur => ur.RideId, ur => ur);
-
         Expression<Func<Ride, bool>> filter = r => r.Owner.Id != request.UserId
                                                    && r.DateOfTheRide > DateTime.Now
                                                    && !r.Passengers.Select(p => p.Id).Contains(request.UserId);
@@ -69,7 +59,7 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
 
         if (request.DateOfTheRide.HasValue)
         {
-            filter = filter.AndAlso(r => r.DateOfTheRide == request.DateOfTheRide.Value);
+            filter = filter.AndAlso(r => r.DateOfTheRide.Date == request.DateOfTheRide);
         }
 
         Expression<Func<Ride, object>> orderBy = request.OrderBy.ToLower() switch
@@ -93,14 +83,9 @@ public class GetAllRidesQueryHandler : IRequestHandler<GetAllRidesQuery, Paginat
             r => r.RideDetail
         );
 
-        var filteredRides = rides.Items.Where(r =>
-            ((!approvedPassengersLookup.Contains(r.Id) || approvedPassengersLookup[r.Id].Count() < r.TotalSeats) 
-             && !completedUserRidesLookup.Contains(r.Id))
-        ).ToList();
+        var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(rides.Items);
 
-        var rideDTOs = _mapper.Map<List<RideShortInfoDTO>>(filteredRides);
-
-        return new PaginatedList<RideShortInfoDTO>(rideDTOs, filteredRides.Count, rides.PageIndex, rides.PageSize);
+        return new PaginatedList<RideShortInfoDTO>(rideDTOs, rides.TotalCount, rides.PageIndex, rides.PageSize);
     }
 }
 
