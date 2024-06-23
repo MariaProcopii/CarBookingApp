@@ -112,7 +112,6 @@ function RideService(instance: AxiosInstance | null) {
             setOpen(false);
             setVehicleDetail(response?.data);
         } catch(error) {
-            console.log("NOT CLOSING");
             setOpen(true);
             console.log(error);
         }

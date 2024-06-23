@@ -11,14 +11,13 @@ import BookedRides from "../pages/bookedRides/BookedRides";
 import PendingRides from "../pages/pendingRides/PendingRides";
 import PendingPassengers from "../pages/pendingPassengers/PendingPassengers";
 import { Routes, Route } from "react-router-dom";
+import { ExecutePayment } from "../components/executePaymen/ExecutePayment";
 
 export default function AppRoutes() {
 
     return (
         <>
             <Routes>
-                <Route path="/service" element={<div>Service Page</div>} />
-                <Route path="/about-us" element={<div>About Us</div>} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="*" element={<div>Not Found</div>} />
@@ -34,6 +33,7 @@ export default function AppRoutes() {
                         <Route path="booked-rides" element={<BookedRides />} />
                         <Route path="pending-rides" element={<PendingRides />} />
                         <Route path="pending-passengers" element={<PendingPassengers />}/>
+                        <Route path="/payment/execute" element={<ExecutePayment />} />
                     </Route>
                 </Route>
             </Routes>

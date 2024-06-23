@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import useAPI from "../../context/api/UseAPI";
 import RideService from "../../services/rideService/RideService";
+import CustomSnackbar from "../../components/customSnackbar/CustomSnackbar";
+import { useLocation } from 'react-router-dom';
 
 export default function MyRides() {
     const containerStyle = {
@@ -59,6 +61,9 @@ export default function MyRides() {
     const [pageIndex, setPageIndex] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
+    const location = useLocation();
+    const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
     const { theme } = useTheme();
 
     const { token } = useAuth();
@@ -66,6 +71,16 @@ export default function MyRides() {
 
     const { instance } = useAPI();
     const { fetchCreatedRides } = RideService(instance);
+
+    useEffect(() => {
+        if (location.state) {
+        setSnackbar({
+            open: location.state.open,
+            message: location.state.message,
+            severity: location.state.severity
+        });
+        }
+    }, [location.state]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -110,7 +125,7 @@ export default function MyRides() {
                             <Grid item xs={6} sm={5} md={4} lg={3} key={ride.id}>
                                 <Grow in={true} timeout={500}>
                                     <div>
-                                        <SmallRideCard ride={ride} action={"edit"} />
+                                        <SmallRideCard ride={ride} action={"tip"} />
                                     </div>
                                 </Grow>
                             </Grid>
@@ -125,6 +140,12 @@ export default function MyRides() {
                             sx={paginationStyle}
                         />
                     </Grid>
+                    <CustomSnackbar 
+                        open={snackbar.open} 
+                        message={snackbar.message} 
+                        severity={snackbar.severity} 
+                        onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    />
                 </>
             )}
         </Container>

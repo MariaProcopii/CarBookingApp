@@ -2,12 +2,13 @@ using CarBookingApp.Application.Abstractions;
 using CarBookingApp.Domain.Auth;
 using CarBookingApp.Infrastructure.Configurations;
 using CarBookingApp.Infrastructure.Identity;
+using CarBookingApp.Infrastructure.Options;
+using CarBookingApp.Infrastructure.PayPal;
 using CarBookingApp.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace CarBookingApp.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
@@ -33,5 +34,7 @@ public static class ServiceCollectionExtension
             .AddEntityFrameworkStores<CarBookingAppDbContext>();
 
         svcs.AddTransient<IJwtService, JwtService>();
+
+        svcs.AddScoped<IPaymentService, PayPalService>();
     }
 }
